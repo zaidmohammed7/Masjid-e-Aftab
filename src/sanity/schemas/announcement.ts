@@ -21,7 +21,7 @@ export const announcementType = defineType({
           { title: 'Image', value: 'image' },
           { title: 'Video', value: 'video' },
           { title: 'Text', value: 'text' },
-          { title: 'PDF', value: 'pdf' },
+          { title: 'Document (PDF/Word)', value: 'pdf' },
         ],
         layout: 'radio',
       },
@@ -43,9 +43,9 @@ export const announcementType = defineType({
     }),
     defineField({
       name: 'contentVideo',
-      title: 'Content: Video (URL or File)',
-      type: 'url', // Alternatively, a file if preferring to host
-      description: 'Provide an external video URL (e.g. YouTube or direct link)',
+      title: 'Content: Video',
+      type: 'file',
+      options: { accept: 'video/*' },
       hidden: ({ document }) => document?.type !== 'video',
     }),
     defineField({
@@ -56,9 +56,9 @@ export const announcementType = defineType({
     }),
     defineField({
       name: 'contentPdf',
-      title: 'Content: PDF',
+      title: 'Content: Document (PDF/Word)',
       type: 'file',
-      options: { accept: 'application/pdf' },
+      options: { accept: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
       hidden: ({ document }) => document?.type !== 'pdf',
     }),
     defineField({
@@ -69,6 +69,7 @@ export const announcementType = defineType({
         list: [
           { title: 'Urdu', value: 'urdu' },
           { title: 'English', value: 'english' },
+          { title: 'Both (English & Urdu)', value: 'both' },
         ],
         layout: 'radio',
       },

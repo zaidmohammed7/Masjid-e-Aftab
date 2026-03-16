@@ -8,7 +8,7 @@ import clsx from "clsx";
 type Announcement = {
   _id: string;
   type: "audio" | "image" | "video" | "text" | "pdf";
-  language: "urdu" | "english";
+  language: "urdu" | "english" | "both";
   timestamp: string;
   contentImage?: string;
   contentAudio?: string;
@@ -19,10 +19,10 @@ type Announcement = {
 };
 
 export default function FeedClient({ announcements }: { announcements: Announcement[] }) {
-  const [activeLang, setActiveLang] = useState<"urdu" | "english">("urdu");
+  const [activeLang, setActiveLang] = useState<"urdu" | "english" | "all">("urdu");
 
   const filteredAnnouncements = announcements.filter(
-    (a) => a.language === activeLang
+    (a) => activeLang === "all" || a.language === "both" || a.language === activeLang
   );
 
   return (
@@ -40,28 +40,40 @@ export default function FeedClient({ announcements }: { announcements: Announcem
       {/* Floating Header Container */}
       <div className="sticky top-4 z-50 px-4">
         {/* Language Toggle */}
-        <div className="flex z-10 p-1.5 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-[2rem] max-w-[320px] mx-auto shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)] border border-white/50 dark:border-gray-800 relative">
+        <div className="flex z-10 p-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl rounded-[2.5rem] max-w-[360px] mx-auto shadow-2xl border border-white/40 dark:border-gray-800 relative ring-1 ring-black/5">
           <button
-            onClick={() => setActiveLang("urdu")}
+            onClick={() => setActiveLang("all")}
             className={clsx(
-              "flex-1 flex items-center justify-center py-3.5 rounded-[1.75rem] transition-all duration-300 relative z-10 text-lg font-bold outline-none",
-              activeLang === "urdu"
-                ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md transform scale-[1.02]"
-                : "text-gray-500 hover:text-gray-700"
+              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tighter",
+              activeLang === "all"
+                ? "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-800 shadow-lg scale-105"
+                : "text-gray-500 hover:text-gray-800"
             )}
           >
-            اردو (Urdu)
+            All
           </button>
           <button
             onClick={() => setActiveLang("english")}
             className={clsx(
-              "flex-1 flex items-center justify-center py-3.5 rounded-[1.75rem] transition-all duration-300 relative z-10 text-lg font-bold outline-none",
+              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tighter mx-1",
               activeLang === "english"
-                ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-[1.02]"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg scale-105"
+                : "text-gray-500 dark:text-gray-400 hover:text-blue-600"
             )}
           >
             English
+          </button>
+          <button
+            onClick={() => setActiveLang("urdu")}
+            className={clsx(
+              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none",
+              activeLang === "urdu"
+                ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg scale-105"
+                : "text-gray-500 hover:text-emerald-600"
+            )}
+          >
+            <span className="text-xl">اردو</span>
+            <span className="ml-1.5 text-[10px] font-bold opacity-80 translate-y-[2px]">(Urdu)</span>
           </button>
         </div>
       </div>
@@ -85,13 +97,20 @@ export default function FeedClient({ announcements }: { announcements: Announcem
 function AnnouncementCard({ item }: { item: Announcement }) {
   return (
     <div className="overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_15px_45px_-15px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[2.5rem] p-3 transition-colors duration-300">
-      {item.title && (
-        <div className="px-5 pt-4 pb-3 border-b border-[var(--card-border)] mb-3">
-           <h3 className="text-2xl font-black text-[var(--card-text)] tracking-tight leading-tight">
+      <div className="flex justify-between items-center px-5 pt-4 pb-3 border-b border-[var(--card-border)] mb-3">
+        {item.title ? (
+           <h3 className="text-2xl font-black text-[var(--card-text)] tracking-tight leading-tight flex-1">
              {item.title}
            </h3>
+        ) : <div className="flex-1"></div>}
+        
+        <div className={clsx(
+          "ml-3 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm",
+          item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+        )}>
+           {item.language === "both" ? "Urdu/Eng" : item.language}
         </div>
-      )}
+      </div>
       <div className="rounded-[1.8rem] overflow-hidden">
         {item.type === "audio" && <AudioPlayer fileUrl={item.contentAudio} />}
         {item.type === "image" && (

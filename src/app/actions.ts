@@ -18,8 +18,8 @@ export async function publishAnnouncement(data: FormData) {
     token,
   });
 
-  const type = data.get("type") as "audio" | "image" | "text" | "pdf" | null;
-  const language = data.get("language") as "urdu" | "english" || "urdu";
+  const type = data.get("type") as "audio" | "image" | "video" | "text" | "pdf" | null;
+  const language = data.get("language") as "urdu" | "english" | "both" || "urdu";
   const file = data.get("file") as File | null;
   const textContent = data.get("textContent") as string | null;
   const rawTitle = data.get("title") as string | null;
@@ -41,10 +41,10 @@ export async function publishAnnouncement(data: FormData) {
       document.contentText = textContent;
     } else if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const assetType = (type === "audio" || type === "pdf") ? "file" : "image";
+      const assetType = (type === "audio" || type === "pdf" || type === "video") ? "file" : "image";
       
       const asset = await client.assets.upload(assetType, buffer, {
-        filename: file.name || `upload_${Date.now()}.${type === "audio" ? "webm" : type === "pdf" ? "pdf" : "jpg"}`,
+        filename: file.name || `upload_${Date.now()}.${type === "audio" ? "webm" : type === "pdf" ? "pdf" : type === "video" ? "mp4" : "jpg"}`,
       });
 
       if (type === "audio") {
@@ -54,6 +54,11 @@ export async function publishAnnouncement(data: FormData) {
         };
       } else if (type === "pdf") {
         document.contentPdf = {
+          _type: "file",
+          asset: { _type: "reference", _ref: asset._id },
+        };
+      } else if (type === "video") {
+        document.contentVideo = {
           _type: "file",
           asset: { _type: "reference", _ref: asset._id },
         };
@@ -113,7 +118,8 @@ export async function updateAnnouncement(data: FormData) {
 
   const id = data.get("id") as string;
   const title = data.get("title") as string | null;
-  const type = data.get("type") as "audio" | "image" | "text" | "pdf";
+  const type = data.get("type") as "audio" | "image" | "video" | "text" | "pdf";
+  const language = data.get("language") as "urdu" | "english" | "both";
   const textContent = data.get("textContent") as string | null;
   const file = data.get("file") as File | null;
 
@@ -130,7 +136,7 @@ export async function updateAnnouncement(data: FormData) {
 
     if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const assetType = (type === "audio" || type === "pdf") ? "file" : "image";
+      const assetType = (type === "audio" || type === "pdf" || type === "video") ? "file" : "image";
       
       const asset = await client.assets.upload(assetType, buffer, {
         filename: file.name || `update_${Date.now()}.${type === "audio" ? "webm" : type === "pdf" ? "pdf" : "jpg"}`,
@@ -140,6 +146,8 @@ export async function updateAnnouncement(data: FormData) {
         patch.set({ contentAudio: { _type: "file", asset: { _type: "reference", _ref: asset._id } } });
       } else if (type === "pdf") {
         patch.set({ contentPdf: { _type: "file", asset: { _type: "reference", _ref: asset._id } } });
+      } else if (type === "video") {
+        patch.set({ contentVideo: { _type: "file", asset: { _type: "reference", _ref: asset._id } } });
       } else {
         patch.set({ contentImage: { _type: "image", asset: { _type: "reference", _ref: asset._id } } });
       }

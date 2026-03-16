@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock } from "lucide-react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
@@ -9,16 +9,18 @@ import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayer
 type Announcement = {
   _id: string;
   type: "audio" | "image" | "video" | "text" | "pdf";
-  language: "urdu" | "english";
+  language: "urdu" | "english" | "both";
   timestamp: string;
   title?: string;
   contentText?: string;
   contentImage?: string;
   contentAudio?: string;
+  contentVideo?: string;
   contentPdf?: string;
 };
 
 // Reusable TimePicker ensuring uniform cross-platform UI
+// Custom Select Component for a more "Pro" feel
 function TimePicker({ value, onChange }: { value: string, onChange: (val: string) => void }) {
   const [h, mAmpm] = value.split(":");
   const [m, ampmRaw] = (mAmpm || "").split(" ");
@@ -27,54 +29,85 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   const minute = m ? String(parseInt(m)).padStart(2, '0') : "00";
   const ampm = (ampmRaw || "PM").toUpperCase();
 
-  const handleUpdate = (newH: string, newM: string, newAmPm: string) => {
-    onChange(`${newH}:${newM} ${newAmPm}`);
+  const handleHourChange = (newVal: string) => {
+    let val = parseInt(newVal);
+    if (isNaN(val)) return;
+    if (val < 1) val = 1;
+    if (val > 12) val = 12;
+    onChange(`${String(val).padStart(2, '0')}:${minute} ${ampm}`);
   };
 
-  const hours = Array.from({length: 12}, (_, i) => String(i + 1).padStart(2, '0'));
-  const minutes = Array.from({length: 60}, (_, i) => String(i).padStart(2, '0'));
+  const handleMinuteChange = (newVal: string) => {
+    let val = parseInt(newVal);
+    if (isNaN(val)) return;
+    if (val < 0) val = 0;
+    if (val > 59) val = 59;
+    onChange(`${hour}:${String(val).padStart(2, '0')} ${ampm}`);
+  };
 
   return (
-    <div className="flex gap-2 text-xl w-full">
-      <select 
-        value={hour} 
-        onChange={e => handleUpdate(e.target.value, minute, ampm)}
-        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
-      >
-        {hours.map(hr => <option key={hr} value={hr}>{hr}</option>)}
-      </select>
-      <span className="text-3xl font-black text-gray-400 self-center mb-1">:</span>
-      <select 
-        value={minute} 
-        onChange={e => handleUpdate(hour, e.target.value, ampm)}
-        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
-      >
-        {minutes.map(mn => <option key={mn} value={mn}>{mn}</option>)}
-      </select>
-      <select 
-        value={ampm} 
-        onChange={e => handleUpdate(hour, minute, e.target.value)}
-        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner transition-colors focus:bg-emerald-50 appearance-none custom-select-arrow"
-      >
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
+    <div className="flex gap-4 items-center w-full">
+      <div className="flex flex-1 items-center gap-2 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-sm focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+        <div className="flex-1 flex flex-col items-center">
+           <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">HH</span>
+           <input 
+             type="number"
+             min="1"
+             max="12"
+             value={hour}
+             onChange={(e) => handleHourChange(e.target.value)}
+             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
+             style={{ MozAppearance: 'textfield' }}
+           />
+        </div>
+        <span className="text-2xl font-black text-gray-200">:</span>
+        <div className="flex-1 flex flex-col items-center">
+           <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">MM</span>
+           <input 
+             type="number"
+             min="0"
+             max="59"
+             value={minute}
+             onChange={(e) => handleMinuteChange(e.target.value)}
+             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
+             style={{ MozAppearance: 'textfield' }}
+           />
+        </div>
+      </div>
+      
+      <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl shadow-inner gap-1">
+        <button 
+          onClick={() => onChange(`${hour}:${minute} AM`)}
+          className={clsx(
+            "px-4 py-2 rounded-xl text-[10px] font-black transition-all", 
+            ampm === "AM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
+          )}
+        >AM</button>
+        <button 
+          onClick={() => onChange(`${hour}:${minute} PM`)}
+          className={clsx(
+            "px-4 py-2 rounded-xl text-[10px] font-black transition-all", 
+            ampm === "PM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
+          )}
+        >PM</button>
+      </div>
     </div>
   );
 }
 
 export default function AdminClient({ announcements, initialPrayerTimes }: { announcements: Announcement[], initialPrayerTimes: any }) {
-  const [activeTab, setActiveTab] = useState<"announcements" | "prayerTimes">("announcements");
+  const [activeTab, setActiveTab] = useState<"announcements" | "prayerTimes" | "imaamsCorner">("announcements");
+  const [adminLang, setAdminLang] = useState<"all" | "urdu" | "english">("all");
   const router = useRouter();
 
   // Post Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [postType, setPostType] = useState<"audio" | "image" | "text" | "pdf" | null>(null);
+  const [postType, setPostType] = useState<"audio" | "image" | "video" | "text" | "pdf" | null>(null);
   const [postTitle, setPostTitle] = useState("");
   const [textContent, setTextContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [postLang, setPostLang] = useState<"urdu" | "english">("urdu");
+  const [postLang, setPostLang] = useState<"urdu" | "english" | "both">("urdu");
 
   // Audio Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -242,7 +275,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         }
       `}} />
       {/* Premium Gradient Header block - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
           <Lock size={160} />
         </div>
@@ -251,72 +284,100 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
         <div className="absolute bottom-[-10%] -left-10 w-40 h-40 bg-emerald-400 rounded-full mix-blend-screen opacity-20 blur-2xl"></div>
         
-        <div className="absolute top-4 right-4 z-20">
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 bg-black/20 hover:bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/10 transition-all active:scale-95 text-[10px]"
-          >
-            <LogOut size={14} />
-            <span className="font-bold uppercase tracking-wider">Logout</span>
-          </button>
-        </div>
-
-        <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg">
+        <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white">
           Admin Control
         </h1>
         <p className="text-emerald-50/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">
-          Manage Announcements & Times
+          Management Dashboard
         </p>
       </div>
 
+      <div className="px-6 -mt-3 relative z-30">
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-950 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 px-6 py-3.5 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 transition-all active:scale-95 group"
+        >
+          <LogOut size={18} className="transition-transform group-hover:-translate-x-1" />
+          <span className="font-black uppercase tracking-[0.2em] text-[10px]">Logout from Session</span>
+        </button>
+      </div>
+
       {/* Tabs */}
-      <div className="flex bg-gray-200 dark:bg-gray-800 p-1 mx-6 mt-6 rounded-2xl shadow-inner">
+      <div className="flex bg-gray-100 dark:bg-gray-800/50 p-1 mx-6 mt-6 rounded-[2rem] shadow-inner">
          <button 
            onClick={() => setActiveTab("announcements")}
            className={clsx(
-             "flex-1 py-4 text-xl flex items-center justify-center gap-2 font-bold rounded-xl transition-all",
-             activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-md scale-105" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
+             activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
            )}
          >
-           <Megaphone size={28} /> Posts
+           <Megaphone size={20} /> Posts
          </button>
          <button 
            onClick={() => setActiveTab("prayerTimes")}
            className={clsx(
-             "flex-1 py-4 text-xl flex items-center justify-center gap-2 font-bold rounded-xl transition-all",
-             activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-md scale-105" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
+             activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
            )}
          >
-           <Clock size={28} /> Times
+           <Clock size={20} /> Times
+         </button>
+         <button 
+           onClick={() => setActiveTab("imaamsCorner")}
+           className={clsx(
+             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
+             activeTab === "imaamsCorner" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+           )}
+         >
+           <Star size={20} /> Imaam
          </button>
       </div>
 
-      {activeTab === "announcements" ? (
+      {activeTab === "announcements" && (
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight">Recent Posts</h2>
-          {announcements.length === 0 ? (
-            <div className="bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--card-border)] flex items-center justify-center min-h-[200px]">
-              <p className="text-gray-400 font-medium">No recent posts to show.</p>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Recent Posts</h2>
+            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl shadow-inner">
+               <button 
+                 onClick={() => setAdminLang("all")}
+                 className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "all" ? "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm" : "text-gray-400")}
+               >All</button>
+               <button 
+                 onClick={() => setAdminLang("english")}
+                 className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all mx-1", adminLang === "english" ? "bg-blue-500 text-white shadow-sm" : "text-gray-400")}
+               >English</button>
+               <button 
+                 onClick={() => setAdminLang("urdu")}
+                 className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "urdu" ? "bg-green-500 text-white shadow-sm" : "text-gray-400")}
+               >اردو</button>
+            </div>
+          </div>
+
+          {announcements.filter(a => adminLang === "all" || a.language === "both" || a.language === adminLang).length === 0 ? (
+            <div className="bg-[var(--card-bg)] p-10 rounded-3xl shadow-sm border border-[var(--card-border)] flex flex-col items-center justify-center min-h-[200px] text-center">
+              <Megaphone size={48} className="text-gray-200 mb-4" />
+              <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No {adminLang !== "all" ? adminLang : ""} posts found.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {announcements.map((item) => (
+              {announcements.filter(a => adminLang === "all" || a.language === "both" || a.language === adminLang).map((item) => (
                 <div key={item._id} className="bg-[var(--card-bg)] p-5 rounded-3xl shadow-sm border border-[var(--card-border)] flex justify-between items-center relative overflow-hidden">
                   {/* Language Tag Badge */}
                   <div className={clsx(
-                    "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-xs font-bold text-white",
-                    item.language === "urdu" ? "bg-green-500" : "bg-blue-500"
+                    "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-xs font-bold",
+                    item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                   )}>
-                     {item.language === "urdu" ? "Urdu" : "English"}
+                     {item.language === "urdu" ? "Urdu" : item.language === "english" ? "English" : "Both"}
                   </div>
                   
                   <div className="flex gap-4 items-center mt-2 flex-1 min-w-0 pr-2">
                     <div className={clsx(
-                      "p-4 rounded-2xl flex-shrink-0 text-white",
-                      item.type === "text" ? "bg-amber-400" : item.type === "audio" ? "bg-blue-400" : item.type === "pdf" ? "bg-purple-400" : "bg-emerald-400"
+                      "p-4 rounded-2xl flex-shrink-0 text-white shadow-lg",
+                      item.type === "text" ? "bg-amber-400" : item.type === "audio" ? "bg-blue-400" : item.type === "video" ? "bg-rose-400" : item.type === "pdf" ? "bg-purple-400" : "bg-emerald-400"
                     )}>
                       {item.type === "text" && <FileText size={28} />}
                       {item.type === "audio" && <Mic size={28} />}
+                      {item.type === "video" && <Video size={28} />}
                       {item.type === "image" && <ImageIcon size={28} />}
                       {item.type === "pdf" && <FileText size={28} />}
                     </div>
@@ -361,71 +422,97 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             <Plus size={40} />
           </button>
         </div>
-      ) : (
+      )}
+
+      {activeTab === "prayerTimes" && (
         <div className="p-6">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800 flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4">Manage Posts</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4 tracking-tighter uppercase">Daily Jamaat Times</h2>
               
               <div className="space-y-6">
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Fajr</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Fajr</label>
                     <TimePicker value={ptFajr} onChange={setPtFajr} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Dhuhr</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Dhuhr</label>
                     <TimePicker value={ptDhuhr} onChange={setPtDhuhr} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Asr</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Asr</label>
                     <TimePicker value={ptAsr} onChange={setPtAsr} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Maghrib</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Maghrib</label>
                     <TimePicker value={ptMaghrib} onChange={setPtMaghrib} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Isha</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Isha</label>
                     <TimePicker value={ptIsha} onChange={setPtIsha} />
                  </div>
-                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">1st Jummah Jamaat</label>
+                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-100/50">
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">1st Jummah Jamaat</label>
                     <TimePicker value={ptJummah1} onChange={setPtJummah1} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">2nd Jummah Jamaat</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">2nd Jummah Jamaat</label>
                     <TimePicker value={ptJummah2} onChange={setPtJummah2} />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">3rd Jummah Jamaat</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">3rd Jummah Jamaat</label>
                     <TimePicker value={ptJummah3} onChange={setPtJummah3} />
                  </div>
 
-                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Hadeeth Title</label>
+                 <button
+                    disabled={ptSaving}
+                    onClick={handlePrayerTimesSubmit}
+                    className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
+                 >
+                    {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={24} /> Save Times</>}
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {activeTab === "imaamsCorner" && (
+        <div className="p-6 pt-2">
+           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800">
+              <div className="flex flex-col items-center mb-8">
+                 <div className="bg-emerald-100 dark:bg-emerald-900/30 p-4 rounded-3xl text-emerald-600 dark:text-emerald-400 mb-4">
+                    <Star size={48} />
+                 </div>
+                 <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Imaam's Corner</h2>
+                 <p className="text-gray-400 font-medium">Update the Hadeeth of the Day</p>
+              </div>
+
+              <div className="space-y-6">
+                 <div className="flex flex-col gap-2">
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Hadeeth Title</label>
                     <input 
                       value={ptHadeethTitle}
                       onChange={e => setPtHadeethTitle(e.target.value)}
                       placeholder="e.g. Hadeeth of the Day"
-                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-inner"
+                      className="w-full p-4 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 shadow-sm transition-all"
                     />
                  </div>
                  <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Hadeeth Text / Message</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Hadeeth Text / Message</label>
                     <textarea 
                       value={ptHadeethText}
                       onChange={e => setPtHadeethText(e.target.value)}
                       placeholder="Type the Imaam's message or Hadeeth..."
-                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-inner"
-                      rows={4}
+                      className="w-full p-4 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 shadow-sm transition-all min-h-[150px]"
+                      rows={6}
                     />
                  </div>
 
                  <button
                     disabled={ptSaving}
                     onClick={handlePrayerTimesSubmit}
-                    className="w-full bg-emerald-500 text-white p-6 rounded-full text-2xl font-bold flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6"
+                    className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
                  >
-                    {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Update Mosque Info</>}
+                    {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={24} /> Update Content</>}
                  </button>
               </div>
            </div>
@@ -437,33 +524,43 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {/* Action / Add Post Sheet */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300 pb-12">
-          <div className="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative translate-y-0 animate-in slide-in-from-bottom-10 h-auto max-h-[85vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative translate-y-0 animate-in slide-in-from-bottom-10 h-auto max-h-[85vh] overflow-y-auto">
             
             <button
               onClick={toggleModal}
-              className="absolute top-6 right-6 p-2 bg-gray-100 text-gray-400 rounded-full active:scale-90"
+              className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-full active:scale-90"
             >
               <X size={32} />
             </button>
             
-            <h3 className="text-3xl font-bold text-gray-800 mb-6 mt-2 tracking-tight">New Post</h3>
+            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 mt-2 tracking-tight">New Post</h3>
             
             {/* Language Selector */}
-            <div className="flex bg-gray-100 p-1 rounded-2xl mb-6 shadow-inner">
+            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl mb-6 shadow-inner">
                <button 
-                 onClick={() => setPostLang("urdu")}
+                 onClick={() => setPostLang("both")}
                  className={clsx(
-                   "flex-1 py-3 text-lg font-bold rounded-xl transition-all",
-                   postLang === "urdu" ? "bg-green-500 text-white shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
+                   "flex-1 py-3 text-sm font-black rounded-xl transition-all uppercase tracking-tighter",
+                   postLang === "both" ? "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
                  )}
-               >Urdu</button>
+               >Both</button>
                <button 
                  onClick={() => setPostLang("english")}
                  className={clsx(
-                   "flex-1 py-3 text-lg font-bold rounded-xl transition-all",
+                   "flex-1 py-3 text-sm font-black rounded-xl transition-all uppercase tracking-tighter mx-1",
                    postLang === "english" ? "bg-blue-500 text-white shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
                  )}
                >English</button>
+               <button 
+                 onClick={() => setPostLang("urdu")}
+                 className={clsx(
+                   "flex-1 py-3 text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5",
+                   postLang === "urdu" ? "bg-green-500 text-white shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
+                 )}
+               >
+                 <span className="text-lg">اردو</span>
+                 <span className="text-[9px] font-bold opacity-80 translate-y-[2px]">(Urdu)</span>
+               </button>
             </div>
 
             <div className="mb-6 flex flex-col gap-2">
@@ -472,7 +569,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 value={postTitle}
                 onChange={e => setPostTitle(e.target.value)}
                 placeholder="e.g. Eid Update"
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-500 outline-none text-xl font-bold shadow-sm"
+                className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 rounded-2xl focus:border-emerald-500 outline-none text-xl font-bold shadow-sm text-gray-800 dark:text-gray-100"
               />
             </div>
 
@@ -495,7 +592,17 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-emerald-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-emerald-500/30">
                     <ImageIcon size={40} />
                   </div>
-                  <span className="text-2xl font-bold">Photo / Flyer</span>
+                  <span className="text-2xl font-bold">Photo</span>
+                </button>
+
+                <button 
+                  onClick={() => setPostType("video")}
+                  className="flex items-center gap-6 p-4 rounded-3xl bg-rose-50 text-rose-600 hover:bg-rose-100 active:scale-95 transition-all shadow-sm"
+                >
+                  <div className="bg-rose-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-rose-500/30">
+                    <Video size={40} />
+                  </div>
+                  <span className="text-2xl font-bold">Video</span>
                 </button>
                 
                 <button 
@@ -505,7 +612,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-purple-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-purple-500/30">
                     <FileText size={40} />
                   </div>
-                  <span className="text-2xl font-bold">Attach PDF</span>
+                  <span className="text-2xl font-bold">PDF / Word</span>
                 </button>
 
                 <button 
@@ -523,14 +630,15 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <div className="flex items-center gap-3">
                    <div className={clsx(
                      "p-2 rounded-xl text-white",
-                     postType === "audio" ? "bg-blue-500" : postType === "image" ? "bg-emerald-500" : postType === "pdf" ? "bg-purple-500" : "bg-amber-500"
+                     postType === "audio" ? "bg-blue-500" : postType === "image" ? "bg-emerald-500" : postType === "video" ? "bg-rose-500" : postType === "pdf" ? "bg-purple-500" : "bg-amber-500"
                    )}>
                       {postType === "audio" && <Mic size={20} />}
                       {postType === "image" && <ImageIcon size={20} />}
+                      {postType === "video" && <Video size={20} />}
                       {postType === "pdf" && <FileText size={20} />}
                       {postType === "text" && <FileText size={20} />}
                    </div>
-                   <span className="font-bold text-gray-700 capitalize">{postType} Selected</span>
+                   <span className="font-bold text-gray-700 capitalize">{postType === "pdf" ? "Document" : postType} Selected</span>
                 </div>
                 <button 
                   onClick={() => { setPostType(null); setFile(null); setTextContent(""); }}
@@ -616,9 +724,9 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                         </div>
                       )}
                     </div>
-                  ) : (
+                   ) : (
                     <div className="w-full flex flex-col items-center mb-6">
-                      <p className="text-gray-500 mb-4 font-bold text-center">Attach {postType === "pdf" ? "PDF Document" : "Photo"} below:</p>
+                      <p className="text-gray-500 mb-4 font-bold text-center">Attach {postType === "pdf" ? "PDF or Word Doc" : postType === "video" ? "Video Clip" : "Photo"} below:</p>
                       
                       {postType === "image" ? (
                          <div className="flex flex-col gap-4 w-full">
@@ -669,14 +777,62 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                              />
                            </label>
                          </div>
+                      ) : postType === "video" ? (
+                        <div className="flex flex-col gap-4 w-full">
+                           <label className="cursor-pointer bg-rose-50 hover:bg-rose-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-rose-300 active:scale-95 transition-all">
+                             <div className="bg-rose-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
+                                <Video size={32} />
+                             </div>
+                             <span className="text-lg font-bold text-rose-800">Record Video</span>
+                             <input 
+                               type="file" 
+                               accept="video/*" 
+                               capture="environment"
+                               className="hidden"
+                               onChange={(e) => {
+                                 const selected = e.target.files?.[0];
+                                 if (selected && selected.size > 25 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 25MB.");
+                                   e.target.value = "";
+                                   return setFile(null);
+                                 }
+                                 setFile(selected || null);
+                               }}
+                             />
+                           </label>
+                           
+                           <div className="flex items-center gap-4 text-gray-400 font-bold w-full uppercase text-sm justify-center">
+                              <hr className="flex-1"/> OR <hr className="flex-1"/>
+                           </div>
+
+                           <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
+                             <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
+                               Choose Video from Gallery
+                             </span>
+                             <input 
+                               type="file" 
+                               accept="video/*" 
+                               className="hidden"
+                               onChange={(e) => {
+                                 const selected = e.target.files?.[0];
+                                 if (selected && selected.size > 25 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 25MB.");
+                                   e.target.value = "";
+                                   return setFile(null);
+                                 }
+                                 setFile(selected || null);
+                               }}
+                             />
+                           </label>
+                         </div>
                       ) : (
                          <label className="cursor-pointer bg-gray-50 hover:bg-emerald-50 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 hover:border-emerald-400 active:scale-95 transition-all">
-                           <span className="text-xl font-bold text-emerald-700 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
-                             Tap to Attach File
+                           <span className="text-xl font-black text-emerald-700 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
+                             Tap to Attach PDF / Word
                            </span>
                            <input 
                              type="file" 
-                             accept="application/pdf"
+                             accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                              className="hidden"
                              onChange={(e) => {
                                const selected = e.target.files?.[0];
@@ -728,7 +884,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                toggleModal();
                                router.refresh();
                            } else {
-                               alert("Error: " + res.error);
+                               alert("Error: " + (res as any).error);
                            }
                         } catch (e: any) {
                            setIsSubmitting(false);
