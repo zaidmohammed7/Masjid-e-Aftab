@@ -8,6 +8,7 @@ import clsx from "clsx";
 export default function AdminLogin() {
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -19,9 +20,11 @@ export default function AdminLogin() {
       document.cookie = "admin_auth=true; path=/";
       router.push("/admin");
     } else {
-      alert("Incorrect PIN");
+      setError(true);
       setPin("");
       setLoading(false);
+      // Reset error after 2 seconds
+      setTimeout(() => setError(false), 2000);
     }
   };
 
@@ -39,15 +42,21 @@ export default function AdminLogin() {
         </div>
         
         <h1 className="text-4xl font-bold text-white mb-2">Admin Access</h1>
-        <p className="text-gray-400 mb-10 text-xl">Enter your 4-digit PIN</p>
+        <p className={clsx(
+          "mb-10 text-xl transition-colors duration-300",
+          error ? "text-red-400 font-bold" : "text-gray-400"
+        )}>
+          {error ? "Incorrect PIN" : "Enter your 4-digit PIN"}
+        </p>
 
         {/* PIN Display */}
-        <div className="flex gap-4 mb-12">
+        <div className={clsx("flex gap-4 mb-12", error && "animate-bounce")}>
           {[0, 1, 2, 3].map((idx) => (
             <div 
               key={idx} 
               className={clsx(
                 "w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+                error ? "border-red-500 bg-red-500/20" : 
                 pin.length > idx ? "bg-emerald-500 border-emerald-500" : "border-gray-600 bg-transparent"
               )}
             />

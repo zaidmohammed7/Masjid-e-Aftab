@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock } from "lucide-react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
@@ -99,6 +99,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptJummah2, setPtJummah2] = useState(initialPrayerTimes?.jummah2 || "01:30 PM");
   const [ptJummah3, setPtJummah3] = useState(initialPrayerTimes?.jummah3 || "02:00 PM");
   const [ptSaving, setPtSaving] = useState(false);
+
+  const handleLogout = () => {
+    document.cookie = "admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    router.push("/admin/login");
+  };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -239,6 +244,16 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
         <div className="absolute bottom-[-10%] -left-10 w-40 h-40 bg-emerald-400 rounded-full mix-blend-screen opacity-20 blur-2xl"></div>
         
+        <div className="absolute top-6 right-6 z-20">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl backdrop-blur-md border border-white/20 transition-all active:scale-95"
+          >
+            <LogOut size={20} />
+            <span className="font-bold">Logout</span>
+          </button>
+        </div>
+
         <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg">
           Admin Control
         </h1>
