@@ -20,8 +20,8 @@ interface SettingSection {
 }
 
 export default function SettingsClient() {
-  const { theme, toggleTheme, fontSize, setFontSize } = useTheme();
-  const [language, setLanguage] = useState("english");
+  const { theme, toggleTheme } = useTheme();
+  const [prayerAlerts, setPrayerAlerts] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function SettingsClient() {
 
   const sections: SettingSection[] = [
     {
-      title: "Appearance",
+      title: "Preferences",
       items: [
         {
           id: "dark-mode",
@@ -66,53 +66,25 @@ export default function SettingsClient() {
           )
         },
         {
-          id: "font-size",
-          label: "Font Size",
-          icon: <Type size={24} className="text-purple-500" />,
+          id: "prayer-alerts",
+          label: "Prayer Alerts",
+          icon: <ShieldCheck size={24} className="text-purple-500" />,
           action: (
-            <select 
-              value={fontSize}
-              onChange={(e) => setFontSize(e.target.value as any)}
-              className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg font-bold text-sm outline-none border-none dark:text-white"
+            <button 
+              onClick={() => setPrayerAlerts(!prayerAlerts)}
+              className={clsx(
+                "w-14 h-8 rounded-full p-1 transition-colors duration-300 flex items-center",
+                prayerAlerts ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
+              )}
             >
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
+              <div className="w-6 h-6 bg-white rounded-full shadow-md" />
+            </button>
           )
         }
       ]
     },
     {
-      title: "General",
-      items: [
-        {
-          id: "language",
-          label: "App Language",
-          icon: <Globe size={24} className="text-blue-500" />,
-          action: (
-            <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-               <button 
-                 onClick={() => setLanguage("english")}
-                 className={clsx(
-                   "px-3 py-1 rounded-lg text-xs font-bold transition-all",
-                   language === "english" ? "bg-white dark:bg-gray-700 shadow-sm text-emerald-600" : "text-gray-500"
-                 )}
-               >EN</button>
-               <button 
-                 onClick={() => setLanguage("urdu")}
-                 className={clsx(
-                   "px-3 py-1 rounded-lg text-xs font-bold transition-all",
-                   language === "urdu" ? "bg-white dark:bg-gray-700 shadow-sm text-emerald-600" : "text-gray-500"
-                 )}
-               >اردو</button>
-            </div>
-          )
-        }
-      ]
-    },
-    {
-      title: "Support & About",
+      title: "Application",
       items: [
         {
           id: "install",
@@ -133,7 +105,8 @@ export default function SettingsClient() {
           icon: <Share2 size={24} className="text-indigo-500" />,
           action: (
             <button 
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 navigator.clipboard.writeText("https://masjid-e-aftab.vercel.app/");
                 alert("App link copied to clipboard!");
               }}
@@ -146,7 +119,7 @@ export default function SettingsClient() {
         {
           id: "about",
           label: "About Mosque App",
-          icon: <Info size={24} className="text-emerald-500" />,
+          icon: <Info size={24} className="text-blue-500" />,
           action: <ChevronRight className="text-gray-400" />
         }
       ]
