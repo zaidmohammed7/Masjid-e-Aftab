@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "Masjid e Aftab App",
   description: "Extreme UX Masjid e Aftab PWA",
   manifest: "/manifest.ts",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
