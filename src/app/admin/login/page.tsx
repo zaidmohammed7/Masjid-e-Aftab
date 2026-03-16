@@ -32,8 +32,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-sm flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-6 flex flex-col pt-12 pb-32 overflow-y-auto">
+      <div className="w-full max-w-sm flex flex-col items-center mx-auto">
         <div className="bg-emerald-500 p-6 rounded-full mb-8 shadow-[0_0_40px_rgba(16,185,129,0.5)]">
           <Lock size={64} className="text-white" />
         </div>
