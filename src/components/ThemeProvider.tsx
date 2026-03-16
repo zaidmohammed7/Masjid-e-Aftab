@@ -62,13 +62,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.add(`font-size-${size}`);
   };
 
-  if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
-  }
-
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, fontSize, setFontSize }}>
-      {children}
+      <div style={{ visibility: mounted ? 'visible' : 'hidden' }}>
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 }
