@@ -228,7 +228,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-40 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent pb-40 transition-colors duration-300">
       <style dangerouslySetInnerHTML={{__html: `
         .custom-select-arrow {
           background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8l5 5 5-5'/%3e%3c/svg%3e");
@@ -356,8 +356,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
       ) : (
         <div className="p-6">
-           <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 flex flex-col gap-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4">Set Namaz Times</h2>
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800 flex flex-col gap-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4">Manage Posts</h2>
               
               <div className="space-y-6">
                  <div className="flex flex-col gap-2">
