@@ -84,10 +84,10 @@ export default function FeedClient({ announcements }: { announcements: Announcem
 
 function AnnouncementCard({ item }: { item: Announcement }) {
   return (
-    <div className="overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/40 dark:border-gray-800 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] rounded-[2.5rem] p-3 transition-colors duration-300">
+    <div className="overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_15px_45px_-15px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[2.5rem] p-3 transition-colors duration-300">
       {item.title && (
-        <div className="px-5 pt-4 pb-3 border-b border-gray-100/50 dark:border-gray-800 mb-3">
-           <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight leading-tight">
+        <div className="px-5 pt-4 pb-3 border-b border-[var(--card-border)] mb-3">
+           <h3 className="text-2xl font-black text-[var(--card-text)] tracking-tight leading-tight">
              {item.title}
            </h3>
         </div>
@@ -95,7 +95,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
       <div className="rounded-[1.8rem] overflow-hidden">
         {item.type === "audio" && <AudioPlayer fileUrl={item.contentAudio} />}
         {item.type === "image" && (
-          <div className="bg-gray-100 dark:bg-gray-800 flex items-center justify-center min-h-[200px]">
+          <div className="bg-gray-50 dark:bg-gray-800 flex items-center justify-center min-h-[200px]">
             <img
               src={item.contentImage}
               alt={item.title || "Announcement"}
@@ -104,8 +104,8 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
         {item.type === "text" && (
-          <div className="p-10 text-center bg-gray-50/80 dark:bg-gray-800/50">
-            <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">
+          <div className="p-10 text-center bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-2xl font-bold text-[var(--card-text)] leading-relaxed whitespace-pre-wrap">
               {item.contentText}
             </p>
           </div>

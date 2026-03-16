@@ -238,7 +238,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         }
       `}} />
       {/* Premium Header - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
         <div className="absolute -top-16 -right-16 opacity-20 rotate-12 mix-blend-overlay">
           <div className="w-80 h-80 rounded-[4rem] border-[30px] border-white blur-sm"></div>
         </div>
@@ -288,13 +288,13 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         <div className="p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight">Recent Posts</h2>
           {announcements.length === 0 ? (
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center min-h-[200px]">
+            <div className="bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--card-border)] flex items-center justify-center min-h-[200px]">
               <p className="text-gray-400 font-medium">No recent posts to show.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {announcements.map((item) => (
-                <div key={item._id} className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center relative overflow-hidden">
+                <div key={item._id} className="bg-[var(--card-bg)] p-5 rounded-3xl shadow-sm border border-[var(--card-border)] flex justify-between items-center relative overflow-hidden">
                   {/* Language Tag Badge */}
                   <div className={clsx(
                     "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-xs font-bold text-white",

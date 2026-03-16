@@ -3,13 +3,26 @@
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --dark-mode: selector(.dark);
 }
+
+/* 
+  FORCE Tailwind 4 to use class-based dark mode.
+  We redefine the 'dark' variant to only look for the .dark class on an ancestor.
+  This prevents system dark mode from interfering when the app is in light mode.
+*/
+@variant dark (&:where(.dark, .dark *));
 
 @layer base {
   :root {
     --background: #f8fafc; /* slate-50 */
     --foreground: #0f172a; /* slate-900 */
+    
+    /* Card specific variables to bypass variant issues if they persist */
+    --card-bg: #ffffff;
+    --card-border: #f1f5f9; /* slate-100 */
+    --card-text: #064e3b; /* emerald-900 */
+    --card-hover: #f8fafc; /* slate-50 */
+    
     --app-font-size: 16px;
     color-scheme: light;
   }
@@ -17,7 +30,22 @@
   html.dark {
     --background: #020617; /* slate-950 */
     --foreground: #f8fafc;
+    
+    --card-bg: #111827; /* gray-900 */
+    --card-border: #1f2937; /* gray-800 */
+    --card-text: #ecfdf5; /* emerald-50 */
+    --card-hover: #1f2937; /* gray-800 */
+    
     color-scheme: dark;
+  }
+
+  /* Explicitly reset for light mode just in case browser forces colors */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.dark) {
+       --background: #f8fafc;
+       --foreground: #0f172a;
+       color-scheme: light;
+    }
   }
 
   .font-size-small { --app-font-size: 14px; }
@@ -26,15 +54,15 @@
 
   html {
     font-size: var(--app-font-size);
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 body {
-  color: inherit;
-  background-color: inherit;
+  color: inherit !important;
+  background-color: inherit !important;
   transition: inherit;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

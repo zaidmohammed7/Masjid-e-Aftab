@@ -157,8 +157,8 @@ export default function SettingsClient() {
 
   return (
     <div className="min-h-screen bg-transparent pb-32">
-      {/* Premium Header - Vibrantly Green */}
-      <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-800 text-white pt-16 pb-28 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
+      {/* Premium Header - Vibrantly Emerald Green */}
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-16 pb-24 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full blur-xl animate-pulse" />
           <div className="absolute bottom-10 right-10 w-32 h-32 border border-white rounded-full blur-2xl opacity-50" />
@@ -171,19 +171,19 @@ export default function SettingsClient() {
         </p>
       </div>
 
-      <div className="p-6 -mt-10 pt-4 relative z-20 space-y-10">
+      <div className="p-6 pt-12 relative z-20 space-y-10">
         {sections.map((section) => (
           <div key={section.title} className="space-y-4">
-            <h2 className="px-4 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.3em] drop-shadow-sm">{section.title}</h2>
-            <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-white dark:border-gray-800 overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
+            <h2 className="px-5 text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.25em]">{section.title}</h2>
+            <div className="bg-[var(--card-bg)] rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-[var(--card-border)] overflow-hidden divide-y divide-[var(--card-border)]">
               {section.items.map((item: SettingItem) => {
                 const content = (
-                  <div key={item.id} className="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors active:scale-[0.98]">
+                  <div key={item.id} className="flex items-center justify-between p-6 hover:bg-[var(--card-hover)] transition-colors active:scale-[0.98]">
                     <div className="flex items-center gap-4">
-                      <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-2xl">
+                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl">
                         {item.icon}
                       </div>
-                      <span className="font-bold text-gray-800 dark:text-gray-100 text-lg">{item.label}</span>
+                      <span className="font-bold text-[var(--card-text)] text-lg">{item.label}</span>
                     </div>
                     {item.action}
                   </div>
