@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="theme-color" content="#10b981" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body className={`${inter.className} overscroll-none`}>
         <ThemeProvider>
