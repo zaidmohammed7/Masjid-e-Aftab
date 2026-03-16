@@ -37,8 +37,17 @@ export async function publishAnnouncement(data: FormData) {
       timestamp: new Date().toISOString(),
     };
 
+    const assetId = data.get("assetId") as string | null;
+
     if (type === "text" && textContent) {
       document.contentText = textContent;
+    } else if (assetId) {
+      // Use existing asset ID from client-side upload
+      const assetRef = { _type: "reference", _ref: assetId };
+      if (type === "audio") document.contentAudio = { _type: "file", asset: assetRef };
+      else if (type === "pdf") document.contentPdf = { _type: "file", asset: assetRef };
+      else if (type === "video") document.contentVideo = { _type: "file", asset: assetRef };
+      else document.contentImage = { _type: "image", asset: assetRef };
     } else if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
       const assetType = (type === "audio" || type === "pdf" || type === "video") ? "file" : "image";
@@ -123,6 +132,8 @@ export async function updateAnnouncement(data: FormData) {
   const textContent = data.get("textContent") as string | null;
   const file = data.get("file") as File | null;
 
+  const assetId = data.get("assetId") as string | null;
+
   try {
     const patch = client.patch(id);
     
@@ -134,7 +145,13 @@ export async function updateAnnouncement(data: FormData) {
       patch.set({ contentText: textContent });
     }
 
-    if (file && file.size > 0) {
+    if (assetId) {
+       const assetRef = { _type: "reference", _ref: assetId };
+       if (type === "audio") patch.set({ contentAudio: { _type: "file", asset: assetRef } });
+       else if (type === "pdf") patch.set({ contentPdf: { _type: "file", asset: assetRef } });
+       else if (type === "video") patch.set({ contentVideo: { _type: "file", asset: assetRef } });
+       else patch.set({ contentImage: { _type: "image", asset: assetRef } });
+    } else if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
       const assetType = (type === "audio" || type === "pdf" || type === "video") ? "file" : "image";
       

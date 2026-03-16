@@ -5,6 +5,8 @@ import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Mega
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
+import { createClient } from "@sanity/client";
+import { projectId, dataset, apiVersion } from "@/sanity/env";
 
 type Announcement = {
   _id: string;
@@ -108,6 +110,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postLang, setPostLang] = useState<"urdu" | "english" | "both">("urdu");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Audio Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -134,6 +138,41 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "Hadeeth of the Day");
   const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
+
+  // Secure Token Fetcher
+  const fetchSanityToken = async () => {
+    const res = await fetch("/api/admin/sanity-token");
+    if (!res.ok) throw new Error("Could not fetch secure upload token");
+    const data = await res.json();
+    return data.token;
+  };
+
+  // Direct Sanity Upload Helper
+  const uploadFileDirectly = async (fileToUpload: File, type: string) => {
+    setIsUploading(true);
+    setUploadProgress(10);
+    try {
+      const token = await fetchSanityToken();
+      const client = createClient({
+        projectId,
+        dataset,
+        apiVersion,
+        useCdn: false,
+        token,
+      });
+
+      const assetType = (type === "audio" || type === "pdf" || type === "video") ? "file" : "image";
+      
+      setUploadProgress(30);
+      const asset = await client.assets.upload(assetType, fileToUpload, {
+        filename: fileToUpload.name,
+      });
+      setUploadProgress(100);
+      return asset._id;
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleLogout = () => {
     document.cookie = "admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -214,24 +253,27 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
     if (!editId || !editType) return;
     setIsEditing(true);
 
-    if (editFile && editFile.size > 20 * 1024 * 1024) {
-      alert("This file is too large! Please upload a file smaller than 20MB.");
-      setIsEditing(false);
-      return;
-    }
-
     const formData = new FormData();
     formData.append("id", editId);
     formData.append("title", editTitle);
     formData.append("type", editType);
+    
     if (editType === "text") {
        formData.append("textContent", editTextContent);
     } else if (editFile) {
-       formData.append("file", editFile);
+       try {
+         const assetId = await uploadFileDirectly(editFile, editType);
+         formData.append("assetId", assetId);
+       } catch (err: any) {
+         alert("Upload failed: " + err.message);
+         setIsEditing(false);
+         return;
+       }
     }
 
     const res = await updateAnnouncement(formData);
     setIsEditing(false);
+    setUploadProgress(0);
     if (res.success) {
       closeEditModal();
       router.refresh();
@@ -389,6 +431,26 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                       <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                          {new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
+                      
+                      {/* Media Previews in Admin List */}
+                      <div className="mt-3">
+                        {item.type === "image" && item.contentImage && (
+                          <img src={item.contentImage} className="w-20 h-20 object-cover rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm" alt="Thumbnail" />
+                        )}
+                        {item.type === "video" && item.contentVideo && (
+                          <video src={item.contentVideo} className="w-40 h-24 object-cover rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm bg-black" />
+                        )}
+                        {item.type === "audio" && item.contentAudio && (
+                           <div className="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full w-fit">
+                              <Mic size={14} /> Voice Note Attached
+                           </div>
+                        )}
+                        {item.type === "pdf" && item.contentPdf && (
+                           <div className="flex items-center gap-2 text-purple-500 font-bold text-xs uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 px-3 py-1.5 rounded-full w-fit">
+                              <FileText size={14} /> Document Added
+                           </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -712,8 +774,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                className="hidden"
                                onChange={(e) => {
                                  const selected = e.target.files?.[0];
-                                 if (selected && selected.size > 20 * 1024 * 1024) {
-                                   alert("This file is too large! Please upload a file smaller than 20MB.");
+                                 if (selected && selected.size > 100 * 1024 * 1024) {
+                                   alert("This file is too large! Please upload a file smaller than 100MB.");
                                    e.target.value = "";
                                    return setFile(null);
                                  }
@@ -743,8 +805,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                title="Camera"
                                onChange={(e) => {
                                  const selected = e.target.files?.[0];
-                                 if (selected && selected.size > 20 * 1024 * 1024) { 
-                                   alert("This file is too large! Please upload a file smaller than 20MB.");
+                                 if (selected && selected.size > 100 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 100MB.");
                                    e.target.value = "";
                                    return setFile(null);
                                  }
@@ -767,8 +829,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                className="hidden"
                                onChange={(e) => {
                                  const selected = e.target.files?.[0];
-                                 if (selected && selected.size > 20 * 1024 * 1024) { 
-                                   alert("This file is too large! Please upload a file smaller than 20MB.");
+                                 if (selected && selected.size > 100 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 100MB.");
                                    e.target.value = "";
                                    return setFile(null);
                                  }
@@ -791,8 +853,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                className="hidden"
                                onChange={(e) => {
                                  const selected = e.target.files?.[0];
-                                 if (selected && selected.size > 25 * 1024 * 1024) { 
-                                   alert("This file is too large! Please upload a file smaller than 25MB.");
+                                 if (selected && selected.size > 100 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 100MB.");
                                    e.target.value = "";
                                    return setFile(null);
                                  }
@@ -815,8 +877,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                                className="hidden"
                                onChange={(e) => {
                                  const selected = e.target.files?.[0];
-                                 if (selected && selected.size > 25 * 1024 * 1024) { 
-                                   alert("This file is too large! Please upload a file smaller than 25MB.");
+                                 if (selected && selected.size > 100 * 1024 * 1024) { 
+                                   alert("This file is too large! Please upload a file smaller than 100MB.");
                                    e.target.value = "";
                                    return setFile(null);
                                  }
@@ -836,8 +898,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                              className="hidden"
                              onChange={(e) => {
                                const selected = e.target.files?.[0];
-                               if (selected && selected.size > 20 * 1024 * 1024) { 
-                                 alert("This file is too large! Please upload a file smaller than 20MB.");
+                               if (selected && selected.size > 100 * 1024 * 1024) { 
+                                 alert("This file is too large! Please upload a file smaller than 100MB.");
                                  e.target.value = "";
                                  return setFile(null);
                                }
@@ -850,36 +912,38 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   )}
                   
                   <button
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isUploading}
                     onClick={async () => {
                         setIsSubmitting(true);
                         
-                        // Enforce final size checks before passing to next-server actions payload
-                        if (file && file.size > 20 * 1024 * 1024) {
-                            alert("This file is too large (Exceeds 20MB server action safety net).");
+                        if (postType !== "text" && !file) {
+                            alert("Please attach a file first!");
                             setIsSubmitting(false);
                             return;
                         }
 
                         const formData = new FormData();
-                        formData.append("type", postType);
+                        formData.append("type", postType as string);
                         formData.append("language", postLang);
                         formData.append("title", postTitle);
                         
                         if (postType === "text") {
                             formData.append("textContent", textContent);
-                        } else {
-                            if (!file) {
-                                alert("Please attach a file first!");
+                        } else if (file) {
+                            try {
+                                const assetId = await uploadFileDirectly(file, postType as string);
+                                formData.append("assetId", assetId);
+                            } catch (err: any) {
+                                alert("Upload failed: " + err.message);
                                 setIsSubmitting(false);
                                 return;
                             }
-                            formData.append("file", file);
                         }
 
                         try {
                            const res = await publishAnnouncement(formData);
                            setIsSubmitting(false);
+                           setUploadProgress(0);
                            if (res.success) {
                                toggleModal();
                                router.refresh();
@@ -888,15 +952,25 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                            }
                         } catch (e: any) {
                            setIsSubmitting(false);
-                           alert("Upload Failed. The file might be too large or the network is unreachable. Details: " + e.message);
+                           setUploadProgress(0);
+                           alert("Publish Failed: " + e.message);
                         }
                     }}
                     className={clsx(
-                      "w-full text-white p-6 rounded-full text-2xl font-bold flex items-center justify-center gap-4 shadow-xl active:scale-90 transition-all duration-300",
-                      isSubmitting ? "bg-gray-400" : "bg-emerald-500 hover:bg-emerald-600"
+                      "w-full text-white p-6 rounded-full text-2xl font-bold flex flex-col items-center justify-center gap-2 shadow-xl active:scale-90 transition-all duration-300 overflow-hidden relative",
+                      (isSubmitting || isUploading) ? "bg-gray-400" : "bg-emerald-500 hover:bg-emerald-600"
                     )}
                   >
-                    {isSubmitting ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Publish</>}
+                    {isUploading && (
+                        <div 
+                          className="absolute bottom-0 left-0 h-2 bg-emerald-300 transition-all duration-300" 
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                    )}
+                    <div className="flex items-center gap-4">
+                        {(isSubmitting || isUploading) ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Publish</>}
+                    </div>
+                    {isUploading && <span className="text-xs opacity-80">Uploading to Cloud... {uploadProgress}%</span>}
                   </button>
                </div>
             )}
@@ -944,13 +1018,13 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                    </span>
                    <input 
                      type="file" 
-                     accept={editType === "audio" ? "audio/*" : editType === "pdf" ? "application/pdf" : "image/*"} 
+                     accept={editType === "audio" ? "audio/*" : editType === "pdf" ? "application/pdf" : "image/*"}
                      capture={editType === "image" ? "environment" : undefined}
                      className="hidden"
                      onChange={(e) => {
                        const selected = e.target.files?.[0];
-                       if (selected && selected.size > 20 * 1024 * 1024) {
-                         alert("This file is too large! Please upload a file smaller than 20MB.");
+                       if (selected && selected.size > 100 * 1024 * 1024) {
+                         alert("This file is too large! Please upload a file smaller than 100MB.");
                          e.target.value = "";
                          return setEditFile(null);
                        }
@@ -962,14 +1036,23 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             )}
 
             <button
-               disabled={isEditing}
+               disabled={isEditing || isUploading}
                onClick={handleEditSubmit}
                className={clsx(
-                 "w-full text-white p-6 rounded-full text-2xl font-bold flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-all",
-                 isEditing ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
+                 "w-full text-white p-6 rounded-full text-2xl font-bold flex flex-col items-center justify-center gap-2 shadow-xl active:scale-95 transition-all relative overflow-hidden",
+                 (isEditing || isUploading) ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
                )}
             >
-               {isEditing ? <Loader2 size={32} className="animate-spin" /> : <><Edit size={32} /> Save Changes</>}
+               {isUploading && (
+                    <div 
+                        className="absolute bottom-0 left-0 h-2 bg-amber-300 transition-all duration-300" 
+                        style={{ width: `${uploadProgress}%` }}
+                    />
+               )}
+               <div className="flex items-center gap-4">
+                   {(isEditing || isUploading) ? <Loader2 size={32} className="animate-spin" /> : <><Edit size={32} /> Save Changes</>}
+               </div>
+               {isUploading && <span className="text-xs opacity-80">Uploading Changes... {uploadProgress}%</span>}
             </button>
           </div>
         </div>

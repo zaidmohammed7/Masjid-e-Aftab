@@ -129,6 +129,17 @@ function AnnouncementCard({ item }: { item: Announcement }) {
             </p>
           </div>
         )}
+        {item.type === "video" && (
+           <div className="bg-black flex items-center justify-center min-h-[200px]">
+             <video 
+               src={item.contentVideo} 
+               controls 
+               playsInline
+               className="w-full h-auto max-h-[500px]"
+               poster={item.contentImage} // Optional: use image as poster if available
+             />
+           </div>
+        )}
         {item.type === "pdf" && (
           <div className="bg-gray-100 dark:bg-gray-800 flex flex-col p-8 items-center justify-center text-center">
             <div className="w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-3xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6 shadow-sm ring-1 ring-purple-100 dark:ring-purple-900/50">
@@ -163,6 +174,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
            {item.type === 'audio' && <Megaphone size={24} className="opacity-50" />}
            {item.type === 'image' && <ImageIcon size={24} className="opacity-50" />}
            {item.type === 'text' && <FileText size={24} className="opacity-50" />}
+           {item.type === 'video' && <Video size={24} className="opacity-50" />}
            {item.type === 'pdf' && <FileText size={24} className="opacity-50" />}
         </div>
       </div>

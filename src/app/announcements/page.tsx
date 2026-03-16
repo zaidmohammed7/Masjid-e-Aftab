@@ -22,7 +22,7 @@ export default async function AnnouncementsPage() {
       "contentImage": contentImage.asset->url,
       "contentAudio": contentAudio.asset->url,
       "contentPdf": contentPdf.asset->url,
-      "contentVideo": contentVideo,
+      "contentVideo": contentVideo.asset->url,
       contentText
     }
   `);

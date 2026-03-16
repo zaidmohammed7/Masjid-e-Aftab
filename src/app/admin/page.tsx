@@ -21,7 +21,7 @@ export default async function AdminPage() {
       timestamp,
       "contentImage": contentImage.asset->url,
       "contentAudio": contentAudio.asset->url,
-      "contentVideo": contentVideo,
+      "contentVideo": contentVideo.asset->url,
       contentText
     }
   `);
