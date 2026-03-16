@@ -449,47 +449,70 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               />
             </div>
 
-            <div className="flex flex-col gap-4">
-              <button 
-                onClick={() => setPostType("audio")}
-                className="flex items-center gap-6 p-4 rounded-3xl bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-95 transition-all shadow-sm"
-              >
-                <div className="bg-blue-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-blue-500/30">
-                  <Mic size={40} />
-                </div>
-                <span className="text-2xl font-bold">Voice Note</span>
-              </button>
+            {!postType ? (
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={() => setPostType("audio")}
+                  className="flex items-center gap-6 p-4 rounded-3xl bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-95 transition-all shadow-sm"
+                >
+                  <div className="bg-blue-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-blue-500/30">
+                    <Mic size={40} />
+                  </div>
+                  <span className="text-2xl font-bold">Voice Note</span>
+                </button>
 
-              <button 
-                onClick={() => setPostType("image")}
-                className="flex items-center gap-6 p-4 rounded-3xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all shadow-sm"
-              >
-                <div className="bg-emerald-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-emerald-500/30">
-                  <ImageIcon size={40} />
-                </div>
-                <span className="text-2xl font-bold">Photo / Flyer</span>
-              </button>
-              
-              <button 
-                onClick={() => setPostType("pdf")}
-                className="flex items-center gap-6 p-4 rounded-3xl bg-purple-50 text-purple-600 hover:bg-purple-100 active:scale-95 transition-all shadow-sm"
-              >
-                <div className="bg-purple-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-purple-500/30">
-                  <FileText size={40} />
-                </div>
-                <span className="text-2xl font-bold">Attach PDF</span>
-              </button>
+                <button 
+                  onClick={() => setPostType("image")}
+                  className="flex items-center gap-6 p-4 rounded-3xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all shadow-sm"
+                >
+                  <div className="bg-emerald-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-emerald-500/30">
+                    <ImageIcon size={40} />
+                  </div>
+                  <span className="text-2xl font-bold">Photo / Flyer</span>
+                </button>
+                
+                <button 
+                  onClick={() => setPostType("pdf")}
+                  className="flex items-center gap-6 p-4 rounded-3xl bg-purple-50 text-purple-600 hover:bg-purple-100 active:scale-95 transition-all shadow-sm"
+                >
+                  <div className="bg-purple-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-purple-500/30">
+                    <FileText size={40} />
+                  </div>
+                  <span className="text-2xl font-bold">Attach PDF</span>
+                </button>
 
-              <button 
-                onClick={() => setPostType("text")}
-                className="flex items-center gap-6 p-4 rounded-3xl bg-amber-50 text-amber-600 hover:bg-amber-100 active:scale-95 transition-all shadow-sm"
-              >
-                <div className="bg-amber-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-amber-500/30">
-                  <FileText size={40} />
+                <button 
+                  onClick={() => setPostType("text")}
+                  className="flex items-center gap-6 p-4 rounded-3xl bg-amber-50 text-amber-600 hover:bg-amber-100 active:scale-95 transition-all shadow-sm"
+                >
+                  <div className="bg-amber-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-amber-500/30">
+                    <FileText size={40} />
+                  </div>
+                  <span className="text-2xl font-bold">Text Only</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl mb-4 border border-gray-100">
+                <div className="flex items-center gap-3">
+                   <div className={clsx(
+                     "p-2 rounded-xl text-white",
+                     postType === "audio" ? "bg-blue-500" : postType === "image" ? "bg-emerald-500" : postType === "pdf" ? "bg-purple-500" : "bg-amber-500"
+                   )}>
+                      {postType === "audio" && <Mic size={20} />}
+                      {postType === "image" && <ImageIcon size={20} />}
+                      {postType === "pdf" && <FileText size={20} />}
+                      {postType === "text" && <FileText size={20} />}
+                   </div>
+                   <span className="font-bold text-gray-700 capitalize">{postType} Selected</span>
                 </div>
-                <span className="text-2xl font-bold">Text Only</span>
-              </button>
-            </div>
+                <button 
+                  onClick={() => { setPostType(null); setFile(null); setTextContent(""); }}
+                  className="text-emerald-600 font-black text-sm uppercase tracking-wider underline underline-offset-4"
+                >
+                  Change
+                </button>
+              </div>
+            )}
 
             {postType && (
                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center w-full animate-in fade-in zoom-in-95">
@@ -501,6 +524,19 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                       className="w-full p-4 mb-6 border-2 border-amber-200 rounded-2xl text-lg text-gray-800 focus:outline-none focus:border-amber-500 shadow-inner"
                       rows={4}
                     />
+                  ) : file ? (
+                    <div className="w-full mb-8 p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex flex-col items-center gap-4 animate-in zoom-in-95">
+                       <div className="bg-emerald-500 text-white p-4 rounded-full shadow-lg">
+                          <Plus size={32} className="rotate-45" /> {/* Success check replacement */}
+                       </div>
+                       <p className="text-xl font-black text-emerald-800 uppercase tracking-widest">Ready to Publish</p>
+                       <button 
+                         onClick={() => setFile(null)}
+                         className="text-emerald-600 font-bold text-sm underline underline-offset-4"
+                       >
+                         Retake / Remove
+                       </button>
+                    </div>
                   ) : postType === "audio" ? (
                     <div className="w-full flex flex-col items-center mb-6 gap-4">
                       {isRecording ? (
@@ -532,8 +568,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                            </div>
 
                            <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
-                             <span className="text-lg font-bold text-gray-600 block line-clamp-2 px-4 shadow-sm py-4 bg-white rounded-2xl border border-gray-100">
-                               {file ? file.name : `Attach Pre-recorded Audio File`}
+                             <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
+                               Attach Pre-recorded Audio
                              </span>
                              <input 
                                type="file" 
@@ -587,8 +623,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                            </div>
 
                            <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
-                             <span className="text-lg font-bold text-gray-600 block line-clamp-2 px-4 shadow-sm py-4 bg-white rounded-2xl border border-gray-100">
-                               {file && file.name ? file.name : `Choose from Gallery`}
+                             <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
+                               Choose from Gallery
                              </span>
                              <input 
                                type="file" 
@@ -608,8 +644,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                          </div>
                       ) : (
                          <label className="cursor-pointer bg-gray-50 hover:bg-emerald-50 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 hover:border-emerald-400 active:scale-95 transition-all">
-                           <span className="text-xl font-bold text-emerald-700 block line-clamp-2 px-4 shadow-sm py-4 bg-white rounded-2xl border border-gray-100">
-                             {file ? file.name : `Tap to Attach File`}
+                           <span className="text-xl font-bold text-emerald-700 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
+                             Tap to Attach File
                            </span>
                            <input 
                              type="file" 

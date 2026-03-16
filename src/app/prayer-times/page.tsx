@@ -56,15 +56,15 @@ export default async function PrayerTimesPage() {
                {pt.extra && (
                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-full blur-2xl opacity-50"></div>
                )}
-               <div className="flex justify-between items-center relative z-10 w-full">
-                <div className="flex flex-col">
+               <div className="flex justify-between items-center relative z-10 w-full gap-4">
+                <div className="flex flex-col min-w-0">
                    {pt.extra && <span className="bg-gradient-to-r from-emerald-100 to-emerald-50 dark:from-emerald-900/50 dark:to-emerald-800/20 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block w-max mb-1 shadow-sm border border-emerald-100/50 dark:border-emerald-900/50">Friday</span>}
-                   <div className="flex items-baseline gap-3">
-                     <h2 className="text-xl font-black tracking-tight drop-shadow-sm text-[var(--card-text)]">{pt.name}</h2>
-                     <span className="text-emerald-600/60 dark:text-emerald-400/60 font-medium text-lg" dir="rtl">{pt.arabic}</span>
+                   <div className="flex items-baseline gap-2 overflow-hidden">
+                     <h2 className="text-xl font-black tracking-tight drop-shadow-sm text-[var(--card-text)] truncate">{pt.name}</h2>
+                     <span className="text-emerald-600/60 dark:text-emerald-400/60 font-medium text-lg whitespace-nowrap" dir="rtl">{pt.arabic}</span>
                    </div>
                  </div>
-                 <p className="text-3xl font-black tabular-nums tracking-tighter text-[var(--card-text)]">{pt.time}</p>
+                 <p className="text-3xl font-black tabular-nums tracking-tighter text-[var(--card-text)] flex-shrink-0">{pt.time}</p>
                </div>
             </div>
           );

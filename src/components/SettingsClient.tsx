@@ -131,7 +131,17 @@ export default function SettingsClient() {
           id: "share",
           label: "Share App",
           icon: <Share2 size={24} className="text-indigo-500" />,
-          action: <ChevronRight className="text-gray-400" />
+          action: (
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText("https://masjid-e-aftab.vercel.app/");
+                alert("App link copied to clipboard!");
+              }}
+              className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-indigo-100 dark:border-indigo-900/50"
+            >
+              Copy Link
+            </button>
+          )
         },
         {
           id: "about",

@@ -111,20 +111,21 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
         {item.type === "pdf" && (
-          <div className="bg-gray-100 dark:bg-gray-800 flex flex-col">
-            <iframe 
-              src={`${item.contentPdf}#toolbar=0&navpanes=0&scrollbar=0`} 
-              className="w-full h-96 border-0"
-              title={item.title || "PDF Preview"}
-            />
+          <div className="bg-gray-100 dark:bg-gray-800 flex flex-col p-8 items-center justify-center text-center">
+            <div className="w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-3xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6 shadow-sm ring-1 ring-purple-100 dark:ring-purple-900/50">
+               <FileText size={48} />
+            </div>
+            <h4 className="font-black text-gray-800 dark:text-gray-200 text-lg mb-2 line-clamp-1 px-4">{item.title || "Document Flyer"}</h4>
+            <p className="text-gray-500 text-sm mb-8 font-bold uppercase tracking-widest">PDF Document</p>
+            
             <a 
               href={item.contentPdf} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center justify-center p-5 bg-purple-600 text-white w-full font-black text-lg transition-all active:bg-purple-700 shadow-inner"
+              className="flex items-center justify-center py-4 px-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white w-full rounded-[1.5rem] font-black text-lg transition-all active:scale-95 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)]"
             >
-              <FileText size={28} className="mr-3" />
-              Open Full PDF
+              <FileText size={24} className="mr-3" />
+              Open Document
             </a>
           </div>
         )}
