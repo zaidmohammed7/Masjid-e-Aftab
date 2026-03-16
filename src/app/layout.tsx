@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,11 +24,13 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
-      <body className={`${inter.className} bg-gray-50 text-gray-900 overscroll-none`}>
-        <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-white">
-          {children}
-          <BottomNav />
-        </div>
+      <body className={`${inter.className} bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 overscroll-none`}>
+        <ThemeProvider>
+          <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-white dark:bg-gray-900">
+            {children}
+            <BottomNav />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ export default async function HomePage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
 
   return (
-    <main className="min-h-screen pb-40 bg-gray-50 font-sans selection:bg-emerald-200">
+    <main className="min-h-screen pb-40 bg-gray-50 dark:bg-gray-950 font-sans selection:bg-emerald-200 transition-colors duration-300">
       {/* Premium Hero Header - Centered & Slightly Taller */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-16 pb-20 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
         {/* Abstract Background Elements */}

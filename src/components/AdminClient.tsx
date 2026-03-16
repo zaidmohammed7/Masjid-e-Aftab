@@ -39,7 +39,7 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
       <select 
         value={hour} 
         onChange={e => handleUpdate(e.target.value, minute, ampm)}
-        className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
+        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
       >
         {hours.map(hr => <option key={hr} value={hr}>{hr}</option>)}
       </select>
@@ -47,14 +47,14 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
       <select 
         value={minute} 
         onChange={e => handleUpdate(hour, e.target.value, ampm)}
-        className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
+        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner appearance-none custom-select-arrow"
       >
         {minutes.map(mn => <option key={mn} value={mn}>{mn}</option>)}
       </select>
       <select 
         value={ampm} 
         onChange={e => handleUpdate(hour, minute, e.target.value)}
-        className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white text-center cursor-pointer min-w-[30%] shadow-inner transition-colors focus:bg-emerald-50 appearance-none custom-select-arrow"
+        className="flex-1 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center cursor-pointer min-w-[30%] shadow-inner transition-colors focus:bg-emerald-50 appearance-none custom-select-arrow"
       >
         <option value="AM">AM</option>
         <option value="PM">PM</option>
@@ -228,7 +228,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-40 transition-colors duration-300">
       <style dangerouslySetInnerHTML={{__html: `
         .custom-select-arrow {
           background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8l5 5 5-5'/%3e%3c/svg%3e");
@@ -263,12 +263,12 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-gray-200 p-1 mx-6 mt-6 rounded-2xl shadow-inner">
+      <div className="flex bg-gray-200 dark:bg-gray-800 p-1 mx-6 mt-6 rounded-2xl shadow-inner">
          <button 
            onClick={() => setActiveTab("announcements")}
            className={clsx(
              "flex-1 py-4 text-xl flex items-center justify-center gap-2 font-bold rounded-xl transition-all",
-             activeTab === "announcements" ? "bg-white text-emerald-600 shadow-md scale-105" : "text-gray-500 hover:bg-gray-100/50"
+             activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-md scale-105" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
            )}
          >
            <Megaphone size={28} /> Posts
@@ -277,7 +277,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
            onClick={() => setActiveTab("prayerTimes")}
            className={clsx(
              "flex-1 py-4 text-xl flex items-center justify-center gap-2 font-bold rounded-xl transition-all",
-             activeTab === "prayerTimes" ? "bg-white text-emerald-600 shadow-md scale-105" : "text-gray-500 hover:bg-gray-100/50"
+             activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-md scale-105" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
            )}
          >
            <Clock size={28} /> Times
@@ -315,10 +315,10 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     </div>
 
                     <div className="overflow-hidden flex-1 min-w-0">
-                      <p className="font-bold text-gray-800 capitalize truncate w-full text-lg pr-2">
+                      <p className="font-bold text-gray-800 dark:text-gray-100 capitalize truncate w-full text-lg pr-2">
                          {item.title || "Announcement"}
                       </p>
-                      <p className="text-sm text-gray-500 font-medium">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                          {new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -356,8 +356,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
       ) : (
         <div className="p-6">
-           <div className="bg-white p-6 rounded-[2rem] shadow-xl border border-gray-100 flex flex-col gap-6">
-              <h2 className="text-2xl font-bold text-gray-800 text-center border-b border-gray-100 pb-4">Set Namaz Times</h2>
+           <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800 flex flex-col gap-6">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4">Set Namaz Times</h2>
               
               <div className="space-y-6">
                  <div className="flex flex-col gap-2">

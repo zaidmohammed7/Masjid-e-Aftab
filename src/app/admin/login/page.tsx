@@ -72,7 +72,7 @@ export default function AdminLogin() {
                   key={key}
                   disabled={loading}
                   onClick={() => setPin("")}
-                  className="flex items-center justify-center h-20 text-xl font-bold text-gray-400 hover:text-white active:scale-95"
+                  className="flex items-center justify-center h-20 text-xl font-bold text-gray-400 hover:text-white active:scale-95 transition-colors"
                 >
                   Clear
                 </button>
@@ -86,7 +86,7 @@ export default function AdminLogin() {
                   onClick={handleLogin}
                   className={clsx(
                     "flex items-center justify-center h-20 rounded-full transition-all duration-300 active:scale-95 shadow-xl",
-                    pin.length === 4 ? "bg-emerald-500 text-white shadow-emerald-500/50" : "bg-gray-800 text-gray-600"
+                    pin.length === 4 ? "bg-emerald-500 text-white shadow-emerald-500/50" : "bg-gray-800 dark:bg-gray-700/50 text-gray-600 dark:text-gray-500"
                   )}
                 >
                   <ArrowRight size={40} />
@@ -98,7 +98,7 @@ export default function AdminLogin() {
                 key={key}
                 disabled={loading}
                 onClick={() => handleKeypad(key)}
-                className="flex items-center justify-center h-20 rounded-full bg-gray-800 hover:bg-gray-700 text-3xl font-bold text-white shadow-lg active:scale-95 transition-all"
+                className="flex items-center justify-center h-20 rounded-full bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 text-3xl font-bold text-white shadow-lg active:scale-95 transition-all"
               >
                 {key}
               </button>

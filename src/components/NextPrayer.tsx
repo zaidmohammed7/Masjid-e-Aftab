@@ -30,9 +30,9 @@ export default function NextPrayer({ prayerTimes }: { prayerTimes: any }) {
   }, []);
 
   if (!now || !prayerTimes) return (
-     <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-gray-100 min-h-[160px] animate-pulse flex flex-col items-center justify-center">
-        <Clock className="text-gray-300 mb-2 rotate-180 transition-transform" />
-        <p className="text-gray-400 font-bold">Syncing Timings...</p>
+     <div className="bg-white dark:bg-gray-900 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-gray-800 min-h-[160px] animate-pulse flex flex-col items-center justify-center">
+        <Clock className="text-gray-300 dark:text-gray-700 mb-2 rotate-180 transition-transform" />
+        <p className="text-gray-400 dark:text-gray-500 font-bold">Syncing Timings...</p>
      </div>
   );
 
@@ -81,31 +81,31 @@ export default function NextPrayer({ prayerTimes }: { prayerTimes: any }) {
   const currentTimeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
   return (
-    <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-gray-100 flex flex-col pt-6 relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-gray-800 flex flex-col pt-6 relative overflow-hidden transition-colors duration-300">
        {/* Background decorative blob */}
-       <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-50 rounded-full blur-2xl"></div>
+       <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-full blur-2xl"></div>
 
        <div className="flex justify-between items-start z-10 mt-2">
           <div>
-            <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mb-1">Current Time</p>
-            <h2 className="text-3xl font-black text-gray-800 tracking-tight">{currentTimeStr}</h2>
+            <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">Current Time</p>
+            <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">{currentTimeStr}</h2>
           </div>
-          <Link href="/prayer-times" className="text-emerald-700 font-extrabold hover:bg-emerald-100 px-4 py-2 bg-emerald-50 rounded-[1rem] transition-colors text-sm flex items-center gap-1 shadow-sm border border-emerald-100">
+          <Link href="/prayer-times" className="text-emerald-700 dark:text-emerald-400 font-extrabold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-[1rem] transition-colors text-sm flex items-center gap-1 shadow-sm border border-emerald-100 dark:border-emerald-900/50">
              All Times
           </Link>
        </div>
        
-       <hr className="my-5 border-gray-100 relative z-10" />
+       <hr className="my-5 border-gray-100 dark:border-gray-800 relative z-10" />
 
        {next ? (
          <div className="flex justify-between items-end z-10">
            <div>
-             <p className="text-emerald-600 font-bold uppercase tracking-widest text-xs mb-1 flex items-center gap-1">
+             <p className="text-emerald-600 dark:text-emerald-500 font-bold uppercase tracking-widest text-xs mb-1 flex items-center gap-1">
                <Clock size={14} /> Next: {next.name}
              </p>
-             <p className="text-4xl font-extrabold text-emerald-800 tracking-tight tabular-nums">{next.time}</p>
+             <p className="text-4xl font-extrabold text-emerald-800 dark:text-emerald-300 tracking-tight tabular-nums">{next.time}</p>
            </div>
-           <div className="text-right bg-orange-50 text-orange-700 px-4 py-2 rounded-[1rem] border border-orange-100">
+           <div className="text-right bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 px-4 py-2 rounded-[1rem] border border-orange-100 dark:border-orange-900/50">
              <p className="text-[10px] font-bold uppercase tracking-wider opacity-80 mb-0.5">Time Left</p>
              <p className="font-extrabold text-xl line-clamp-1">{timeString}</p>
            </div>

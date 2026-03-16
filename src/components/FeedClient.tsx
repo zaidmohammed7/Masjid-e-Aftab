@@ -26,7 +26,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
   );
 
   return (
-    <main className="min-h-screen pb-40 bg-gray-50 font-sans selection:bg-emerald-200">
+    <main className="min-h-screen pb-40 bg-gray-50 dark:bg-gray-950 font-sans selection:bg-emerald-200">
       
       {/* Premium Gradient Header block - Centered & Sync Height */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
@@ -40,7 +40,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
       {/* Floating Header Container */}
       <div className="sticky top-4 z-50 px-4">
         {/* Language Toggle */}
-        <div className="flex z-10 p-1.5 bg-white/80 backdrop-blur-xl rounded-[2rem] max-w-[320px] mx-auto shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)] border border-white/50 relative">
+        <div className="flex z-10 p-1.5 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-[2rem] max-w-[320px] mx-auto shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)] border border-white/50 dark:border-gray-800 relative">
           <button
             onClick={() => setActiveLang("urdu")}
             className={clsx(
@@ -58,7 +58,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
               "flex-1 flex items-center justify-center py-3.5 rounded-[1.75rem] transition-all duration-300 relative z-10 text-lg font-bold outline-none",
               activeLang === "english"
                 ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md transform scale-[1.02]"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             )}
           >
             English
@@ -84,10 +84,10 @@ export default function FeedClient({ announcements }: { announcements: Announcem
 
 function AnnouncementCard({ item }: { item: Announcement }) {
   return (
-    <div className="overflow-hidden bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] rounded-[2.5rem] p-3">
+    <div className="overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/40 dark:border-gray-800 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] rounded-[2.5rem] p-3 transition-colors duration-300">
       {item.title && (
-        <div className="px-5 pt-4 pb-3 border-b border-gray-100/50 mb-3">
-           <h3 className="text-2xl font-black text-gray-900 tracking-tight leading-tight">
+        <div className="px-5 pt-4 pb-3 border-b border-gray-100/50 dark:border-gray-800 mb-3">
+           <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight leading-tight">
              {item.title}
            </h3>
         </div>
@@ -104,8 +104,8 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
         {item.type === "text" && (
-          <div className="p-10 text-center bg-gray-50/80">
-            <p className="text-2xl font-bold text-gray-800 leading-relaxed whitespace-pre-wrap">
+          <div className="p-10 text-center bg-gray-50/80 dark:bg-gray-800/80">
+            <p className="text-2xl font-bold text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
               {item.contentText}
             </p>
           </div>
@@ -131,7 +131,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
       </div>
       
       {/* Meta Footer */}
-      <div className="px-5 pt-4 pb-2 border-t border-gray-100 flex justify-between items-center text-gray-400">
+      <div className="px-5 pt-4 pb-2 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-gray-400 dark:text-gray-500">
         <span className="text-[12px] font-black flex flex-col uppercase tracking-widest">
           <span>{new Date(item.timestamp).toLocaleDateString(undefined, {
             month: "short",
@@ -172,7 +172,7 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gradient-to-br from-emerald-100 to-green-50 rounded-[1.5rem] relative overflow-hidden">
+    <div className="flex items-center justify-between p-4 bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-[1.5rem] relative overflow-hidden">
       {/* Background Pulse Animation */}
       {isPlaying && (
         <>
@@ -195,7 +195,7 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
         )}
       </button>
       
-      <p className="text-xl font-bold text-emerald-800 z-10 text-right w-full pr-4">
+      <p className="text-xl font-bold text-emerald-800 dark:text-emerald-400 z-10 text-right w-full pr-4">
         {isPlaying ? "Playing..." : "Listen Notes"}
       </p>
     </div>
