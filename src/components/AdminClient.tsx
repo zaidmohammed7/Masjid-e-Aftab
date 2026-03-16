@@ -98,6 +98,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptJummah1, setPtJummah1] = useState(initialPrayerTimes?.jummah1 || "01:00 PM");
   const [ptJummah2, setPtJummah2] = useState(initialPrayerTimes?.jummah2 || "01:30 PM");
   const [ptJummah3, setPtJummah3] = useState(initialPrayerTimes?.jummah3 || "02:00 PM");
+  const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "Hadeeth of the Day");
+  const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
 
   const handleLogout = () => {
@@ -216,6 +218,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       jummah1: ptJummah1,
       jummah2: ptJummah2,
       jummah3: ptJummah3,
+      hadeethTitle: ptHadeethTitle,
+      hadeethText: ptHadeethText,
     };
     const res = await savePrayerTimes(initialPrayerTimes?._id || null, data);
     setPtSaving(false);
@@ -393,12 +397,32 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     <TimePicker value={ptJummah3} onChange={setPtJummah3} />
                  </div>
 
+                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Hadeeth Title</label>
+                    <input 
+                      value={ptHadeethTitle}
+                      onChange={e => setPtHadeethTitle(e.target.value)}
+                      placeholder="e.g. Hadeeth of the Day"
+                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-inner"
+                    />
+                 </div>
+                 <div className="flex flex-col gap-2">
+                    <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Hadeeth Text / Message</label>
+                    <textarea 
+                      value={ptHadeethText}
+                      onChange={e => setPtHadeethText(e.target.value)}
+                      placeholder="Type the Imaam's message or Hadeeth..."
+                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-inner"
+                      rows={4}
+                    />
+                 </div>
+
                  <button
                     disabled={ptSaving}
                     onClick={handlePrayerTimesSubmit}
                     className="w-full bg-emerald-500 text-white p-6 rounded-full text-2xl font-bold flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6"
                  >
-                    {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Save Times</>}
+                    {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Update Mosque Info</>}
                  </button>
               </div>
            </div>
