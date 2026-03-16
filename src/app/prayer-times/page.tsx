@@ -37,7 +37,7 @@ export default async function PrayerTimesPage() {
   return (
     <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
       {/* Premium Header - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay">
           <Clock size={160} />
         </div>
@@ -57,14 +57,12 @@ export default async function PrayerTimesPage() {
                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-full blur-2xl opacity-50"></div>
                )}
                <div className="flex justify-between items-center relative z-10 w-full gap-4">
-                <div className="flex flex-col min-w-0">
-                   {pt.extra && <span className="bg-gradient-to-r from-emerald-100 to-emerald-50 dark:from-emerald-900/50 dark:to-emerald-800/20 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block w-max mb-1 shadow-sm border border-emerald-100/50 dark:border-emerald-900/50">Friday</span>}
-                   <div className="flex items-baseline gap-2 overflow-hidden">
-                     <h2 className="text-xl font-black tracking-tight drop-shadow-sm text-[var(--card-text)] truncate">{pt.name}</h2>
-                     <span className="text-emerald-600/60 dark:text-emerald-400/60 font-medium text-lg whitespace-nowrap" dir="rtl">{pt.arabic}</span>
-                   </div>
+                 <div className="flex flex-col min-w-0 pr-2 items-center flex-1">
+                    {pt.extra && <span className="bg-gradient-to-r from-emerald-100 to-emerald-50 dark:from-emerald-900/50 dark:to-emerald-800/20 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block w-max mb-1 shadow-sm border border-emerald-100/50 dark:border-emerald-900/50 text-center">Friday</span>}
+                    <h2 className="text-xl font-black tracking-tight drop-shadow-sm text-[var(--card-text)] leading-none text-center">{pt.name}</h2>
+                    <span className="text-emerald-600/60 dark:text-emerald-400/60 font-bold text-lg mt-1 tracking-tight text-center">{pt.arabic}</span>
                  </div>
-                 <p className="text-3xl font-black tabular-nums tracking-tighter text-[var(--card-text)] flex-shrink-0">{pt.time}</p>
+                 <p className="text-2xl font-black tabular-nums tracking-tighter text-[var(--card-text)] flex-shrink-0 bg-gray-50 dark:bg-gray-800/50 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-inner">{pt.time}</p>
                </div>
             </div>
           );

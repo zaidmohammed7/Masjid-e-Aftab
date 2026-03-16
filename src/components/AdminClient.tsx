@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut } from "lucide-react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
@@ -241,8 +241,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           background-size: 1.5em 1.5em;
         }
       `}} />
-      {/* Premium Header - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
+      {/* Premium Gradient Header block - Centered & Sync Height */}
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
+        <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
+          <Lock size={160} />
+        </div>
         <div className="absolute -top-16 -right-16 opacity-20 rotate-12 mix-blend-overlay">
           <div className="w-80 h-80 rounded-[4rem] border-[30px] border-white blur-sm"></div>
         </div>

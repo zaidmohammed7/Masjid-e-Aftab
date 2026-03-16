@@ -29,12 +29,12 @@ export default function FeedClient({ announcements }: { announcements: Announcem
     <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
       
       {/* Premium Gradient Header block - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
         <div className="absolute top-10 left-10 opacity-10 mix-blend-overlay rotate-12">
           <Megaphone size={160} />
         </div>
-        <h1 className="text-4xl font-black text-white relative z-10 tracking-tight drop-shadow-lg">Announcements</h1>
-        <p className="text-emerald-100/90 font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">Latest news and updates</p>
+        <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg">Announcements</h1>
+        <p className="text-emerald-100/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">Latest news and updates</p>
       </div>
 
       {/* Floating Header Container */}

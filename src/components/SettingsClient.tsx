@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Moon, Sun, Lock, Globe, Type, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone } from "lucide-react";
+import { Moon, Sun, Lock, Globe, Type, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import Link from "next/link";
 import clsx from "clsx";
@@ -146,7 +146,10 @@ export default function SettingsClient() {
   return (
     <div className="min-h-screen bg-transparent pb-32">
       {/* Premium Header - Vibrantly Emerald Green */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-16 pb-24 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
+        <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
+          <Settings size={160} />
+        </div>
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full blur-xl animate-pulse" />
           <div className="absolute bottom-10 right-10 w-32 h-32 border border-white rounded-full blur-2xl opacity-50" />

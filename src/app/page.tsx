@@ -21,25 +21,30 @@ export default async function HomePage() {
       </div>
 
       {/* Premium Hero Header */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-16 pb-24 px-8 rounded-b-[4rem] shadow-[0_25px_50px_-12px_rgba(4,120,87,0.3)] relative overflow-hidden text-center z-10">
+      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-8 pb-10 px-8 rounded-b-[3rem] shadow-[0_25px_50px_-12px_rgba(4,120,87,0.3)] relative overflow-hidden text-center z-10">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full blur-xl animate-pulse" />
           <div className="absolute bottom-10 right-10 w-32 h-32 border border-white rounded-full blur-2xl opacity-50" />
         </div>
         
+        {/* Background Watermark Logo */}
+        <div className="absolute -right-6 -bottom-6 opacity-5 mix-blend-overlay rotate-12 pointer-events-none">
+           <Image src="/icon.png" alt="" width={200} height={200} priority />
+        </div>
+        
         {/* Masjid Logo */}
-        <div className="relative z-20 mb-6 flex justify-center animate-in zoom-in duration-1000">
-           <div className="p-1 bg-white/10 backdrop-blur-md rounded-[2.5rem] border border-white/20 shadow-2xl">
-              <div className="bg-white rounded-[2.2rem] p-1 overflow-hidden shadow-inner">
-                 <Image src="/icon.png" alt="Masjid e Aftab Logo" width={100} height={100} className="rounded-[2rem]" priority />
+        <div className="relative z-20 mb-4 flex justify-center animate-in zoom-in duration-1000">
+           <div className="p-0.5 bg-white/10 backdrop-blur-md rounded-[1.8rem] border border-white/20 shadow-2xl">
+              <div className="bg-white rounded-[1.6rem] p-0.5 overflow-hidden shadow-inner">
+                 <Image src="/icon.png" alt="Masjid e Aftab Logo" width={60} height={60} className="rounded-[1.4rem]" priority />
               </div>
            </div>
         </div>
 
-        <h1 className="text-5xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white">
+        <h1 className="text-3xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white">
           Masjid e Aftab
         </h1>
-        <p className="text-emerald-50/90 text-[1.15rem] font-medium mt-3 relative z-10 tracking-wide drop-shadow-md">
+        <p className="text-emerald-50/90 text-sm font-medium mt-1.5 relative z-10 tracking-wide drop-shadow-md">
           Heart of the Community
         </p>
       </div>
