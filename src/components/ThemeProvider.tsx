@@ -3,28 +3,42 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
+type FontSize = "small" | "medium" | "large";
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
+  const [fontSize, setFontSizeState] = useState<FontSize>("medium");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as Theme;
+    const savedFontSize = localStorage.getItem("fontSize") as FontSize;
+
+    const root = document.documentElement;
+
     if (savedTheme) {
       setTheme(savedTheme);
-      if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      }
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      // setTheme("dark"); // Default to light for now unless user picks
+      if (savedTheme === "dark") root.classList.add("dark");
+      else root.classList.remove("dark");
     }
+    
+    if (savedFontSize) {
+      setFontSizeState(savedFontSize);
+      root.classList.remove("font-size-small", "font-size-medium", "font-size-large");
+      root.classList.add(`font-size-${savedFontSize}`);
+    } else {
+      root.classList.add("font-size-medium");
+    }
+
     setMounted(true);
   }, []);
 
@@ -32,19 +46,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
+    const root = document.documentElement;
     if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
+      root.classList.add("dark");
     } else {
-      document.documentElement.classList.remove("dark");
+      root.classList.remove("dark");
     }
   };
 
+  const setFontSize = (size: FontSize) => {
+    setFontSizeState(size);
+    localStorage.setItem("fontSize", size);
+    const root = document.documentElement;
+    root.classList.remove("font-size-small", "font-size-medium", "font-size-large");
+    root.classList.add(`font-size-${size}`);
+  };
+
   if (!mounted) {
-    return <>{children}</>;
+    return <div style={{ visibility: 'hidden' }}>{children}</div>;
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, fontSize, setFontSize }}>
       {children}
     </ThemeContext.Provider>
   );

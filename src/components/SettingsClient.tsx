@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Moon, Sun, Lock, Globe, Type, Info, ChevronRight, Share2, Star, ShieldCheck } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import Link from "next/link";
@@ -20,9 +20,30 @@ interface SettingSection {
 }
 
 export default function SettingsClient() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, fontSize, setFontSize } = useTheme();
   const [language, setLanguage] = useState("english");
-  const [fontSize, setFontSize] = useState("medium");
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        setDeferredPrompt(null);
+      }
+    } else {
+      alert("To install: Tap the browser menu (3 dots or share icon) and select 'Add to Home Screen'.");
+    }
+  };
 
   const sections: SettingSection[] = [
     {
@@ -51,7 +72,7 @@ export default function SettingsClient() {
           action: (
             <select 
               value={fontSize}
-              onChange={(e) => setFontSize(e.target.value)}
+              onChange={(e) => setFontSize(e.target.value as any)}
               className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg font-bold text-sm outline-none border-none dark:text-white"
             >
               <option value="small">Small</option>
@@ -94,15 +115,22 @@ export default function SettingsClient() {
       title: "Support & About",
       items: [
         {
+          id: "install",
+          label: "Install on Phone",
+          icon: <ShieldCheck size={24} className="text-emerald-500" />,
+          action: (
+            <button 
+              onClick={handleInstall}
+              className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/50"
+            >
+              Get App
+            </button>
+          )
+        },
+        {
           id: "share",
           label: "Share App",
           icon: <Share2 size={24} className="text-indigo-500" />,
-          action: <ChevronRight className="text-gray-400" />
-        },
-        {
-          id: "rate",
-          label: "Rate on Store",
-          icon: <Star size={24} className="text-yellow-500" />,
           action: <ChevronRight className="text-gray-400" />
         },
         {

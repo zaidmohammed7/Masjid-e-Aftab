@@ -26,7 +26,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
   );
 
   return (
-    <main className="min-h-screen pb-40 bg-gray-50 dark:bg-gray-950 font-sans selection:bg-emerald-200">
+    <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
       
       {/* Premium Gradient Header block - Centered & Sync Height */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
@@ -95,7 +95,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
       <div className="rounded-[1.8rem] overflow-hidden">
         {item.type === "audio" && <AudioPlayer fileUrl={item.contentAudio} />}
         {item.type === "image" && (
-          <div className="bg-gray-100 flex items-center justify-center min-h-[200px]">
+          <div className="bg-gray-100 dark:bg-gray-800 flex items-center justify-center min-h-[200px]">
             <img
               src={item.contentImage}
               alt={item.title || "Announcement"}
@@ -104,14 +104,14 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
         {item.type === "text" && (
-          <div className="p-10 text-center bg-gray-50/80 dark:bg-gray-800/80">
-            <p className="text-2xl font-bold text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+          <div className="p-10 text-center bg-gray-50/80 dark:bg-gray-800/50">
+            <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">
               {item.contentText}
             </p>
           </div>
         )}
         {item.type === "pdf" && (
-          <div className="bg-gray-100 flex flex-col">
+          <div className="bg-gray-100 dark:bg-gray-800 flex flex-col">
             <iframe 
               src={`${item.contentPdf}#toolbar=0&navpanes=0&scrollbar=0`} 
               className="w-full h-96 border-0"

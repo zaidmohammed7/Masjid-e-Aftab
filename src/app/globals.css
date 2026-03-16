@@ -9,19 +9,31 @@
   :root {
     --background: #ffffff;
     --foreground: #171717;
+    --app-font-size: 16px;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: #0a0a0a;
-      --foreground: #ededed;
-    }
+  /* Manual Dark Mode Selector */
+  html.dark {
+    --background: #020617;
+    --foreground: #f8fafc;
+  }
+
+  .font-size-small { --app-font-size: 14px; }
+  .font-size-medium { --app-font-size: 16px; }
+  .font-size-large { --app-font-size: 18px; }
+
+  html {
+    font-size: var(--app-font-size);
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: inherit;
+  background-color: inherit;
+  transition: inherit;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

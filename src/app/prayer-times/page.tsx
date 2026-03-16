@@ -35,7 +35,7 @@ export default async function PrayerTimesPage() {
   ];
 
   return (
-    <main className="min-h-screen pb-40 bg-gray-50 dark:bg-gray-950 font-sans selection:bg-emerald-200 transition-colors duration-300">
+    <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
       {/* Premium Header - Centered & Sync Height */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-12 pb-14 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay">

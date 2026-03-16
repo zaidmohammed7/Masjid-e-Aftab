@@ -24,9 +24,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
-      <body className={`${inter.className} bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 overscroll-none`}>
+      <body className={`${inter.className} overscroll-none`}>
         <ThemeProvider>
-          <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-white dark:bg-gray-900">
+          <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-inherit">
             {children}
             <BottomNav />
           </div>
