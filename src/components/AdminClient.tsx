@@ -350,7 +350,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           Admin Control
         </h1>
         <p className="text-emerald-50/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">
-          Management Dashboard
+          Management dashboard
         </p>
       </div>
 

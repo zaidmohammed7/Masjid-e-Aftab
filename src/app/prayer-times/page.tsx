@@ -45,7 +45,7 @@ export default async function PrayerTimesPage() {
         <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg">
           Prayer Times
         </h1>
-        <p className="text-emerald-50/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">Daily Prayer Timings</p>
+        <p className="text-emerald-50/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">Daily prayer timings</p>
       </div>
 
       <div className="px-6 pt-10 flex flex-col gap-5 max-w-md mx-auto relative z-20">
