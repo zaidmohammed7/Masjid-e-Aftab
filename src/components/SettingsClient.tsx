@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Moon, Sun, Lock, Globe, Type, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings } from "lucide-react";
+import { Moon, Sun, Lock, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import Link from "next/link";
 import clsx from "clsx";
+import { get, set } from "idb-keyval";
+import { subscribeToPush, unsubscribeFromPush } from "@/lib/push";
 
 interface SettingItem {
   id: string;
@@ -19,13 +21,37 @@ interface SettingSection {
   items: SettingItem[];
 }
 
+type PrayerKey = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+
 export default function SettingsClient() {
   const { theme, toggleTheme } = useTheme();
   const [prayerAlerts, setPrayerAlerts] = useState(false);
+  const [individualAlerts, setIndividualAlerts] = useState<Record<PrayerKey, boolean>>({
+    fajr: true,
+    dhuhr: true,
+    asr: true,
+    maghrib: true,
+    isha: true,
+  });
+
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
+    async function loadPrefs() {
+      const enabled = await get("prayer_alerts_enabled");
+      setPrayerAlerts(!!enabled);
+      
+      const pKeys: PrayerKey[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+      const newIdxAlerts = { ...individualAlerts };
+      for (const k of pKeys) {
+        const val = await get(`prayer_alert_${k}`);
+        if (val !== undefined) newIdxAlerts[k] = !!val;
+      }
+      setIndividualAlerts(newIdxAlerts);
+    }
+    loadPrefs();
+
     const handler = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -33,6 +59,37 @@ export default function SettingsClient() {
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
+
+  const handleTogglePrayerAlerts = async () => {
+    const newVal = !prayerAlerts;
+    setPrayerAlerts(newVal);
+    await set("prayer_alerts_enabled", newVal);
+
+    if (newVal) {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          await subscribeToPush();
+        } else {
+          setPrayerAlerts(false);
+          await set("prayer_alerts_enabled", false);
+          alert("Permission denied. Please enable notifications in your browser settings.");
+        }
+      } catch (e) {
+        console.error("Subscription Error:", e);
+        setPrayerAlerts(false);
+        await set("prayer_alerts_enabled", false);
+      }
+    } else {
+      await unsubscribeFromPush();
+    }
+  };
+
+  const handleToggleIndividual = async (key: PrayerKey) => {
+    const newVal = !individualAlerts[key];
+    setIndividualAlerts(prev => ({ ...prev, [key]: newVal }));
+    await set(`prayer_alert_${key}`, newVal);
+  };
 
   const handleInstall = async () => {
     if (deferredPrompt) {
@@ -72,7 +129,7 @@ export default function SettingsClient() {
           icon: <ShieldCheck size={24} className="text-purple-500" />,
           action: (
             <button 
-              onClick={() => setPrayerAlerts(!prayerAlerts)}
+              onClick={handleTogglePrayerAlerts}
               className={clsx(
                 "w-14 h-8 rounded-full p-1 transition-colors duration-300 flex items-center",
                 prayerAlerts ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
@@ -82,6 +139,36 @@ export default function SettingsClient() {
             </button>
           )
         }
+      ]
+    },
+    {
+      title: "Notification Filters",
+      items: [
+        { id: "fajr", label: "Fajr Alert", icon: <Sun size={24} className="text-orange-500" />, action: (
+          <button onClick={() => handleToggleIndividual("fajr")} className={clsx("w-12 h-6 rounded-full p-1 flex items-center transition-all", individualAlerts.fajr ? "bg-emerald-500 justify-end" : "bg-gray-200 justify-start")}>
+            <div className="w-4 h-4 bg-white rounded-full" />
+          </button>
+        )},
+        { id: "dhuhr", label: "Dhuhr Alert", icon: <Sun size={24} className="text-amber-500" />, action: (
+          <button onClick={() => handleToggleIndividual("dhuhr")} className={clsx("w-12 h-6 rounded-full p-1 flex items-center transition-all", individualAlerts.dhuhr ? "bg-emerald-500 justify-end" : "bg-gray-200 justify-start")}>
+            <div className="w-4 h-4 bg-white rounded-full" />
+          </button>
+        )},
+        { id: "asr", label: "Asr Alert", icon: <Sun size={24} className="text-yellow-600" />, action: (
+          <button onClick={() => handleToggleIndividual("asr")} className={clsx("w-12 h-6 rounded-full p-1 flex items-center transition-all", individualAlerts.asr ? "bg-emerald-500 justify-end" : "bg-gray-200 justify-start")}>
+            <div className="w-4 h-4 bg-white rounded-full" />
+          </button>
+        )},
+        { id: "maghrib", label: "Maghrib Alert", icon: <Moon size={24} className="text-indigo-500" />, action: (
+          <button onClick={() => handleToggleIndividual("maghrib")} className={clsx("w-12 h-6 rounded-full p-1 flex items-center transition-all", individualAlerts.maghrib ? "bg-emerald-500 justify-end" : "bg-gray-200 justify-start")}>
+            <div className="w-4 h-4 bg-white rounded-full" />
+          </button>
+        )},
+        { id: "isha", label: "Isha Alert", icon: <Moon size={24} className="text-slate-800" />, action: (
+          <button onClick={() => handleToggleIndividual("isha")} className={clsx("w-12 h-6 rounded-full p-1 flex items-center transition-all", individualAlerts.isha ? "bg-emerald-500 justify-end" : "bg-gray-200 justify-start")}>
+            <div className="w-4 h-4 bg-white rounded-full" />
+          </button>
+        )}
       ]
     },
     {
@@ -145,7 +232,6 @@ export default function SettingsClient() {
 
   return (
     <div className="min-h-screen bg-transparent pb-32">
-      {/* Premium Header - Vibrantly Emerald Green */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
           <Settings size={160} />
@@ -193,7 +279,6 @@ export default function SettingsClient() {
           </div>
         ))}
         
-        {/* Footer Info */}
         <div className="text-center pt-8 pb-4">
           <div className="flex items-center justify-center gap-2 text-emerald-500 mb-2">
             <ShieldCheck size={20} />
@@ -204,7 +289,6 @@ export default function SettingsClient() {
         </div>
       </div>
 
-      {/* About / Donation Modal */}
       {isAboutOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-6 animate-in fade-in duration-300">
           <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[3rem] p-8 shadow-2xl relative animate-in zoom-in-95 border border-emerald-100 dark:border-emerald-900/30 overflow-hidden">

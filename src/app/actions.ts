@@ -181,17 +181,29 @@ export async function updateAnnouncement(data: FormData) {
   }
 }
 
+import { istToUtc } from "@/lib/time";
+
 export async function savePrayerTimes(id: string | null, data: any) {
   const token = process.env.SANITY_API_TOKEN;
   if (!token) throw new Error("Missing Sanity API Token.");
 
   const client = createClient({ projectId, dataset, apiVersion, useCdn: false, token });
 
+  // Convert IST input strings to UTC ISO Strings
+  const utcData = { ...data };
+  const timeFields = ["fajr", "dhuhr", "asr", "maghrib", "isha", "jummah1", "jummah2", "jummah3"];
+  
+  for (const field of timeFields) {
+    if (utcData[field]) {
+      utcData[field] = istToUtc(utcData[field]);
+    }
+  }
+
   try {
     if (id) {
-       await client.patch(id).set(data).commit();
+       await client.patch(id).set(utcData).commit();
     } else {
-       await client.create({ _type: "prayerTimes", title: "Current Prayer Times", ...data });
+       await client.create({ _type: "prayerTimes", title: "Current Prayer Times", ...utcData });
     }
     revalidatePath("/prayer-times");
     revalidatePath("/admin");

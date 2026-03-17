@@ -6,11 +6,19 @@ const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
 
 export const revalidate = 0; // Opt out of caching so updates reflect instantly
 
+import { utcToIst } from "@/lib/time";
+
 export default async function PrayerTimesPage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
 
   function formatTime(timeStr: string) {
     if (!timeStr || timeStr === "--:--") return "--:--";
+    
+    // Check if it's an ISO String (UTC)
+    if (timeStr.includes("T") && timeStr.endsWith("Z")) {
+      return utcToIst(timeStr);
+    }
+
     if (timeStr.toLowerCase().includes("m")) return timeStr;
     const parts = timeStr.split(":");
     if (parts.length !== 2) return timeStr;
