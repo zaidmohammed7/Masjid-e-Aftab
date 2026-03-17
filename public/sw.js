@@ -9,7 +9,7 @@ self.addEventListener('push', function(event) {
         if (shouldShow) {
           const options = {
             body: data.body || `It's time for ${prayerType} prayer.`,
-            icon: '/notification-icon.png',
+            icon: '/icon-192x192.png',
             badge: '/notification-icon.png',
             vibrate: [200, 100, 200, 100, 200], // Stronger physical alert
             tag: `prayer-alert-${prayerType}`,
