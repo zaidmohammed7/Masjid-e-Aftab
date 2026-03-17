@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Masjid e Aftab Community',
-    short_name: 'Masjid e Aftab',
+    name: 'Masjid-e-Aftab Community',
+    short_name: 'Masjid-e-Aftab',
     description: 'Community PWA for local masjid announcements',
     start_url: '/',
     display: 'standalone',

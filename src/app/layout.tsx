@@ -8,8 +8,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Masjid e Aftab App",
-  description: "Extreme UX Masjid e Aftab PWA",
+  title: "Masjid-e-Aftab App",
+  description: "Extreme UX Masjid-e-Aftab PWA",
   manifest: "/manifest.ts",
   icons: {
     icon: "/icon.png",

@@ -27,7 +27,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
 
   return (
     <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
-      
+
       {/* Premium Gradient Header block - Centered & Sync Height */}
       <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
         <div className="absolute top-10 left-10 opacity-10 mix-blend-overlay rotate-12">
@@ -99,16 +99,16 @@ function AnnouncementCard({ item }: { item: Announcement }) {
     <div className="overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_15px_45px_-15px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[2.5rem] p-3 transition-colors duration-300">
       <div className="flex justify-between items-center px-5 pt-4 pb-3 border-b border-[var(--card-border)] mb-3">
         {item.title ? (
-           <h3 className="text-2xl font-black text-[var(--card-text)] tracking-tight leading-tight flex-1">
-             {item.title}
-           </h3>
+          <h3 className="text-2xl font-black text-[var(--card-text)] tracking-tight leading-tight flex-1">
+            {item.title}
+          </h3>
         ) : <div className="flex-1"></div>}
-        
+
         <div className={clsx(
           "ml-3 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm",
           item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
         )}>
-           {item.language === "both" ? "Urdu/Eng" : item.language}
+          {item.language === "both" ? "Urdu/Eng" : item.language}
         </div>
       </div>
       <div className="rounded-[1.8rem] overflow-hidden">
@@ -130,27 +130,27 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
         {item.type === "video" && (
-           <div className="bg-black flex items-center justify-center min-h-[200px]">
-             <video 
-               src={item.contentVideo} 
-               controls 
-               playsInline
-               className="w-full h-auto max-h-[500px]"
-               poster={item.contentImage} // Optional: use image as poster if available
-             />
-           </div>
+          <div className="bg-black flex items-center justify-center min-h-[200px]">
+            <video
+              src={item.contentVideo}
+              controls
+              playsInline
+              className="w-full h-auto max-h-[500px]"
+              poster={item.contentImage} // Optional: use image as poster if available
+            />
+          </div>
         )}
         {item.type === "pdf" && (
           <div className="bg-gray-100 dark:bg-gray-800 flex flex-col p-8 items-center justify-center text-center">
             <div className="w-24 h-24 bg-purple-100 dark:bg-purple-900/30 rounded-3xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6 shadow-sm ring-1 ring-purple-100 dark:ring-purple-900/50">
-               <FileText size={48} />
+              <FileText size={48} />
             </div>
             <h4 className="font-black text-gray-800 dark:text-gray-200 text-lg mb-2 line-clamp-1 px-4">{item.title || "Document Flyer"}</h4>
             <p className="text-gray-500 text-sm mb-8 font-bold uppercase tracking-widest">PDF Document</p>
-            
-            <a 
-              href={item.contentPdf} 
-              target="_blank" 
+
+            <a
+              href={item.contentPdf}
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center py-4 px-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white w-full rounded-[1.5rem] font-black text-lg transition-all active:scale-95 shadow-[0_10px_20px_-5px_rgba(147,51,234,0.4)]"
             >
@@ -160,7 +160,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           </div>
         )}
       </div>
-      
+
       {/* Meta Footer */}
       <div className="px-5 pt-4 pb-2 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-gray-400 dark:text-gray-500">
         <span className="text-[12px] font-black flex flex-col uppercase tracking-widest">
@@ -171,11 +171,11 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           <span className="opacity-60 mt-0.5">{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </span>
         <div className="flex items-center gap-2">
-           {item.type === 'audio' && <Megaphone size={24} className="opacity-50" />}
-           {item.type === 'image' && <ImageIcon size={24} className="opacity-50" />}
-           {item.type === 'text' && <FileText size={24} className="opacity-50" />}
-           {item.type === 'video' && <Video size={24} className="opacity-50" />}
-           {item.type === 'pdf' && <FileText size={24} className="opacity-50" />}
+          {item.type === 'audio' && <Megaphone size={24} className="opacity-50" />}
+          {item.type === 'image' && <ImageIcon size={24} className="opacity-50" />}
+          {item.type === 'text' && <FileText size={24} className="opacity-50" />}
+          {item.type === 'video' && <Video size={24} className="opacity-50" />}
+          {item.type === 'pdf' && <FileText size={24} className="opacity-50" />}
         </div>
       </div>
     </div>
@@ -211,7 +211,7 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
           <div className="absolute left-6 w-24 h-24 bg-emerald-400 rounded-full opacity-20 animate-ping" style={{ animationDuration: '1.5s' }} />
         </>
       )}
-      
+
       {/* Play Button */}
       <button
         onClick={togglePlay}
@@ -226,7 +226,7 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
           <Play size={40} className="text-white ml-2 fill-current" />
         )}
       </button>
-      
+
       <p className="text-xl font-bold text-emerald-800 dark:text-emerald-400 z-10 text-right w-full pr-4">
         {isPlaying ? "Playing..." : "Listen Notes"}
       </p>

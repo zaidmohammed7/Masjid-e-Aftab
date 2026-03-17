@@ -221,7 +221,7 @@ export default function SettingsClient() {
               <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-3xl flex items-center justify-center text-emerald-600 mb-4 shadow-inner">
                  <Info size={40} />
               </div>
-              <h3 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Masjid e Aftab</h3>
+              <h3 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Masjid-e-Aftab</h3>
             </div>
 
             <div className="mt-8 space-y-6">

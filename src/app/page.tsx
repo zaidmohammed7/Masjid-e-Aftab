@@ -26,34 +26,36 @@ export default async function HomePage() {
           <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full blur-xl animate-pulse" />
           <div className="absolute bottom-10 right-10 w-32 h-32 border border-white rounded-full blur-2xl opacity-50" />
         </div>
-        
-        {/* Background Watermark Logo */}
-        <div className="absolute -right-6 -bottom-6 opacity-5 mix-blend-overlay rotate-12 pointer-events-none">
-           <Image src="/icon.png" alt="" width={200} height={200} priority />
-        </div>
-        
-        {/* Masjid Logo */}
-        <div className="relative z-20 mb-4 flex justify-center animate-in zoom-in duration-1000">
-           <div className="p-0.5 bg-white/10 backdrop-blur-md rounded-[1.8rem] border border-white/20 shadow-2xl">
-              <div className="bg-white rounded-[1.6rem] p-0.5 overflow-hidden shadow-inner">
-                 <Image src="/icon.png" alt="Masjid e Aftab Logo" width={60} height={60} className="rounded-[1.4rem]" priority />
-              </div>
-           </div>
+
+        {/* Background Watermark Icon - Simplistic & Seamless */}
+        <div className="absolute -right-12 -bottom-16 opacity-[0.12] mix-blend-screen pointer-events-none"
+             style={{ maskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)' }}>
+          <Image src="/watermark.png" alt="" width={350} height={350} priority />
         </div>
 
-        <h1 className="text-3xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white">
-          Masjid e Aftab
+        {/* Masjid Logo */}
+        <div className="relative z-20 mb-4 flex justify-center animate-in zoom-in duration-1000">
+          <div className="p-0.5 bg-white/10 backdrop-blur-md rounded-[1.8rem] border border-white/20 shadow-2xl">
+            <div className="bg-white rounded-[1.6rem] p-0.5 overflow-hidden shadow-inner">
+              <Image src="/icon.png" alt="Masjid-e-Aftab Logo" width={60} height={60} className="rounded-[1.4rem]" priority />
+            </div>
+          </div>
+        </div>
+
+        <h1 className="text-4xl font-black relative z-10 tracking-tighter leading-tight drop-shadow-2xl text-white uppercase">
+          Masjid-e-Aftab
         </h1>
-        <p className="text-emerald-50/90 text-sm font-medium mt-1.5 relative z-10 tracking-wide drop-shadow-md">
+        <div className="h-1 w-12 bg-white/30 mx-auto mt-3 rounded-full relative z-10" />
+        <p className="text-emerald-50/80 text-[10px] font-black mt-3 relative z-10 tracking-[0.3em] uppercase drop-shadow-md">
           Heart of the Community
         </p>
       </div>
 
       <div className="px-6 pt-12 space-y-12 max-w-md mx-auto relative z-20">
-        
+
         {/* Dynamic Prayer Times clock */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
-           <NextPrayer prayerTimes={prayerTimes} />
+          <NextPrayer prayerTimes={prayerTimes} />
         </div>
 
         {/* Imaams Corner Section */}
@@ -61,45 +63,48 @@ export default async function HomePage() {
           <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 delay-200 fill-mode-both">
             <div className="relative bg-white dark:bg-gray-900 rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-gray-800/50 overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-[5rem] transition-transform group-hover:scale-110 duration-700" />
-              
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-emerald-500 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-                   <Star size={24} className="fill-white" />
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-4 bg-emerald-500 rounded-[1.2rem] text-white shadow-lg shadow-emerald-500/20">
+                  <Star size={24} className="fill-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tight leading-none uppercase text-[10px] tracking-[0.3em] font-black text-emerald-500 mb-1">Imaams Corner</h3>
-                  <p className="font-black text-gray-800 dark:text-gray-100 tracking-tight text-lg">{prayerTimes?.hadeethTitle || "Daily Message"}</p>
+                  <h3 className="text-[10px] font-black text-emerald-500 tracking-[0.3em] uppercase mb-1">Imaam's Corner</h3>
+                  <p className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tighter leading-none">
+                    {prayerTimes?.hadeethTitle || "Daily Message"}
+                  </p>
                 </div>
               </div>
 
-              <div className="relative">
-                <span className="absolute -top-4 -left-2 text-6xl text-emerald-500/10 font-serif leading-none">&ldquo;</span>
-                <p className="text-gray-700 dark:text-gray-300 text-xl font-bold italic leading-relaxed pl-4 pr-2">
-                  {prayerTimes.hadeethText}
+              <div className="relative border-l-4 border-emerald-500/20 pl-6 ml-2">
+                <p className="text-xl font-bold text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                  "{prayerTimes.hadeethText}"
                 </p>
-                <span className="absolute -bottom-8 -right-2 text-6xl text-emerald-500/10 font-serif leading-none">&rdquo;</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* News & Announcements Big Button */}
-        <Link href="/announcements" className="block relative bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 rounded-[3rem] p-10 shadow-[0_20px_45px_-12px_rgba(245,158,11,0.4)] text-white transform active:scale-[0.97] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 ease-out fill-mode-both">
-           <div className="absolute top-0 right-0 opacity-[0.2] -m-10 group-hover:scale-110 transition-transform duration-700">
-              <Megaphone size={200} />
-           </div>
-           
-           <h2 className="text-4xl font-black mb-3 relative z-10 tracking-tight drop-shadow-md">News Feed</h2>
-           <p className="text-amber-50/90 font-bold text-lg relative z-10 w-4/5 leading-snug drop-shadow-sm mb-8">
-             Check the latest announcements and community updates.
-           </p>
-           
-           <div className="bg-white/20 px-10 py-5 rounded-full font-black tracking-[0.15em] text-sm inline-flex items-center gap-3 backdrop-blur-md relative z-10 shadow-inner group-hover:bg-white/30 transition-colors uppercase">
-              Open Board
-              <div className="w-2.5 h-2.5 rounded-full bg-white animate-ping"></div>
-           </div>
+        {/* News & Announcements Professional Card */}
+        <Link href="/announcements" className="block relative bg-white dark:bg-gray-900 rounded-[2.5rem] p-1 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-gray-800 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 ease-out fill-mode-both">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-bl-[6rem] transition-transform group-hover:scale-125 duration-700" />
+          
+          <div className="flex items-center gap-8 p-1 relative z-10">
+            <div className="p-7 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] text-white shadow-xl shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-500">
+               <Megaphone size={40} />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter mb-1">News Feed</h2>
+              <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] leading-none mb-5">Digital Notice Board</p>
+              
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-widest group-hover:translate-x-1 transition-all">
+                Open Announcements
+                <div className="h-0.5 w-6 bg-emerald-500/30 rounded-full" />
+              </div>
+            </div>
+          </div>
         </Link>
-        
+
       </div>
     </main>
   );
