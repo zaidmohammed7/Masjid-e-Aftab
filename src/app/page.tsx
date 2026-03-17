@@ -5,9 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
 
-const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
+const client = createClient({ projectId, dataset, apiVersion, useCdn: true, // Use CDN for faster global delivery
+});
 
-export const revalidate = 0;
+export const revalidate = 60; // Cache for 60 seconds
 
 export default async function HomePage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);

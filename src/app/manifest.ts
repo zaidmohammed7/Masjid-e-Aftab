@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Community PWA for local masjid announcements',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
+    background_color: '#bbf7d0',
     theme_color: '#10b981',
     icons: [
       {

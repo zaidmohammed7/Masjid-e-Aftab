@@ -6,10 +6,10 @@ const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Ensure we get fresh data directly from Sanity DB
+  useCdn: true, // Use CDN for faster global delivery
 });
 
-export const revalidate = 0; // Opt out of static caching so new announcements appear immediately
+export const revalidate = 60; // Cache for 60 seconds
 
 export default async function AnnouncementsPage() {
   const announcements = await client.fetch(`
