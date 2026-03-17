@@ -22,6 +22,7 @@ export default async function AdminPage() {
       "contentImage": contentImage.asset->url,
       "contentAudio": contentAudio.asset->url,
       "contentVideo": contentVideo.asset->url,
+      "contentPdf": contentPdf.asset->url,
       contentText
     }
   `);

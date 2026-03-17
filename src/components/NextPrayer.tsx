@@ -123,7 +123,7 @@ export default function NextPrayer({ prayerTimes }: { prayerTimes: any }) {
 
        <div className="flex justify-between items-start z-10 mt-2">
           <div>
-            <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">Current IST Time</p>
+            <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">Current Time</p>
             <h2 className="text-3xl font-black text-[var(--card-text)] tracking-tight">{currentTimeStr}</h2>
           </div>
           <Link href="/prayer-times" className="text-emerald-700 dark:text-emerald-400 font-extrabold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-[1rem] transition-colors text-sm flex items-center gap-1 shadow-sm border border-emerald-100 dark:border-emerald-900/50">

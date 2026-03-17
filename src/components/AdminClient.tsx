@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight, Pause, Play } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
@@ -158,9 +158,85 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   );
 }
 
+function CompactAudioPlayer({ fileUrl, duration: totalDuration = 0 }: { fileUrl?: string; duration?: number }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(totalDuration);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!audioRef.current && fileUrl) {
+      const audio = new Audio(fileUrl);
+      audioRef.current = audio;
+      audio.onended = () => setIsPlaying(false);
+      audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
+      audio.onloadedmetadata = () => setDuration(audio.duration);
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [fileUrl]);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(console.error);
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!audioRef.current) return;
+    const time = parseFloat(e.target.value);
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="flex items-center gap-3 p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl w-full min-w-0" onClick={e => e.stopPropagation()}>
+      <button onClick={togglePlay} className={clsx(
+        "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-95",
+        isPlaying ? "bg-red-500" : "bg-emerald-500"
+      )}>
+        {isPlaying ? <Pause size={18} className="text-white fill-current" /> : <Play size={18} className="text-white fill-current ml-0.5" />}
+      </button>
+
+      <div className="flex-1 flex flex-col justify-center min-w-0 pr-1">
+        <div className="flex justify-between items-center mb-1 px-0.5">
+          <span className="text-[9px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tighter tabular-nums">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+        </div>
+        <div className="relative h-2 flex items-center">
+          <div className="absolute left-0 right-0 h-1 bg-emerald-200/40 dark:bg-emerald-900/40 rounded-full" />
+          <div className="absolute left-0 h-1 bg-emerald-500 rounded-full z-10" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
+          <input 
+            type="range" min="0" max={duration || 0} step="0.1" value={currentTime}
+            onChange={handleSeek}
+            className="seek-slider h-2 w-full absolute opacity-0 cursor-pointer z-20"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminClient({ announcements, initialPrayerTimes }: { announcements: Announcement[], initialPrayerTimes: any }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "prayerTimes" | "imaamsCorner">("announcements");
   const [adminLang, setAdminLang] = useState<"all" | "urdu" | "english">("all");
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const router = useRouter();
 
   // Post Modal States
@@ -173,10 +249,28 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [postLang, setPostLang] = useState<"urdu" | "english" | "both">("urdu");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectionGroup, setSelectionGroup] = useState<"audio" | "media" | "document" | "text" | null>(null);
 
   // Audio Recording States
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+
+  // Handle Android/Browser back button to close expanded image
+  useEffect(() => {
+    if (expandedImage) {
+      window.history.pushState({ imageExpanded: true }, "");
+      const handlePopState = () => setExpandedImage(null);
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
+    }
+  }, [expandedImage]);
+
+  const closeExpandedImage = () => {
+    if (expandedImage) {
+      window.history.back();
+      setExpandedImage(null);
+    }
+  };
 
   // Edit Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -210,32 +304,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptSaving, setPtSaving] = useState(false);
   const [isTestSending, setIsTestSending] = useState(false);
 
-  const handleSendTestNotification = async () => {
-    const deviceId = localStorage.getItem("deviceId");
-    if (!deviceId) {
-      alert("No device ID found. Open the settings page first to register.");
-      return;
-    }
-
-    setIsTestSending(true);
-    try {
-      const res = await fetch("/api/notifications/test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert("Test notification sent! Check your phone.");
-      } else {
-        alert("Error: " + data.error);
-      }
-    } catch (e: any) {
-      alert("Test failed: " + e.message);
-    } finally {
-      setIsTestSending(false);
-    }
-  };
 
   // Secure Token Fetcher
   const fetchSanityToken = async () => {
@@ -455,14 +523,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             <span className="font-black uppercase tracking-[0.2em] text-[10px]">Logout from Session</span>
           </button>
           
-          <button
-            onClick={handleSendTestNotification}
-            disabled={isTestSending}
-            className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3.5 rounded-2xl shadow-lg hover:bg-blue-600 transition-all active:scale-95 group"
-          >
-            {isTestSending ? <Loader2 size={18} className="animate-spin" /> : <Megaphone size={18} />}
-            <span className="font-black uppercase tracking-[0.2em] text-[10px]">Send Test Notification</span>
-          </button>
         </div>
       </div>
 
@@ -525,72 +585,88 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           ) : (
             <div className="space-y-4">
               {announcements.filter(a => adminLang === "all" || a.language === "both" || a.language === adminLang).map((item) => (
-                <div key={item._id} className="bg-[var(--card-bg)] p-5 rounded-3xl shadow-sm border border-[var(--card-border)] flex justify-between items-center relative overflow-hidden">
-                  {/* Language Tag Badge */}
-                  <div className={clsx(
-                    "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-xs font-bold",
-                    item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  )}>
-                    {item.language === "urdu" ? "Urdu" : item.language === "english" ? "English" : "Both"}
+                <div key={item._id} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[2rem] overflow-hidden shadow-sm flex flex-col transition-all active:scale-[0.99] duration-300">
+                  {/* Header: Title and Language Badge */}
+                  <div className="flex justify-between items-center px-5 py-3 border-b border-[var(--card-border)] bg-gray-50/50 dark:bg-gray-800/30">
+                    <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 tracking-tight leading-tight flex-1 line-clamp-1">
+                      {item.title || "Announcement"}
+                    </h3>
+                    <div className={clsx(
+                      "ml-2 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm",
+                      item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    )}>
+                      {item.language === "both" ? "Urdu/Eng" : item.language}
+                    </div>
                   </div>
 
-                  <div className="flex gap-4 items-center mt-2 flex-1 min-w-0 pr-2">
-                    <div className={clsx(
-                      "p-4 rounded-2xl flex-shrink-0 text-white shadow-lg",
-                      item.type === "text" ? "bg-amber-400" : item.type === "audio" ? "bg-blue-400" : item.type === "video" ? "bg-rose-400" : item.type === "pdf" ? "bg-purple-400" : "bg-emerald-400"
-                    )}>
-                      {item.type === "text" && <FileText size={28} />}
-                      {item.type === "audio" && <Mic size={28} />}
-                      {item.type === "video" && <Video size={28} />}
-                      {item.type === "image" && <ImageIcon size={28} />}
-                      {item.type === "pdf" && <FileText size={28} />}
-                    </div>
-
-                    <div className="overflow-hidden flex-1 min-w-0">
-                      <p className="font-bold text-gray-800 dark:text-gray-100 capitalize truncate w-full text-lg pr-2">
-                        {item.title || "Announcement"}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                        {new Date(item.timestamp).toLocaleDateString()} at {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-
-                      {/* Media Previews in Admin List */}
-                      <div className="mt-3">
+                  {/* Main Content Area */}
+                  <div className="flex items-stretch">
+                    <div className="flex-1 p-4 min-w-0">
+                      <div className="rounded-xl overflow-hidden">
                         {item.type === "image" && item.contentImage && (
-                          <img src={item.contentImage} className="w-20 h-20 object-cover rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm" alt="Thumbnail" />
+                          <div 
+                            className="bg-gray-50 dark:bg-gray-800 flex items-center justify-center h-44 cursor-pointer group relative"
+                            onClick={() => setExpandedImage(item.contentImage!)}
+                          >
+                            <img src={item.contentImage} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          </div>
                         )}
                         {item.type === "video" && item.contentVideo && (
-                          <video src={item.contentVideo} className="w-40 h-24 object-cover rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm bg-black" />
+                          <div className="bg-black flex items-center justify-center h-44">
+                            <video src={item.contentVideo} controls className="w-full h-full object-contain" />
+                          </div>
                         )}
                         {item.type === "audio" && item.contentAudio && (
-                          <div className="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full w-fit">
-                            <Mic size={14} /> Voice Note Attached
+                          <div className="py-1">
+                            <CompactAudioPlayer fileUrl={item.contentAudio} />
                           </div>
                         )}
                         {item.type === "pdf" && item.contentPdf && (
-                          <div className="flex items-center gap-2 text-purple-500 font-bold text-xs uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 px-3 py-1.5 rounded-full w-fit">
-                            <FileText size={14} /> Document Added
+                          <div className="bg-purple-50 dark:bg-purple-950/30 flex flex-col p-4 items-center justify-center text-center rounded-2xl border border-purple-100 dark:border-purple-800/50">
+                            <FileText size={40} className="text-purple-600 dark:text-purple-400 mb-2" />
+                            <a
+                              href={item.contentPdf}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center py-2 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-black text-xs transition-all active:scale-95 shadow-md"
+                            >
+                              <FileText size={14} className="mr-2" />
+                              Open Document
+                            </a>
                           </div>
+                        )}
+                        {item.type === "text" && item.contentText && (
+                          <p className="text-[12px] font-medium text-gray-600 dark:text-gray-400 leading-relaxed italic line-clamp-3">
+                            {item.contentText}
+                          </p>
                         )}
                       </div>
                     </div>
+
+                    {/* Actions Panel */}
+                    <div className="flex flex-col gap-1 border-l border-gray-100 dark:border-gray-800 p-2 justify-center bg-gray-50/30 dark:bg-gray-800/10">
+                      <button
+                        onClick={() => openEditModal(item._id, item.title || "", item.contentText || "", item.type)}
+                        className="p-3 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-xl transition-colors active:scale-95"
+                        title="Edit"
+                      >
+                        <Edit size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors active:scale-95"
+                        title="Delete"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="pl-4 border-l border-gray-100 ml-2 flex flex-col gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => openEditModal(item._id, item.title || "", item.contentText || "", item.type)}
-                      className="p-3 text-amber-500 hover:bg-amber-50 rounded-xl transition-colors active:scale-95"
-                      title="Edit Post"
-                    >
-                      <Edit size={32} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors active:scale-95"
-                      title="Delete Post"
-                    >
-                      <Trash2 size={32} />
-                    </button>
+                  {/* Footer: Timestamp */}
+                  <div className="px-5 py-2 border-t border-gray-100 dark:border-gray-800 flex items-center text-gray-400 dark:text-gray-500">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+                      {new Date(item.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -602,7 +678,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             onClick={toggleModal}
             className="fixed bottom-32 right-6 w-14 h-14 bg-emerald-500 text-white rounded-full shadow-2xl hover:bg-emerald-600 active:scale-90 transition-all z-40 animate-bounce flex items-center justify-center"
             aria-label="Quick Post"
-            style={{ animationDuration: '3s' }}
+            style={{ animationDuration: '1s' }}
           >
             <Plus size={28} />
           </button>
@@ -705,7 +781,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       )}
 
       {/* ----------- MODALS ----------- */}
-
       {/* Action / Add Post Sheet */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300 pb-12">
@@ -758,278 +833,180 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               />
             </div>
 
-            {!postType ? (
-              <div className="flex flex-col gap-4">
+            {!selectionGroup ? (
+              <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setPostType("audio")}
-                  className="flex items-center gap-6 p-4 rounded-3xl bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-95 transition-all shadow-sm"
+                  onClick={() => { setSelectionGroup("audio"); setPostType("audio"); }}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900 active:scale-95 transition-all shadow-sm border border-emerald-100 dark:border-emerald-800/50"
                 >
-                  <div className="bg-blue-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-blue-500/30">
-                    <Mic size={40} />
+                  <div className="bg-emerald-500 text-white p-2 rounded-xl shadow-md">
+                    <Mic size={20} />
                   </div>
-                  <span className="text-2xl font-bold">Voice Note</span>
+                  <span className="text-sm font-black uppercase tracking-tight">Audio</span>
                 </button>
 
                 <button
-                  onClick={() => setPostType("image")}
-                  className="flex items-center gap-6 p-4 rounded-3xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all shadow-sm"
+                  onClick={() => setSelectionGroup("media")}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900 active:scale-95 transition-all shadow-sm border border-rose-100 dark:border-rose-800/50"
                 >
-                  <div className="bg-emerald-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-emerald-500/30">
-                    <ImageIcon size={40} />
+                  <div className="bg-rose-500 text-white p-2 rounded-xl shadow-md">
+                    <ImageIcon size={20} />
                   </div>
-                  <span className="text-2xl font-bold">Photo</span>
+                  <span className="text-sm font-black uppercase tracking-tight">Photo / Video</span>
                 </button>
 
                 <button
-                  onClick={() => setPostType("video")}
-                  className="flex items-center gap-6 p-4 rounded-3xl bg-rose-50 text-rose-600 hover:bg-rose-100 active:scale-95 transition-all shadow-sm"
+                  onClick={() => setSelectionGroup("document")}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900 active:scale-95 transition-all shadow-sm border border-purple-100 dark:border-purple-800/50"
                 >
-                  <div className="bg-rose-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-rose-500/30">
-                    <Video size={40} />
+                  <div className="bg-purple-500 text-white p-2 rounded-xl shadow-md">
+                    <FileText size={20} />
                   </div>
-                  <span className="text-2xl font-bold">Video</span>
+                  <span className="text-sm font-black uppercase tracking-tight">PDF / Word</span>
                 </button>
 
                 <button
-                  onClick={() => setPostType("pdf")}
-                  className="flex items-center gap-6 p-4 rounded-3xl bg-purple-50 text-purple-600 hover:bg-purple-100 active:scale-95 transition-all shadow-sm"
+                  onClick={() => { setSelectionGroup("text"); setPostType("text"); }}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900 active:scale-95 transition-all shadow-sm border border-amber-100 dark:border-amber-800/50"
                 >
-                  <div className="bg-purple-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-purple-500/30">
-                    <FileText size={40} />
+                  <div className="bg-amber-500 text-white p-2 rounded-xl shadow-md">
+                    <FileText size={20} />
                   </div>
-                  <span className="text-2xl font-bold">PDF / Word</span>
-                </button>
-
-                <button
-                  onClick={() => setPostType("text")}
-                  className="flex items-center gap-6 p-4 rounded-3xl bg-amber-50 text-amber-600 hover:bg-amber-100 active:scale-95 transition-all shadow-sm"
-                >
-                  <div className="bg-amber-500 text-white p-4 rounded-[1.5rem] shadow-lg shadow-amber-500/30">
-                    <FileText size={40} />
-                  </div>
-                  <span className="text-2xl font-bold">Text Only</span>
+                  <span className="text-sm font-black uppercase tracking-tight">Text Only</span>
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl mb-4 border border-gray-100">
+              <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-950 p-4 rounded-2xl mb-4 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                   <div className={clsx(
                     "p-2 rounded-xl text-white",
-                    postType === "audio" ? "bg-blue-500" : postType === "image" ? "bg-emerald-500" : postType === "video" ? "bg-rose-500" : postType === "pdf" ? "bg-purple-500" : "bg-amber-500"
+                    selectionGroup === "audio" ? "bg-emerald-500" : selectionGroup === "media" ? "bg-rose-500" : selectionGroup === "document" ? "bg-purple-500" : "bg-amber-500"
                   )}>
-                    {postType === "audio" && <Mic size={20} />}
-                    {postType === "image" && <ImageIcon size={20} />}
-                    {postType === "video" && <Video size={20} />}
-                    {postType === "pdf" && <FileText size={20} />}
-                    {postType === "text" && <FileText size={20} />}
+                    {selectionGroup === "audio" && <Mic size={20} />}
+                    {selectionGroup === "media" && <ImageIcon size={20} />}
+                    {selectionGroup === "document" && <FileText size={20} />}
+                    {selectionGroup === "text" && <FileText size={20} />}
                   </div>
-                  <span className="font-bold text-gray-700 capitalize">{postType === "pdf" ? "Document" : postType} Selected</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300 capitalize">{selectionGroup === "document" ? "Document" : selectionGroup} Selected</span>
                 </div>
                 <button
-                  onClick={() => { setPostType(null); setFile(null); setTextContent(""); }}
-                  className="text-emerald-600 font-black text-sm uppercase tracking-wider underline underline-offset-4"
+                  onClick={() => { setSelectionGroup(null); setPostType(null); setFile(null); setTextContent(""); }}
+                  className="text-emerald-600 dark:text-emerald-400 font-black text-sm uppercase tracking-wider underline underline-offset-4"
                 >
                   Change
                 </button>
               </div>
             )}
 
-            {postType && (
-              <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center w-full animate-in fade-in zoom-in-95">
-                {postType === "text" ? (
+            {selectionGroup && (
+              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col items-center w-full animate-in fade-in zoom-in-95">
+                {selectionGroup === "text" ? (
                   <textarea
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
                     placeholder="Type your announcement here..."
-                    className="w-full p-4 mb-6 border-2 border-amber-200 rounded-2xl text-lg text-gray-800 focus:outline-none focus:border-amber-500 shadow-inner"
+                    className="w-full p-4 mb-6 border-2 border-amber-200 dark:border-amber-900/50 rounded-2xl text-lg text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-amber-500 shadow-inner"
                     rows={4}
                   />
                 ) : file ? (
-                  <div className="w-full mb-8 p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex flex-col items-center gap-4 animate-in zoom-in-95">
+                  <div className="w-full mb-8 p-6 bg-emerald-50 dark:bg-emerald-950 rounded-[2rem] border border-emerald-100 dark:border-emerald-900/30 flex flex-col items-center gap-4 animate-in zoom-in-95">
                     <div className="bg-emerald-500 text-white p-4 rounded-full shadow-lg">
-                      <Plus size={32} className="rotate-45" /> {/* Success check replacement */}
+                      <Send size={32} className="rotate-0" />
                     </div>
-                    <p className="text-xl font-black text-emerald-800 uppercase tracking-widest">Ready to Publish</p>
+                    <p className="text-xl font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest text-center">
+                      {file.name}<br/><span className="text-xs opacity-60">Ready to Publish</span>
+                    </p>
                     <button
                       onClick={() => setFile(null)}
-                      className="text-emerald-600 font-bold text-sm underline underline-offset-4"
+                      className="text-emerald-600 dark:text-emerald-400 font-bold text-sm underline underline-offset-4"
                     >
-                      Retake / Remove
+                      Remove File
                     </button>
                   </div>
-                ) : postType === "audio" ? (
-                  <div className="w-full flex flex-col items-center mb-6 gap-4">
-                    {isRecording ? (
-                      <div className="flex flex-col items-center">
-                        <div className="w-24 h-24 bg-red-500 rounded-full animate-pulse flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.5)] mb-4 ring-4 ring-red-200">
-                          <Mic size={48} className="text-white" />
-                        </div>
+                ) : (
+                  <div className="w-full flex flex-col items-center mb-6">
+                    {selectionGroup === "audio" && (
+                      <div className="flex flex-col gap-6 w-full">
                         <button
-                          onClick={stopRecording}
-                          className="bg-red-100 text-red-700 px-8 py-4 rounded-full font-bold text-xl active:scale-95 transition-all border border-red-200"
+                          onClick={isRecording ? stopRecording : startRecording}
+                          className={clsx(
+                            "group relative flex items-center justify-center gap-4 p-8 rounded-[2.5rem] w-full transition-all active:scale-95 shadow-lg overflow-hidden",
+                            isRecording ? "bg-red-500 scale-105" : "bg-emerald-50 dark:bg-emerald-950 border-2 border-dashed border-emerald-300 dark:border-emerald-800"
+                          )}
                         >
-                          Stop Recording
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-4 w-full">
-                        <button
-                          onClick={startRecording}
-                          className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-6 rounded-[2rem] border-2 border-dashed border-blue-300 w-full flex flex-col items-center gap-3 active:scale-95 transition-all"
-                        >
-                          <div className="bg-blue-500 p-4 rounded-full text-white shadow-md">
+                          <div className={clsx("p-4 rounded-full text-white shadow-md transition-transform", isRecording && "animate-pulse")}>
                             <Mic size={32} />
                           </div>
-                          <span className="font-bold text-xl">Tap to Record Live Audio</span>
+                          <span className={clsx("font-bold text-xl uppercase tracking-tight", isRecording ? "text-white" : "text-emerald-800 dark:text-emerald-400")}>
+                            {isRecording ? "Recording... (Stop)" : "Record Live Audio"}
+                          </span>
                         </button>
 
-                        <div className="flex items-center gap-4 text-gray-400 font-bold w-full uppercase text-sm justify-center">
-                          <hr className="flex-1" /> OR <hr className="flex-1" />
+                        <div className="flex items-center gap-4 text-gray-400 dark:text-gray-600 font-bold w-full uppercase text-xs justify-center">
+                          <hr className="flex-1 border-gray-100 dark:border-gray-800" /> OR <hr className="flex-1 border-gray-100 dark:border-gray-800" />
                         </div>
 
-                        <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
-                          <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
-                            Attach Pre-recorded Audio
+                        <label className="cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 dark:border-gray-800 active:scale-95 transition-all">
+                          <span className="text-lg font-bold text-gray-600 dark:text-gray-400 block px-4 py-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800">
+                            Attach Audio File
                           </span>
                           <input
-                            type="file"
-                            accept="audio/*"
-                            className="hidden"
+                            type="file" accept="audio/*" className="hidden"
                             onChange={(e) => {
                               const selected = e.target.files?.[0];
                               if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("This file is too large! Please upload a file smaller than 100MB.");
-                                e.target.value = "";
-                                return setFile(null);
+                                alert("File too large!"); e.target.value = ""; return setFile(null);
                               }
-                              setFile(selected || null);
+                              setFile(selected || null); setPostType("audio");
                             }}
                           />
                         </label>
                       </div>
                     )}
-                  </div>
-                ) : (
-                  <div className="w-full flex flex-col items-center mb-6">
-                    <p className="text-gray-500 mb-4 font-bold text-center">Attach {postType === "pdf" ? "PDF or Word Doc" : postType === "video" ? "Video Clip" : "Photo"} below:</p>
-
-                    {postType === "image" ? (
+                    {selectionGroup === "media" && (
                       <div className="flex flex-col gap-4 w-full">
-                        <label className="cursor-pointer bg-emerald-50 hover:bg-emerald-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-emerald-300 active:scale-95 transition-all">
-                          <div className="bg-emerald-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
+                        <p className="text-gray-500 mb-4 font-bold text-center">Attach Photo or Video below:</p>
+                        <label className="cursor-pointer bg-rose-50 dark:bg-rose-950 hover:bg-rose-100 dark:hover:bg-rose-900/40 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-rose-300 dark:border-rose-800 active:scale-95 transition-all">
+                          <div className="bg-rose-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
                             <ImageIcon size={32} />
                           </div>
-                          <span className="text-lg font-bold text-emerald-800">Take Photo (Camera)</span>
+                          <span className="text-lg font-bold text-rose-800 dark:text-rose-400">Capture / Pick Media</span>
                           <input
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            className="hidden"
-                            title="Camera"
+                            type="file" accept="image/*,video/*" className="hidden"
                             onChange={(e) => {
                               const selected = e.target.files?.[0];
                               if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("This file is too large! Please upload a file smaller than 100MB.");
-                                e.target.value = "";
-                                return setFile(null);
+                                alert("File too large!"); e.target.value = ""; return setFile(null);
                               }
-                              setFile(selected || null);
-                            }}
-                          />
-                        </label>
-
-                        <div className="flex items-center gap-4 text-gray-400 font-bold w-full uppercase text-sm justify-center">
-                          <hr className="flex-1" /> OR <hr className="flex-1" />
-                        </div>
-
-                        <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
-                          <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
-                            Choose from Gallery
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const selected = e.target.files?.[0];
-                              if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("This file is too large! Please upload a file smaller than 100MB.");
-                                e.target.value = "";
-                                return setFile(null);
+                              if (selected) {
+                                setFile(selected);
+                                setPostType(selected.type.startsWith("image/") ? "image" : "video");
                               }
-                              setFile(selected || null);
                             }}
                           />
                         </label>
                       </div>
-                    ) : postType === "video" ? (
-                      <div className="flex flex-col gap-4 w-full">
-                        <label className="cursor-pointer bg-rose-50 hover:bg-rose-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-rose-300 active:scale-95 transition-all">
-                          <div className="bg-rose-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
-                            <Video size={32} />
+                    )}
+                    {selectionGroup === "document" && (
+                      <div className="w-full">
+                        <p className="text-gray-500 mb-4 font-bold text-center">Attach PDF or Word Doc below:</p>
+                        <label className="cursor-pointer bg-purple-50 dark:bg-purple-950 hover:bg-purple-100 dark:hover:bg-purple-900/40 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-purple-300 dark:border-purple-800 active:scale-95 transition-all">
+                          <div className="bg-purple-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
+                            <FileText size={32} />
                           </div>
-                          <span className="text-lg font-bold text-rose-800">Record Video</span>
+                          <span className="text-lg font-bold text-purple-800 dark:text-purple-400">Attach Document (PDF/Word)</span>
                           <input
-                            type="file"
-                            accept="video/*"
-                            capture="environment"
-                            className="hidden"
+                            type="file" accept=".pdf,.doc,.docx" className="hidden"
                             onChange={(e) => {
                               const selected = e.target.files?.[0];
                               if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("This file is too large! Please upload a file smaller than 100MB.");
-                                e.target.value = "";
-                                return setFile(null);
+                                alert("File too large!"); e.target.value = ""; return setFile(null);
                               }
-                              setFile(selected || null);
-                            }}
-                          />
-                        </label>
-
-                        <div className="flex items-center gap-4 text-gray-400 font-bold w-full uppercase text-sm justify-center">
-                          <hr className="flex-1" /> OR <hr className="flex-1" />
-                        </div>
-
-                        <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 active:scale-95 transition-all">
-                          <span className="text-lg font-bold text-gray-600 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
-                            Choose Video from Gallery
-                          </span>
-                          <input
-                            type="file"
-                            accept="video/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const selected = e.target.files?.[0];
-                              if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("This file is too large! Please upload a file smaller than 100MB.");
-                                e.target.value = "";
-                                return setFile(null);
-                              }
-                              setFile(selected || null);
+                              setFile(selected || null); setPostType("pdf");
                             }}
                           />
                         </label>
                       </div>
-                    ) : (
-                      <label className="cursor-pointer bg-gray-50 hover:bg-emerald-50 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 hover:border-emerald-400 active:scale-95 transition-all">
-                        <span className="text-xl font-black text-emerald-700 block px-4 py-4 bg-white rounded-2xl border border-gray-100">
-                          Tap to Attach PDF / Word
-                        </span>
-                        <input
-                          type="file"
-                          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          className="hidden"
-                          onChange={(e) => {
-                            const selected = e.target.files?.[0];
-                            if (selected && selected.size > 100 * 1024 * 1024) {
-                              alert("This file is too large! Please upload a file smaller than 100MB.");
-                              e.target.value = "";
-                              return setFile(null);
-                            }
-                            setFile(selected || null);
-                          }}
-                        />
-                      </label>
                     )}
                   </div>
                 )}
@@ -1040,7 +1017,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     setIsSubmitting(true);
 
                     if (postType !== "text" && !file) {
-                      alert("Please attach a file first!");
+                      alert("Please attach a file or record audio first!");
                       setIsSubmitting(false);
                       return;
                     }
@@ -1104,21 +1081,21 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {/* Edit Text/Subject Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative translate-y-0 animate-in zoom-in-95">
+          <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative translate-y-0 animate-in zoom-in-95 border border-gray-100 dark:border-gray-800">
             <button
               onClick={closeEditModal}
-              className="absolute top-6 right-6 p-2 bg-gray-100 text-gray-400 rounded-full active:scale-90"
+              className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-full active:scale-90"
             >
               <X size={32} />
             </button>
-            <h3 className="text-3xl font-bold text-gray-800 mb-6 mt-2 tracking-tight">Edit Post</h3>
+            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 mt-2 tracking-tight">Edit Post</h3>
 
             <div className="mb-6 flex flex-col gap-2">
               <label className="font-bold text-gray-500 uppercase tracking-widest text-sm pl-2">Subject / Title</label>
               <input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl text-xl text-gray-800 focus:outline-none focus:border-amber-500 shadow-sm font-bold"
+                className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-emerald-500 shadow-sm font-bold"
               />
             </div>
 
@@ -1128,28 +1105,39 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <textarea
                   value={editTextContent}
                   onChange={(e) => setEditTextContent(e.target.value)}
-                  className="w-full p-4 border-2 border-gray-200 rounded-2xl text-xl text-gray-800 focus:outline-none focus:border-amber-500 shadow-inner"
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-emerald-500 shadow-inner"
                   rows={4}
                 />
               </div>
             ) : (
               <div className="mb-6 flex flex-col items-center">
                 <label className="font-bold text-gray-500 uppercase tracking-widest text-sm w-full pl-2 mb-2">Replace Attached File (Optional)</label>
-                <label className="cursor-pointer bg-gray-50 hover:bg-amber-50 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 hover:border-amber-400 active:scale-95 transition-all">
-                  <span className="text-xl font-bold text-amber-700 block line-clamp-2 px-4 shadow-sm py-4 bg-white rounded-2xl border border-gray-100">
-                    {editFile ? editFile.name : `Tap to Choose New File...`}
+                <label className={clsx(
+                  "cursor-pointer p-6 rounded-[2rem] w-full text-center border-2 border-dashed active:scale-95 transition-all text-xs",
+                  editType === "audio" ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100" :
+                  (editType === "image" || editType === "video") ? "bg-rose-50 dark:bg-rose-950 border-rose-300 dark:border-rose-800 hover:bg-rose-100" :
+                  "bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-800 hover:bg-purple-100"
+                )}>
+                  <span className={clsx(
+                    "font-bold block line-clamp-2 px-4 shadow-sm py-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800",
+                    editType === "audio" ? "text-emerald-700 dark:text-emerald-400" :
+                    (editType === "image" || editType === "video") ? "text-rose-700 dark:text-rose-400" :
+                    "text-purple-700 dark:text-purple-400"
+                  )}>
+                    {editFile ? editFile.name : `Choose New ${editType === 'audio' ? 'Audio' : (editType === 'image' || editType === 'video') ? 'Media' : 'Document'}...`}
                   </span>
                   <input
                     type="file"
-                    accept={editType === "audio" ? "audio/*" : editType === "pdf" ? "application/pdf" : "image/*"}
-                    capture={editType === "image" ? "environment" : undefined}
+                    accept={
+                      editType === "audio" ? "audio/*" : 
+                      (editType === "image" || editType === "video") ? "image/*,video/*" : 
+                      ".pdf,.doc,.docx"
+                    }
                     className="hidden"
                     onChange={(e) => {
                       const selected = e.target.files?.[0];
                       if (selected && selected.size > 100 * 1024 * 1024) {
-                        alert("This file is too large! Please upload a file smaller than 100MB.");
-                        e.target.value = "";
-                        return setEditFile(null);
+                        alert("File too large!"); e.target.value = ""; return setEditFile(null);
                       }
                       setEditFile(selected || null);
                     }}
@@ -1163,17 +1151,17 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               onClick={handleEditSubmit}
               className={clsx(
                 "w-full text-white p-6 rounded-full text-2xl font-bold flex flex-col items-center justify-center gap-2 shadow-xl active:scale-95 transition-all relative overflow-hidden",
-                (isEditing || isUploading) ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
+                (isEditing || isUploading) ? "bg-gray-400" : "bg-emerald-500 hover:bg-emerald-600"
               )}
             >
               {isUploading && (
                 <div
-                  className="absolute bottom-0 left-0 h-2 bg-amber-300 transition-all duration-300"
+                  className="absolute bottom-0 left-0 h-2 bg-emerald-300 transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               )}
               <div className="flex items-center gap-4">
-                {(isEditing || isUploading) ? <Loader2 size={32} className="animate-spin" /> : <><Edit size={32} /> Save Changes</>}
+                {(isEditing || isUploading) ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Save Changes</>}
               </div>
               {isUploading && <span className="text-xs opacity-80">Uploading Changes... {uploadProgress}%</span>}
             </button>
@@ -1181,6 +1169,27 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
       )}
 
+      {/* Expanded Image Overlay */}
+      {expandedImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
+          onClick={closeExpandedImage}
+        >
+          <button 
+            onClick={closeExpandedImage}
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all active:scale-95"
+          >
+            <X size={32} />
+          </button>
+          <div className="w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
+            <img 
+              src={expandedImage} 
+              alt="Expanded Preview" 
+              className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500" 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
