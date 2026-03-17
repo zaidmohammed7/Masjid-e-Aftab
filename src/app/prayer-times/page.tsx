@@ -2,7 +2,7 @@ import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import { Clock } from "lucide-react";
 
-const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
+const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
 
 export const revalidate = 60; // Cache for 1 minute
 

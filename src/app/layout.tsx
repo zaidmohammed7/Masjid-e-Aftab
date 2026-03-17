@@ -4,6 +4,7 @@ import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import ClearBadge from "@/components/ClearBadge";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} overscroll-none`}>
         <ThemeProvider>
+          <ClearBadge />
           <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-inherit">
             {children}
             <BottomNav />
