@@ -208,6 +208,34 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "Hadeeth of the Day");
   const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
+  const [isTestSending, setIsTestSending] = useState(false);
+
+  const handleSendTestNotification = async () => {
+    const deviceId = localStorage.getItem("deviceId");
+    if (!deviceId) {
+      alert("No device ID found. Open the settings page first to register.");
+      return;
+    }
+
+    setIsTestSending(true);
+    try {
+      const res = await fetch("/api/notifications/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deviceId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Test notification sent! Check your phone.");
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (e: any) {
+      alert("Test failed: " + e.message);
+    } finally {
+      setIsTestSending(false);
+    }
+  };
 
   // Secure Token Fetcher
   const fetchSanityToken = async () => {
@@ -418,13 +446,24 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       </div>
 
       <div className="px-6 -mt-3 relative z-30">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-950 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 px-6 py-3.5 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 transition-all active:scale-95 group"
-        >
-          <LogOut size={18} className="transition-transform group-hover:-translate-x-1" />
-          <span className="font-black uppercase tracking-[0.2em] text-[10px]">Logout from Session</span>
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-950 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 px-6 py-3.5 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 transition-all active:scale-95 group"
+          >
+            <LogOut size={18} className="transition-transform group-hover:-translate-x-1" />
+            <span className="font-black uppercase tracking-[0.2em] text-[10px]">Logout from Session</span>
+          </button>
+          
+          <button
+            onClick={handleSendTestNotification}
+            disabled={isTestSending}
+            className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3.5 rounded-2xl shadow-lg hover:bg-blue-600 transition-all active:scale-95 group"
+          >
+            {isTestSending ? <Loader2 size={18} className="animate-spin" /> : <Megaphone size={18} />}
+            <span className="font-black uppercase tracking-[0.2em] text-[10px]">Send Test Notification</span>
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
