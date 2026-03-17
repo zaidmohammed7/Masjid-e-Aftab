@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/redis";
 import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import webpush from "web-push";
@@ -76,7 +76,7 @@ export async function GET(req: Request) {
 
     for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
       const chunk = keys.slice(i, i + CHUNK_SIZE);
-      const subs = await kv.mget<string[]>(...chunk);
+      const subs = await kv.mget(...chunk);
       
       const chunkPromises = subs.map((subStr, idx) => {
         if (!subStr) return Promise.resolve(null);

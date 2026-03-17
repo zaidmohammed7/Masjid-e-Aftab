@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Moon, Sun, Lock, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings } from "lucide-react";
+import { Moon, Sun, Lock, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings, Sunrise, Sunset, CloudSun } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import Link from "next/link";
 import clsx from "clsx";
@@ -241,15 +241,29 @@ export default function SettingsClient() {
                     {/* Inline Prayer Sub-Toggles */}
                     {item.id === "prayer-alerts" && prayerAlerts && (
                       <div className="px-6 pb-6 animate-in slide-in-from-top-2 duration-300">
-                        <div className="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-800">
-                          {(["fajr", "dhuhr", "asr", "maghrib", "isha"] as PrayerKey[]).map((p) => (
-                            <div key={p} className="flex items-center justify-between">
-                              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{p}</span>
+                        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-800 flex flex-col gap-1">
+                          {[
+                            { key: "fajr", label: "Fajr", script: "فجر", icon: <Sunrise size={18} className="text-amber-500" /> },
+                            { key: "dhuhr", label: "Dhuhr", script: "ظہر", icon: <Sun size={18} className="text-orange-500" /> },
+                            { key: "asr", label: "Asr", script: "عصر", icon: <CloudSun size={18} className="text-amber-600" /> },
+                            { key: "maghrib", label: "Maghrib", script: "مغرب", icon: <Sunset size={18} className="text-rose-500" /> },
+                            { key: "isha", label: "Isha", script: "عشاء", icon: <Moon size={18} className="text-indigo-400" /> },
+                          ].map((p) => (
+                            <div key={p.key} className="flex items-center justify-between p-2 rounded-2xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                                  {p.icon}
+                                </div>
+                                <div className="flex flex-col items-start">
+                                  <span className="text-sm font-bold text-[var(--card-text)]">{p.label}</span>
+                                  <span className="text-[10px] font-medium text-gray-400 text-left">{p.script}</span>
+                                </div>
+                              </div>
                               <button 
-                                onClick={() => handleToggleIndividual(p)}
+                                onClick={() => handleToggleIndividual(p.key as PrayerKey)}
                                 className={clsx(
                                   "w-10 h-5 rounded-full p-0.5 transition-colors flex items-center",
-                                  individualAlerts[p] ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
+                                  individualAlerts[p.key as PrayerKey] ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
                                 )}
                               >
                                 <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
