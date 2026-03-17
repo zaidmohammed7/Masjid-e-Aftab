@@ -2,8 +2,9 @@ import { kv } from "@/lib/redis";
 import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import webpush from "web-push";
+import { differenceInMinutes, parseISO, addDays, format } from "date-fns";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { NextResponse } from "next/server";
-import { isSameMinute, addMinutes, parseISO } from "date-fns";
 
 // Web-push Configuration
 webpush.setVapidDetails(
@@ -21,11 +22,23 @@ const client = createClient({
 });
 
 export async function GET(req: Request) {
-  // 0. Security First: Authorization check at the very top
+  // 0. Security: Check Authorization header OR ?pw query parameter
   const authHeader = req.headers.get("Authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const { searchParams } = new URL(req.url);
+  const password = searchParams.get("pw");
+  
+  const isAuthorized = authHeader === `Bearer ${process.env.CRON_SECRET}` || password === "RaanBiryani@27";
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const nowUtc = new Date();
+  const istNow = toZonedTime(nowUtc, "Asia/Kolkata");
+  
+  console.log(`[Broadcast] --- Debug Start ---`);
+  console.log(`[Broadcast] Server UTC: ${nowUtc.toISOString()}`);
+  console.log(`[Broadcast] India IST: ${istNow.toString()}`);
 
   try {
     // 1. Fetch Today's Prayer Times
@@ -33,28 +46,73 @@ export async function GET(req: Request) {
     if (!prayerTimes) return NextResponse.json({ message: "No prayer times found." });
 
     const types = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
-    const nowUtc = new Date();
     
-    // Precision Window: 15-20 minutes away
-    // This allows a 5-minute cron to trigger exactly once per prayer without overlapping
-    const lowerBound = addMinutes(nowUtc, 15);
-    const upperBound = addMinutes(nowUtc, 20);
+    // Diagnostic info for the response
+    const diagnostics: any = {
+      serverTimeUtc: nowUtc.toISOString(),
+      indiaTimeIst: istNow.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
+      prayersFound: {}
+    };
 
     let activePrayer: string | null = null;
 
     for (const p of types) {
       if (prayerTimes[p]) {
-        const prayerDate = parseISO(prayerTimes[p]);
-        // Check if prayer falls exactly within the 15-20 min window
-        if (prayerDate >= lowerBound && prayerDate < upperBound) {
+        // 1. Extract HH:MM from Sanity (handles ISO or "05:00 AM" format)
+        let hh: number, mm: number;
+        
+        if (prayerTimes[p].includes("T")) {
+          const d = new Date(prayerTimes[p]);
+          const z = toZonedTime(d, "Asia/Kolkata");
+          hh = z.getHours();
+          mm = z.getMinutes();
+        } else {
+          const match = prayerTimes[p].match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!match) continue;
+          hh = parseInt(match[1]);
+          mm = parseInt(match[2]);
+          const ampm = match[3].toUpperCase();
+          if (ampm === "PM" && hh !== 12) hh += 12;
+          if (ampm === "AM" && hh === 12) hh = 0;
+        }
+
+        // 2. Build target date for TODAY in IST using string composition
+        const dateStr = format(istNow, "yyyy-MM-dd");
+        const timeStr = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00`;
+        
+        let targetUtc = fromZonedTime(`${dateStr} ${timeStr}`, "Asia/Kolkata");
+
+        // 3. If target is in the past, move to TOMORROW
+        if (targetUtc.getTime() <= nowUtc.getTime()) {
+          const tomorrow = addDays(istNow, 1);
+          const tomorrowDateStr = format(tomorrow, "yyyy-MM-dd");
+          targetUtc = fromZonedTime(`${tomorrowDateStr} ${timeStr}`, "Asia/Kolkata");
+        }
+
+        const diff = differenceInMinutes(targetUtc, nowUtc);
+        const targetZoned = toZonedTime(targetUtc, "Asia/Kolkata");
+        
+        diagnostics.prayersFound[p] = {
+          original: prayerTimes[p],
+          nextOccurrenceIst: targetZoned.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
+          minutesUntil: diff
+        };
+
+        console.log(`[Broadcast] ${p}: Next at ${targetZoned.toLocaleString()} IST (${diff} mins)`);
+
+        // Precision Window: 15-20 minutes away
+        if (diff >= 15 && diff < 20) {
           activePrayer = p;
-          break;
         }
       }
     }
 
     if (!activePrayer) {
-      return NextResponse.json({ message: "No upcoming prayer in the 15-20m precision window." });
+      console.log(`[Broadcast] No prayer in window. Window: 15-20m. Matches found: 0`);
+      return NextResponse.json({ 
+        message: "No upcoming prayer in the 15-20m precision window.",
+        diagnostics 
+      });
     }
 
     // 2. Fetch all subscriptions from Redis

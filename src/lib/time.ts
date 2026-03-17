@@ -9,16 +9,21 @@ const TIMEZONE = "Asia/Kolkata";
 export function istToUtc(timeStr: string): string {
   if (!timeStr || timeStr === "--:--") return "";
   
-  // Parse the time string assuming today's date in IST
-  const today = new Date();
-  const dateStr = format(today, "yyyy-MM-dd");
+  // Get the current date specifically in the IST timezone
+  const now = new Date();
+  const istNow = toZonedTime(now, TIMEZONE);
+  const dateStr = format(istNow, "yyyy-MM-dd");
   const fullStr = `${dateStr} ${timeStr}`;
   
-  // parse() expects a format like "yyyy-MM-dd hh:mm a"
+  // Parse the string as an IST time
   const parsedIST = parse(fullStr, "yyyy-MM-dd hh:mm a", new Date());
   
   // Convert from IST to UTC
   const utcDate = fromZonedTime(parsedIST, TIMEZONE);
+  
+  // If the resulting time is in the past by more than 12 hours, 
+  // it's likely intended for the next day (e.g. saving 1 AM when it's 11 PM)
+  // But for simple "today" logic, the target timezone date is usually enough.
   return utcDate.toISOString();
 }
 
