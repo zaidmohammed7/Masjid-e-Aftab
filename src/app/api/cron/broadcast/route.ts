@@ -21,6 +21,7 @@ const client = createClient({
 });
 
 export async function GET(req: Request) {
+  // 0. Security First: Authorization check at the very top
   const authHeader = req.headers.get("Authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -33,15 +34,19 @@ export async function GET(req: Request) {
 
     const types = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
     const nowUtc = new Date();
-    const targetTime = addMinutes(nowUtc, 15);
+    
+    // Precision Window: 15-20 minutes away
+    // This allows a 5-minute cron to trigger exactly once per prayer without overlapping
+    const lowerBound = addMinutes(nowUtc, 15);
+    const upperBound = addMinutes(nowUtc, 20);
 
     let activePrayer: string | null = null;
 
     for (const p of types) {
       if (prayerTimes[p]) {
         const prayerDate = parseISO(prayerTimes[p]);
-        // If the prayer is approximately 15 minutes away (within the same minute)
-        if (isSameMinute(prayerDate, targetTime)) {
+        // Check if prayer falls exactly within the 15-20 min window
+        if (prayerDate >= lowerBound && prayerDate < upperBound) {
           activePrayer = p;
           break;
         }
@@ -49,20 +54,20 @@ export async function GET(req: Request) {
     }
 
     if (!activePrayer) {
-      return NextResponse.json({ message: "No upcoming prayer in the 15m window." });
+      return NextResponse.json({ message: "No upcoming prayer in the 15-20m precision window." });
     }
 
     // 2. Fetch all subscriptions from Redis
-    // SCAN to get all keys with patterns user:subscription:*
     const keys = await kv.keys("user:subscription:*");
+    console.log(`[Cron] Target Prayer: ${activePrayer}. Fetched ${keys.length} tokens from Redis.`);
 
     if (keys.length === 0) return NextResponse.json({ message: "Zero subscriptions found." });
 
-    // 3. Broadcast in Chunks of 100
-    const CHUNK_SIZE = 100;
-    const results = [];
+    // 3. Broadcast in Optimized Chunks
+    const CHUNK_SIZE = 250; // Increased for scale
+    let prunedCount = 0;
+    let successCount = 0;
     
-    // Key formatting for payload
     const payload = JSON.stringify({
       title: "Prayer Alert",
       prayerType: activePrayer,
@@ -81,22 +86,33 @@ export async function GET(req: Request) {
         } catch (e) {
           return Promise.resolve(null);
         }
-        return webpush.sendNotification(sub, payload).catch(async (err) => {
-            // Cleanup expired subscriptions
+
+        return webpush.sendNotification(sub, payload)
+          .then(() => { successCount++; return null; })
+          .catch(async (err) => {
+            // Prune expired tokens (410 Gone or 404 Not Found)
             if (err.statusCode === 410 || err.statusCode === 404) {
                 await kv.del(chunk[idx]);
+                prunedCount++;
             }
             return null;
-        });
+          });
       });
 
-      const batchRes = await Promise.allSettled(chunkPromises);
-      results.push(...batchRes);
+      await Promise.allSettled(chunkPromises);
+
+      // Scale Guard: Tiny delay between batches to respect Vercel's Hobby limits
+      if (i + CHUNK_SIZE < keys.length) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
     }
+
+    console.log(`[Cron] Broadcast finished. Success: ${successCount}, Pruned: ${prunedCount}`);
 
     return NextResponse.json({
       message: `Broadcast finished for ${activePrayer}`,
-      recipients: results.length,
+      sent: successCount,
+      pruned: prunedCount
     });
 
   } catch (error: any) {
