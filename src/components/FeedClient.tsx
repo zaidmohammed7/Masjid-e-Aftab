@@ -233,12 +233,17 @@ function AnnouncementCard({ item, onImageClick }: { item: Announcement, onImageC
 
 function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (!audioRef.current && fileUrl) {
-      audioRef.current = new Audio(fileUrl);
-      audioRef.current.onended = () => setIsPlaying(false);
+      const audio = new Audio(fileUrl);
+      audioRef.current = audio;
+      audio.onended = () => setIsPlaying(false);
+      audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
+      audio.onloadedmetadata = () => setDuration(audio.duration);
     }
   }, [fileUrl]);
 
@@ -252,33 +257,72 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
     setIsPlaying(!isPlaying);
   };
 
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!audioRef.current) return;
+    const time = parseFloat(e.target.value);
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className="flex items-center justify-between p-1.5 bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-xl relative overflow-hidden">
+    <div className="flex items-center gap-3 p-1.5 bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-xl relative overflow-hidden group">
       {/* Background Pulse Animation */}
       {isPlaying && (
-        <>
-          <div className="absolute left-3 w-10 h-10 bg-emerald-400 rounded-full opacity-20 animate-ping" style={{ animationDuration: '1.5s' }} />
-        </>
+        <div className="absolute left-3 w-10 h-10 bg-emerald-400 rounded-full opacity-20 animate-ping" style={{ animationDuration: '1.5s' }} />
       )}
 
       {/* Play Button */}
       <button
         onClick={togglePlay}
         className={clsx(
-          "relative z-10 flex items-center justify-center w-10 h-10 rounded-full shadow-[0_3px_10px_rgba(0,0,0,0.1)] transition-all active:scale-90 duration-200",
+          "relative z-10 flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full shadow-[0_3px_10px_rgba(0,0,0,0.1)] transition-all active:scale-90 duration-200",
           isPlaying ? "bg-red-500" : "bg-emerald-500"
         )}
       >
         {isPlaying ? (
-          <Pause size={20} className="text-white fill-current" />
+          <Pause size={18} className="text-white fill-current" />
         ) : (
-          <Play size={20} className="text-white ml-0.5 fill-current" />
+          <Play size={18} className="text-white ml-0.5 fill-current" />
         )}
       </button>
 
-      <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 z-10 text-right w-full pr-2 uppercase tracking-tighter">
-        {isPlaying ? "Playing..." : "Voice Note"}
-      </p>
+      {/* Progress / Seek Slider */}
+      <div className="flex-1 flex flex-col justify-center min-w-0 pr-2">
+        <div className="flex justify-between items-center mb-1.5 px-0.5">
+          <span className="text-[9px] font-black text-emerald-800 dark:text-emerald-400/80 uppercase tracking-tighter">
+            {isPlaying ? "Playing..." : "Voice Note"}
+          </span>
+          <span className="text-[9px] font-black tabular-nums text-emerald-800/60 dark:text-emerald-400/60">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+        </div>
+        <div className="relative h-2 flex items-center group/slider mx-1.5">
+          {/* Unfilled Track Background */}
+          <div className="absolute left-0 right-0 h-1 bg-emerald-200/20 dark:bg-emerald-900/30 rounded-full" />
+          
+          {/* Custom Progress Fill Overlay */}
+          <div 
+            className="absolute left-0 h-1 bg-emerald-500 rounded-full pointer-events-none z-10 transition-all duration-100" 
+            style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+          />
+          <input 
+            type="range"
+            min="0"
+            max={duration || 0}
+            step="0.1"
+            value={currentTime}
+            onChange={handleSeek}
+            className="seek-slider relative z-20 w-full"
+            style={{ width: "calc(100% + 12px)", margin: "0 -6px" }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
