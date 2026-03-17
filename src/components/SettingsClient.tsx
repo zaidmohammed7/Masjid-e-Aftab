@@ -75,8 +75,9 @@ export default function SettingsClient() {
           await set("prayer_alerts_enabled", false);
           alert("Permission denied. Please enable notifications in your browser settings.");
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Subscription Error:", e);
+        alert("Subscription Failed: " + (e.message || "Unknown Error"));
         setPrayerAlerts(false);
         await set("prayer_alerts_enabled", false);
       }
