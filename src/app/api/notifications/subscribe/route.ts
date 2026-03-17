@@ -9,8 +9,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing deviceId or subscription" }, { status: 400 });
     }
 
+    console.log(`[Subscribe] Attempt for device: ${deviceId}`);
+
     // Save to Redis: Key is user:subscription:<deviceId>, Value is the JSON string
     await kv.set(`user:subscription:${deviceId}`, JSON.stringify(subscription));
+    
+    console.log(`[Subscribe] Success for device: ${deviceId}`);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
