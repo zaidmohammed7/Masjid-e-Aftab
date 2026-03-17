@@ -4,7 +4,7 @@ import { Clock } from "lucide-react";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
 
-export const revalidate = 60; // Cache for 1 minute
+export const revalidate = 0; // Disable caching for immediate updates
 
 import { utcToIst } from "@/lib/time";
 

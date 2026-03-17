@@ -7,7 +7,7 @@ import NextPrayer from "@/components/NextPrayer";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
 
-export const revalidate = 60; // Cache for 60 seconds
+export const revalidate = 0; // Disable caching for immediate updates
 
 export default async function HomePage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
