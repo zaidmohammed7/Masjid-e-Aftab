@@ -22,6 +22,28 @@ export default function FeedClient({ announcements }: { announcements: Announcem
   const [activeLang, setActiveLang] = useState<"urdu" | "english" | "all">("urdu");
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
+  // Handle Android/Browser back button to close expanded image
+  useEffect(() => {
+    if (expandedImage) {
+      window.history.pushState({ imageExpanded: true }, "");
+      
+      const handlePopState = (e: PopStateEvent) => {
+        setExpandedImage(null);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
+    }
+  }, [expandedImage]);
+
+  const closeExpandedImage = () => {
+    if (expandedImage) {
+      // Go back in history to clean up the dummy state
+      window.history.back();
+      setExpandedImage(null);
+    }
+  };
+
   const filteredAnnouncements = announcements.filter(
     (a) => activeLang === "all" || a.language === "both" || a.language === activeLang
   );
@@ -100,7 +122,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
       {expandedImage && (
         <div 
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300"
-          onClick={() => setExpandedImage(null)}
+          onClick={closeExpandedImage}
         >
           <div className="relative max-w-4xl w-full h-full flex items-center justify-center">
             <img 

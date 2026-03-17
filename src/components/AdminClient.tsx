@@ -32,27 +32,25 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   const ampm = (ampmRaw || "PM").toUpperCase();
 
   const handleHourChange = (newVal: string) => {
-    if (newVal === "") {
+    const digits = newVal.replace(/\D/g, "").slice(0, 2);
+    if (digits === "") {
       onChange(` :${minute} ${ampm}`);
       return;
     }
-    let val = parseInt(newVal);
-    if (isNaN(val)) return;
-    if (val > 12) val = 12;
-    if (val < 0) val = 0;
-    onChange(`${val}:${minute} ${ampm}`);
+    const val = parseInt(digits);
+    if (val > 12) return; // Prevent invalid hours
+    onChange(`${digits}:${minute} ${ampm}`);
   };
 
   const handleMinuteChange = (newVal: string) => {
-    if (newVal === "") {
+    const digits = newVal.replace(/\D/g, "").slice(0, 2);
+    if (digits === "") {
       onChange(`${hour}:  ${ampm}`);
       return;
     }
-    let val = parseInt(newVal);
-    if (isNaN(val)) return;
-    if (val > 59) val = 59;
-    if (val < 0) val = 0;
-    onChange(`${hour}:${String(val).padStart(2, '0')} ${ampm}`);
+    const val = parseInt(digits);
+    if (val > 59) return; // Prevent invalid minutes
+    onChange(`${hour}:${digits} ${ampm}`);
   };
 
   const hourStr = h.trim();
