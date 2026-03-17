@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
 import { createClient } from "@sanity/client";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
+import { utcToIst } from "@/lib/time";
 
 type Announcement = {
   _id: string;
@@ -24,37 +25,87 @@ type Announcement = {
 // Reusable TimePicker ensuring uniform cross-platform UI
 // Custom Select Component for a more "Pro" feel
 function TimePicker({ value, onChange }: { value: string, onChange: (val: string) => void }) {
-  const [h, mAmpm] = value.split(":");
-  const [m, ampmRaw] = (mAmpm || "").split(" ");
-
-  const hour = h ? String(parseInt(h)).padStart(2, '0') : "12";
-  const minute = m ? String(parseInt(m)).padStart(2, '0') : "00";
+  // Parsing value of format "HH:MM AM/PM"
+  const [timePart, ampmRaw] = value.split(" ");
+  const [hPart, mPart] = (timePart || "").split(":");
+  
+  const hour = hPart || "12";
+  const minute = mPart || "00";
   const ampm = (ampmRaw || "PM").toUpperCase();
 
+  const minuteInputRef = useRef<HTMLInputElement>(null);
+
   const handleHourChange = (newVal: string) => {
-    const digits = newVal.replace(/\D/g, "").slice(0, 2);
-    if (digits === "") {
-      onChange(` :${minute} ${ampm}`);
-      return;
+    // Only allow digits
+    const digits = newVal.replace(/\D/g, "");
+    
+    let finalHour = hour;
+    let shouldFocusMinutes = false;
+    let nextMinuteDigit = "";
+
+    if (digits.length === 1) {
+      const num = parseInt(digits);
+      if (num >= 2 && num <= 9) {
+        finalHour = `0${digits}`;
+        shouldFocusMinutes = true;
+      } else {
+        finalHour = digits; // wait for next digit if it's 1 or 0
+      }
+    } else if (digits.length >= 2) {
+      const lastTwo = digits.slice(-2);
+      const num = parseInt(lastTwo);
+      
+      if (num >= 1 && num <= 12) {
+        finalHour = lastTwo;
+        shouldFocusMinutes = true;
+      } else if (num > 12) {
+        // Smart handle: if user types "1" then "3", it can't be "13".
+        // Assume "1" was "01" and "3" belongs to minutes.
+        if (lastTwo[0] === "1" && parseInt(lastTwo[1]) > 2) {
+          finalHour = "01";
+          nextMinuteDigit = lastTwo[1];
+          shouldFocusMinutes = true;
+        } else {
+          // just take the last digit as a new start
+          finalHour = `0${lastTwo[1]}`;
+          if (parseInt(lastTwo[1]) >= 2) shouldFocusMinutes = true;
+        }
+      }
     }
-    const val = parseInt(digits);
-    if (val > 12) return; // Prevent invalid hours
-    onChange(`${digits}:${minute} ${ampm}`);
+
+    if (shouldFocusMinutes) {
+      const finalMinute = nextMinuteDigit ? `${nextMinuteDigit}0`.slice(0,2) : minute;
+      onChange(`${finalHour}:${finalMinute} ${ampm}`);
+      setTimeout(() => {
+        minuteInputRef.current?.focus();
+        if (nextMinuteDigit) {
+          // If we pushed a digit to minutes, place cursor after it
+          minuteInputRef.current?.setSelectionRange(1, 1);
+        } else {
+          minuteInputRef.current?.select();
+        }
+      }, 0);
+    } else {
+      onChange(`${finalHour}:${minute} ${ampm}`);
+    }
   };
 
   const handleMinuteChange = (newVal: string) => {
-    const digits = newVal.replace(/\D/g, "").slice(0, 2);
-    if (digits === "") {
-      onChange(`${hour}:  ${ampm}`);
-      return;
-    }
-    const val = parseInt(digits);
-    if (val > 59) return; // Prevent invalid minutes
-    onChange(`${hour}:${digits} ${ampm}`);
-  };
+    const digits = newVal.replace(/\D/g, "");
+    let finalMinute = digits;
 
-  const hourStr = h.trim();
-  const minuteStr = m.trim();
+    if (digits.length >= 2) {
+      const lastTwo = digits.slice(-2);
+      const num = parseInt(lastTwo);
+      if (num <= 59) {
+        finalMinute = lastTwo;
+      } else {
+        finalMinute = "59";
+      }
+    }
+
+    onChange(`${hour}:${finalMinute} ${ampm}`);
+  };
 
   return (
     <div className="flex gap-4 items-center w-full">
@@ -64,7 +115,8 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
           <input
             type="text"
             inputMode="numeric"
-            value={hourStr}
+            value={hour}
+            onFocus={(e) => e.target.select()}
             onChange={(e) => handleHourChange(e.target.value)}
             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
             placeholder="12"
@@ -74,9 +126,11 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
         <div className="flex-1 flex flex-col items-center">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">MM</span>
           <input
+            ref={minuteInputRef}
             type="text"
             inputMode="numeric"
-            value={minuteStr}
+            value={minute}
+            onFocus={(e) => e.target.select()}
             onChange={(e) => handleMinuteChange(e.target.value)}
             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
             placeholder="00"
@@ -133,15 +187,24 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [editFile, setEditFile] = useState<File | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Helper to ensure we only have "HH:MM AM/PM" from potentially ISO strings
+  const formatForPicker = (time: string) => {
+    if (!time) return "12:00 PM";
+    if (time.includes("T") && time.endsWith("Z")) {
+      return utcToIst(time);
+    }
+    return time;
+  };
+
   // Prayer Times States
-  const [ptFajr, setPtFajr] = useState(initialPrayerTimes?.fajr || "05:30 AM");
-  const [ptDhuhr, setPtDhuhr] = useState(initialPrayerTimes?.dhuhr || "01:30 PM");
-  const [ptAsr, setPtAsr] = useState(initialPrayerTimes?.asr || "05:00 PM");
-  const [ptMaghrib, setPtMaghrib] = useState(initialPrayerTimes?.maghrib || "07:00 PM");
-  const [ptIsha, setPtIsha] = useState(initialPrayerTimes?.isha || "08:30 PM");
-  const [ptJummah1, setPtJummah1] = useState(initialPrayerTimes?.jummah1 || "01:00 PM");
-  const [ptJummah2, setPtJummah2] = useState(initialPrayerTimes?.jummah2 || "01:30 PM");
-  const [ptJummah3, setPtJummah3] = useState(initialPrayerTimes?.jummah3 || "02:00 PM");
+  const [ptFajr, setPtFajr] = useState(formatForPicker(initialPrayerTimes?.fajr));
+  const [ptDhuhr, setPtDhuhr] = useState(formatForPicker(initialPrayerTimes?.dhuhr));
+  const [ptAsr, setPtAsr] = useState(formatForPicker(initialPrayerTimes?.asr));
+  const [ptMaghrib, setPtMaghrib] = useState(formatForPicker(initialPrayerTimes?.maghrib));
+  const [ptIsha, setPtIsha] = useState(formatForPicker(initialPrayerTimes?.isha));
+  const [ptJummah1, setPtJummah1] = useState(formatForPicker(initialPrayerTimes?.jummah1));
+  const [ptJummah2, setPtJummah2] = useState(formatForPicker(initialPrayerTimes?.jummah2));
+  const [ptJummah3, setPtJummah3] = useState(formatForPicker(initialPrayerTimes?.jummah3));
   const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "Hadeeth of the Day");
   const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
@@ -498,10 +561,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           {/* Floating Action / Quick Post Button */}
           <button
             onClick={toggleModal}
-            className="fixed bottom-32 right-6 p-6 bg-emerald-500 text-white rounded-[2rem] shadow-2xl hover:bg-emerald-600 active:scale-90 transition-all z-40 animate-bounce cursor-pointer flex items-center gap-2"
+            className="fixed bottom-32 right-6 w-14 h-14 bg-emerald-500 text-white rounded-full shadow-2xl hover:bg-emerald-600 active:scale-90 transition-all z-40 animate-bounce flex items-center justify-center"
             aria-label="Quick Post"
+            style={{ animationDuration: '3s' }}
           >
-            <Plus size={40} />
+            <Plus size={28} />
           </button>
         </div>
       )}
@@ -509,7 +573,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {activeTab === "prayerTimes" && (
         <div className="p-6">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800 flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4 tracking-tighter uppercase">Daily Jamaat Times</h2>
+             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4 tracking-tight capitalize">Daily jamaat times</h2>
 
             <div className="space-y-6">
               <div className="flex flex-col gap-2">
@@ -564,7 +628,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <div className="bg-emerald-100 dark:bg-emerald-900/30 p-4 rounded-3xl text-emerald-600 dark:text-emerald-400 mb-4">
                 <Star size={48} />
               </div>
-              <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Imaam's Corner</h2>
+              <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight capitalize">Imaam's corner</h2>
               <p className="text-gray-400 font-medium">Update the Hadeeth of the Day</p>
             </div>
 
