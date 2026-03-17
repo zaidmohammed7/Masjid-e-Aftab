@@ -121,15 +121,15 @@ export default function FeedClient({ announcements }: { announcements: Announcem
 function AnnouncementCard({ item, onImageClick }: { item: Announcement, onImageClick: (url: string) => void }) {
   return (
     <div className="overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-none rounded-[2rem] p-2 transition-colors duration-300">
-      <div className="flex justify-between items-center px-4 pt-2 pb-1.5 border-b border-[var(--card-border)] mb-2">
+      <div className="flex justify-between items-center px-4 pt-1.5 pb-1 border-b border-[var(--card-border)] mb-1.5">
         {item.title ? (
-          <h3 className="text-lg font-black text-[var(--card-text)] tracking-tight leading-tight flex-1 line-clamp-1">
+          <h3 className="text-base font-black text-[var(--card-text)] tracking-tight leading-tight flex-1 line-clamp-1">
             {item.title}
           </h3>
         ) : <div className="flex-1"></div>}
 
         <div className={clsx(
-          "ml-2 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm",
+          "ml-2 px-1.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest shadow-sm",
           item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
         )}>
           {item.language === "both" ? "Urdu/Eng" : item.language}
@@ -153,8 +153,8 @@ function AnnouncementCard({ item, onImageClick }: { item: Announcement, onImageC
           </div>
         )}
         {item.type === "text" && (
-          <div className="p-4 text-center bg-gray-50 dark:bg-gray-800/50">
-            <p className="text-lg font-bold text-[var(--card-text)] leading-relaxed whitespace-pre-wrap">
+          <div className="p-3 text-center bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-base font-bold text-[var(--card-text)] leading-relaxed whitespace-pre-wrap">
               {item.contentText}
             </p>
           </div>
@@ -191,20 +191,18 @@ function AnnouncementCard({ item, onImageClick }: { item: Announcement, onImageC
       </div>
 
       {/* Meta Footer */}
-      <div className="px-4 pt-2 pb-1 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-gray-400 dark:text-gray-500">
-        <span className="text-[11px] font-black flex flex-col uppercase tracking-widest">
-          <span>{new Date(item.timestamp).toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-          })}</span>
+      <div className="px-4 py-1 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-gray-400 dark:text-gray-500">
+        <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+          <span>{new Date(item.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+          <span className="opacity-40">•</span>
           <span className="opacity-60">{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </span>
         <div className="flex items-center gap-2">
-          {item.type === 'audio' && <Megaphone size={18} className="opacity-50" />}
-          {item.type === 'image' && <ImageIcon size={18} className="opacity-50" />}
-          {item.type === 'text' && <FileText size={18} className="opacity-50" />}
-          {item.type === 'video' && <Video size={18} className="opacity-50" />}
-          {item.type === 'pdf' && <FileText size={18} className="opacity-50" />}
+          {item.type === 'audio' && <Megaphone size={14} className="opacity-50" />}
+          {item.type === 'image' && <ImageIcon size={14} className="opacity-50" />}
+          {item.type === 'text' && <FileText size={14} className="opacity-50" />}
+          {item.type === 'video' && <Video size={14} className="opacity-50" />}
+          {item.type === 'pdf' && <FileText size={14} className="opacity-50" />}
         </div>
       </div>
     </div>
@@ -233,11 +231,11 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
   };
 
   return (
-    <div className="flex items-center justify-between p-2 bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-2xl relative overflow-hidden">
+    <div className="flex items-center justify-between p-1.5 bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-950/40 dark:to-green-900/20 rounded-xl relative overflow-hidden">
       {/* Background Pulse Animation */}
       {isPlaying && (
         <>
-          <div className="absolute left-4 w-14 h-14 bg-emerald-400 rounded-full opacity-20 animate-ping" style={{ animationDuration: '1.5s' }} />
+          <div className="absolute left-3 w-10 h-10 bg-emerald-400 rounded-full opacity-20 animate-ping" style={{ animationDuration: '1.5s' }} />
         </>
       )}
 
@@ -245,18 +243,18 @@ function AudioPlayer({ fileUrl }: { fileUrl?: string }) {
       <button
         onClick={togglePlay}
         className={clsx(
-          "relative z-10 flex items-center justify-center w-12 h-12 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.1)] transition-all active:scale-90 duration-200",
+          "relative z-10 flex items-center justify-center w-10 h-10 rounded-full shadow-[0_3px_10px_rgba(0,0,0,0.1)] transition-all active:scale-90 duration-200",
           isPlaying ? "bg-red-500" : "bg-emerald-500"
         )}
       >
         {isPlaying ? (
-          <Pause size={24} className="text-white fill-current" />
+          <Pause size={20} className="text-white fill-current" />
         ) : (
-          <Play size={24} className="text-white ml-1 fill-current" />
+          <Play size={20} className="text-white ml-0.5 fill-current" />
         )}
       </button>
 
-      <p className="text-base font-bold text-emerald-800 dark:text-emerald-400 z-10 text-right w-full pr-2 uppercase tracking-tighter">
+      <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 z-10 text-right w-full pr-2 uppercase tracking-tighter">
         {isPlaying ? "Playing..." : "Voice Note"}
       </p>
     </div>

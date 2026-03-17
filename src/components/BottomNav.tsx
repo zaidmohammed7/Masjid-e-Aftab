@@ -10,8 +10,8 @@ export default function BottomNav() {
 
   const navItems = [
     { name: "Home", href: "/", icon: <Home size={32} /> },
-    { name: "Times", href: "/prayer-times", icon: <Clock size={32} /> },
     { name: "News", href: "/announcements", icon: <Megaphone size={32} /> },
+    { name: "Times", href: "/prayer-times", icon: <Clock size={32} /> },
     { name: "Settings", href: "/settings", icon: <Settings size={32} /> },
   ];
 

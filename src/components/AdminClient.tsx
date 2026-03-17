@@ -32,20 +32,31 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   const ampm = (ampmRaw || "PM").toUpperCase();
 
   const handleHourChange = (newVal: string) => {
+    if (newVal === "") {
+      onChange(` :${minute} ${ampm}`);
+      return;
+    }
     let val = parseInt(newVal);
     if (isNaN(val)) return;
-    if (val < 1) val = 1;
     if (val > 12) val = 12;
-    onChange(`${String(val).padStart(2, '0')}:${minute} ${ampm}`);
+    if (val < 0) val = 0;
+    onChange(`${val}:${minute} ${ampm}`);
   };
 
   const handleMinuteChange = (newVal: string) => {
+    if (newVal === "") {
+      onChange(`${hour}:  ${ampm}`);
+      return;
+    }
     let val = parseInt(newVal);
     if (isNaN(val)) return;
-    if (val < 0) val = 0;
     if (val > 59) val = 59;
+    if (val < 0) val = 0;
     onChange(`${hour}:${String(val).padStart(2, '0')} ${ampm}`);
   };
+
+  const hourStr = h.trim();
+  const minuteStr = m.trim();
 
   return (
     <div className="flex gap-4 items-center w-full">
@@ -53,26 +64,24 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
         <div className="flex-1 flex flex-col items-center">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">HH</span>
           <input
-            type="number"
-            min="1"
-            max="12"
-            value={hour}
+            type="text"
+            inputMode="numeric"
+            value={hourStr}
             onChange={(e) => handleHourChange(e.target.value)}
             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
-            style={{ MozAppearance: 'textfield' }}
+            placeholder="12"
           />
         </div>
         <span className="text-2xl font-black text-gray-200">:</span>
         <div className="flex-1 flex flex-col items-center">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">MM</span>
           <input
-            type="number"
-            min="0"
-            max="59"
-            value={minute}
+            type="text"
+            inputMode="numeric"
+            value={minuteStr}
             onChange={(e) => handleMinuteChange(e.target.value)}
             className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
-            style={{ MozAppearance: 'textfield' }}
+            placeholder="00"
           />
         </div>
       </div>
@@ -284,15 +293,27 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
 
   const handlePrayerTimesSubmit = async () => {
     setPtSaving(true);
+    
+    // Clean up times (e.g. " :30 PM" -> "12:30 PM", "5: 0 PM" -> "05:00 PM")
+    const clean = (time: string) => {
+      let [h, mAmpm] = time.split(":");
+      let [m, ampm] = (mAmpm || "").split(" ");
+      let hr = parseInt(h.trim());
+      if (isNaN(hr) || hr === 0) hr = 12;
+      let min = parseInt(m.trim());
+      if (isNaN(min)) min = 0;
+      return `${String(hr).padStart(2, '0')}:${String(min).padStart(2, '0')} ${ampm || "PM"}`;
+    };
+
     const data = {
-      fajr: ptFajr,
-      dhuhr: ptDhuhr,
-      asr: ptAsr,
-      maghrib: ptMaghrib,
-      isha: ptIsha,
-      jummah1: ptJummah1,
-      jummah2: ptJummah2,
-      jummah3: ptJummah3,
+      fajr: clean(ptFajr),
+      dhuhr: clean(ptDhuhr),
+      asr: clean(ptAsr),
+      maghrib: clean(ptMaghrib),
+      isha: clean(ptIsha),
+      jummah1: clean(ptJummah1),
+      jummah2: clean(ptJummah2),
+      jummah3: clean(ptJummah3),
       hadeethTitle: ptHadeethTitle,
       hadeethText: ptHadeethText,
     };
