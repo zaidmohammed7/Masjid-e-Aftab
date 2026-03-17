@@ -10,7 +10,6 @@ self.addEventListener('push', function(event) {
           const options = {
             body: data.body || `It's time for ${prayerType} prayer.`,
             icon: '/icon-192x192.png',
-            badge: '/notification-icon.png',
             vibrate: [200, 100, 200, 100, 200], // Stronger physical alert
             tag: `prayer-alert-${prayerType}`,
             renotify: true,
