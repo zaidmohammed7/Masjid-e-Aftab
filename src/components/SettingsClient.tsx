@@ -141,7 +141,7 @@ export default function SettingsClient() {
         }
       ]
     },
-    {
+    ...(prayerAlerts ? [{
       title: "Notification Filters",
       items: [
         { id: "fajr", label: "Fajr Alert", icon: <Sun size={24} className="text-orange-500" />, action: (
@@ -170,7 +170,7 @@ export default function SettingsClient() {
           </button>
         )}
       ]
-    },
+    }] : []),
     {
       title: "Application",
       items: [
