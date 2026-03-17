@@ -1,3 +1,12 @@
+// Service Worker Version: 1.3.0
+self.addEventListener('install', function(event) {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(self.clients.claim());
+});
+
 self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
