@@ -4,6 +4,7 @@ import { Clock, Megaphone, MapPin, Phone, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
+import InstallBanner from "@/components/InstallBanner";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
 
@@ -106,6 +107,8 @@ export default async function HomePage() {
         </Link>
 
       </div>
+      
+      <InstallBanner />
     </main>
   );
 }
