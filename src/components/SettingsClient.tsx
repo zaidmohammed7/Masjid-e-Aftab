@@ -36,6 +36,7 @@ export default function SettingsClient() {
 
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isAlertsExpanded, setIsAlertsExpanded] = useState(false);
 
   useEffect(() => {
     async function loadPrefs() {
@@ -207,7 +208,7 @@ export default function SettingsClient() {
           id: "admin",
           label: "Administration",
           icon: <Lock size={24} className="text-red-500" />,
-          href: "/admin/login",
+          href: "/admin",
           action: <div className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-xs font-bold border border-red-100 dark:border-red-900/50">Restricted</div>
         }
       ]
@@ -254,34 +255,46 @@ export default function SettingsClient() {
                     {item.id === "prayer-alerts" && prayerAlerts && (
                       <div className="px-6 pb-6 animate-in slide-in-from-top-2 duration-300">
                         <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-800 flex flex-col gap-1">
-                          {[
-                            { key: "fajr", label: "Fajr", script: "فجر", icon: <Sunrise size={18} className="text-amber-500" /> },
-                            { key: "dhuhr", label: "Dhuhr", script: "ظہر", icon: <Sun size={18} className="text-orange-500" /> },
-                            { key: "asr", label: "Asr", script: "عصر", icon: <CloudSun size={18} className="text-amber-600" /> },
-                            { key: "maghrib", label: "Maghrib", script: "مغرب", icon: <Sunset size={18} className="text-rose-500" /> },
-                            { key: "isha", label: "Isha", script: "عشاء", icon: <Moon size={18} className="text-indigo-400" /> },
-                          ].map((p) => (
-                            <div key={p.key} className="flex items-center justify-between p-2 rounded-2xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
-                                  {p.icon}
+                          <button 
+                            onClick={() => setIsAlertsExpanded(!isAlertsExpanded)}
+                            className="flex items-center justify-between w-full p-2 mb-1 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-80 transition-all border-b border-emerald-100/50 dark:border-emerald-800/50 pb-2"
+                          >
+                            {isAlertsExpanded ? "Hide Settings" : "Adjust Individual Alerts"}
+                            <ChevronRight className={clsx("transition-transform duration-300", isAlertsExpanded ? "rotate-90" : "rotate-0")} size={14} />
+                          </button>
+                          
+                          {isAlertsExpanded && (
+                            <div className="flex flex-col gap-1 animate-in fade-in slide-in-from-top-1 duration-300">
+                              {[
+                                { key: "fajr", label: "Fajr", script: "فجر", icon: <Sunrise size={18} className="text-amber-500" /> },
+                                { key: "dhuhr", label: "Dhuhr", script: "ظہر", icon: <Sun size={18} className="text-orange-500" /> },
+                                { key: "asr", label: "Asr", script: "عصر", icon: <CloudSun size={18} className="text-amber-600" /> },
+                                { key: "maghrib", label: "Maghrib", script: "مغرب", icon: <Sunset size={18} className="text-rose-500" /> },
+                                { key: "isha", label: "Isha", script: "عشاء", icon: <Moon size={18} className="text-indigo-400" /> },
+                              ].map((p) => (
+                                <div key={p.key} className="flex items-center justify-between p-2 rounded-2xl hover:bg-white dark:hover:bg-gray-800 transition-colors">
+                                  <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+                                      {p.icon}
+                                    </div>
+                                    <div className="flex flex-col items-start">
+                                      <span className="text-sm font-bold text-[var(--card-text)]">{p.label}</span>
+                                      <span className="text-[10px] font-medium text-gray-400 text-left">{p.script}</span>
+                                    </div>
+                                  </div>
+                                  <button 
+                                    onClick={() => handleToggleIndividual(p.key as PrayerKey)}
+                                    className={clsx(
+                                      "w-10 h-5 rounded-full p-0.5 transition-colors flex items-center",
+                                      individualAlerts[p.key as PrayerKey] ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
+                                    )}
+                                  >
+                                    <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
+                                  </button>
                                 </div>
-                                <div className="flex flex-col items-start">
-                                  <span className="text-sm font-bold text-[var(--card-text)]">{p.label}</span>
-                                  <span className="text-[10px] font-medium text-gray-400 text-left">{p.script}</span>
-                                </div>
-                              </div>
-                              <button 
-                                onClick={() => handleToggleIndividual(p.key as PrayerKey)}
-                                className={clsx(
-                                  "w-10 h-5 rounded-full p-0.5 transition-colors flex items-center",
-                                  individualAlerts[p.key as PrayerKey] ? "bg-emerald-500 justify-end" : "bg-gray-300 justify-start"
-                                )}
-                              >
-                                <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
-                              </button>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
                     )}
@@ -306,7 +319,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.4.0</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.4.1</p>
           <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-bold uppercase tracking-widest">Made for the Community</p>
         </div>
       </div>

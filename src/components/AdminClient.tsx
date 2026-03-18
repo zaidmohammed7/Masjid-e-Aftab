@@ -1257,11 +1257,20 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             <X size={32} />
           </button>
           <div className="w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
-            <img
-              src={expandedImage}
-              alt="Expanded Preview"
-              className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500"
-            />
+            {postType === "video" && expandedImage === previewUrl ? (
+              <video
+                src={expandedImage}
+                controls
+                autoPlay
+                className="max-w-full max-h-full rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500"
+              />
+            ) : (
+              <img
+                src={expandedImage}
+                alt="Expanded Preview"
+                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500"
+              />
+            )}
           </div>
         </div>
       )}

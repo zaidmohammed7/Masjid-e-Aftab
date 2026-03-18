@@ -17,7 +17,7 @@ export default function AdminLogin() {
     // Simple mock logic for demonstration: 
     // In production, send this via a Server Action to verify process.env.ADMIN_PIN and set an HTTP-Only cookie.
     if (pin === "1234" || pin === process.env.NEXT_PUBLIC_ADMIN_PIN) {
-      document.cookie = "admin_auth=true; path=/; SameSite=Lax";
+      document.cookie = "admin_auth=true; path=/; SameSite=Lax; Max-Age=86400";
       router.push("/admin");
     } else {
       setError(true);
