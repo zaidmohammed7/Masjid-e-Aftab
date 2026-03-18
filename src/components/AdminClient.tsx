@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight, Pause, Play } from "lucide-react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, SendHorizontal, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight, Pause, Play } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
@@ -810,7 +810,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <X size={32} />
             </button>
 
-            <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 mt-2 tracking-tight">New Post</h3>
+            <h3 className="text-2xl font-black text-gray-800 dark:text-gray-100 mb-4 mt-2 tracking-tight text-center">New Post</h3>
 
             {/* Language Selector */}
             <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl mb-6 shadow-inner">
@@ -859,7 +859,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-emerald-500 text-white p-2 rounded-xl shadow-md">
                     <Mic size={20} />
                   </div>
-                  <span className="text-sm font-black uppercase tracking-tight">Audio</span>
+                  <span className="text-xs font-black tracking-tight">Audio</span>
                 </button>
 
                 <button
@@ -869,7 +869,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-rose-500 text-white p-2 rounded-xl shadow-md">
                     <ImageIcon size={20} />
                   </div>
-                  <span className="text-sm font-black uppercase tracking-tight">Photo / Video</span>
+                  <span className="text-xs font-black tracking-tight">Photo / Video</span>
                 </button>
 
                 <button
@@ -879,7 +879,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-purple-500 text-white p-2 rounded-xl shadow-md">
                     <FileText size={20} />
                   </div>
-                  <span className="text-sm font-black uppercase tracking-tight">PDF / Word</span>
+                  <span className="text-xs font-black tracking-tight">PDF / Word</span>
                 </button>
 
                 <button
@@ -889,7 +889,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   <div className="bg-amber-500 text-white p-2 rounded-xl shadow-md">
                     <FileText size={20} />
                   </div>
-                  <span className="text-sm font-black uppercase tracking-tight">Text Only</span>
+                  <span className="text-xs font-black tracking-tight">Text</span>
                 </button>
               </div>
             ) : (
@@ -904,11 +904,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     {selectionGroup === "document" && <FileText size={20} />}
                     {selectionGroup === "text" && <FileText size={20} />}
                   </div>
-                  <span className="font-bold text-gray-700 dark:text-gray-300 capitalize">{selectionGroup === "document" ? "Document" : selectionGroup} Selected</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300 capitalize text-sm">{selectionGroup === "document" ? "Document" : selectionGroup} Selected</span>
                 </div>
                 <button
                   onClick={() => { setSelectionGroup(null); setPostType(null); setFile(null); setTextContent(""); }}
-                  className="text-emerald-600 dark:text-emerald-400 font-black text-sm uppercase tracking-wider underline underline-offset-4"
+                  className="text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-wider underline underline-offset-4"
                 >
                   Change
                 </button>
@@ -947,24 +947,23 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                         <button
                           onClick={isRecording ? stopRecording : startRecording}
                           className={clsx(
-                            "group relative flex items-center justify-center gap-4 p-8 rounded-[2.5rem] w-full transition-all active:scale-95 shadow-lg overflow-hidden",
+                            "group relative flex items-center justify-center gap-3 p-4 rounded-2xl w-full transition-all active:scale-95 shadow-md overflow-hidden",
                             isRecording ? "bg-red-500 scale-105" : "bg-emerald-50 dark:bg-emerald-950 border-2 border-dashed border-emerald-300 dark:border-emerald-800"
                           )}
                         >
-                          <div className={clsx("p-4 rounded-full text-white shadow-md transition-transform", isRecording && "animate-pulse")}>
-                            <Mic size={32} />
+                          <div className={clsx("p-2 rounded-lg text-white shadow-sm transition-transform", isRecording && "animate-pulse")}>
+                            <Mic size={20} />
                           </div>
-                          <span className={clsx("font-bold text-xl uppercase tracking-tight", isRecording ? "text-white" : "text-emerald-800 dark:text-emerald-400")}>
+                          <span className={clsx("font-bold text-sm tracking-tight", isRecording ? "text-white" : "text-emerald-800 dark:text-emerald-400")}>
                             {isRecording ? "Recording... (Stop)" : "Record Live Audio"}
                           </span>
                         </button>
-
-                        <div className="flex items-center gap-4 text-gray-400 dark:text-gray-600 font-bold w-full uppercase text-xs justify-center">
+                        <div className="flex items-center gap-2 text-gray-300 dark:text-gray-700 font-bold w-full uppercase text-[9px] justify-center">
                           <hr className="flex-1 border-gray-100 dark:border-gray-800" /> OR <hr className="flex-1 border-gray-100 dark:border-gray-800" />
                         </div>
-
-                        <label className="cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-gray-300 dark:border-gray-800 active:scale-95 transition-all">
-                          <span className="text-lg font-bold text-gray-600 dark:text-gray-400 block px-4 py-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800">
+                        
+                        <label className="cursor-pointer bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-800 p-2 rounded-2xl w-full text-center active:scale-95 transition-all">
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-400 block px-4 py-3 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800">
                             Attach Audio File
                           </span>
                           <input
@@ -981,15 +980,14 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                       </div>
                     )}
                     {selectionGroup === "media" && (
-                      <div className="flex flex-col gap-4 w-full">
-                        <p className="text-gray-500 mb-4 font-bold text-center">Attach Photo or Video below:</p>
-                        <label className="cursor-pointer bg-rose-50 dark:bg-rose-950 hover:bg-rose-100 dark:hover:bg-rose-900/40 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-rose-300 dark:border-rose-800 active:scale-95 transition-all">
-                          <div className="bg-rose-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
-                            <ImageIcon size={32} />
+                      <div className="flex flex-col gap-3 w-full">
+                        <label className="cursor-pointer bg-rose-50 dark:bg-rose-950 border-2 border-dashed border-rose-200 dark:border-rose-900/50 p-4 rounded-[1.5rem] w-full text-center active:scale-95 transition-all">
+                          <div className="bg-rose-500 w-10 h-10 mx-auto rounded-xl text-white shadow-md flex items-center justify-center mb-2">
+                            <ImageIcon size={20} />
                           </div>
-                          <span className="text-lg font-bold text-rose-800 dark:text-rose-400">Capture / Pick Media</span>
+                          <span className="text-sm font-bold text-rose-800 dark:text-rose-400">Capture / Pick Media</span>
                           <input
-                            type="file" accept="image/*,video/*" className="hidden"
+                            type="file" accept="image/*,video/*" capture="environment" className="hidden"
                             onChange={(e) => {
                               const selected = e.target.files?.[0];
                               if (selected && selected.size > 100 * 1024 * 1024) {
@@ -1006,12 +1004,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     )}
                     {selectionGroup === "document" && (
                       <div className="w-full">
-                        <p className="text-gray-500 mb-4 font-bold text-center">Attach PDF or Word Doc below:</p>
-                        <label className="cursor-pointer bg-purple-50 dark:bg-purple-950 hover:bg-purple-100 dark:hover:bg-purple-900/40 p-6 rounded-[2rem] w-full text-center border-2 border-dashed border-purple-300 dark:border-purple-800 active:scale-95 transition-all">
-                          <div className="bg-purple-500 w-16 h-16 mx-auto rounded-full text-white shadow-md flex items-center justify-center mb-2">
-                            <FileText size={32} />
+                        <label className="cursor-pointer bg-purple-50 dark:bg-purple-950 border-2 border-dashed border-purple-200 dark:border-purple-900/50 p-4 rounded-[1.5rem] w-full text-center active:scale-95 transition-all">
+                          <div className="bg-purple-500 w-10 h-10 mx-auto rounded-xl text-white shadow-md flex items-center justify-center mb-2">
+                            <FileText size={20} />
                           </div>
-                          <span className="text-lg font-bold text-purple-800 dark:text-purple-400">Attach Document (PDF/Word)</span>
+                          <span className="text-sm font-bold text-purple-800 dark:text-purple-400">Attach Document (PDF/Word)</span>
                           <input
                             type="file" accept=".pdf,.doc,.docx" className="hidden"
                             onChange={(e) => {
@@ -1084,8 +1081,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                       style={{ width: `${uploadProgress}%` }}
                     />
                   )}
-                  <div className="flex items-center gap-4">
-                    {(isSubmitting || isUploading) ? <Loader2 size={32} className="animate-spin" /> : <><Send size={32} /> Publish</>}
+                  <div className="flex items-center gap-3">
+                    {(isSubmitting || isUploading) ? <Loader2 size={24} className="animate-spin" /> : <>Publish <SendHorizontal size={24} /></>}
                   </div>
                   {isUploading && <span className="text-xs opacity-80">Uploading to Cloud... {uploadProgress}%</span>}
                 </button>
