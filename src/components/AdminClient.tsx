@@ -904,7 +904,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     {selectionGroup === "document" && <FileText size={20} />}
                     {selectionGroup === "text" && <FileText size={20} />}
                   </div>
-                  <span className="font-bold text-gray-700 dark:text-gray-300 capitalize text-xs">{selectionGroup === "document" ? "Document" : selectionGroup} Selected</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300 capitalize text-sm">{selectionGroup === "document" ? "Document" : selectionGroup} Selected</span>
                 </div>
                 <button
                   onClick={() => { setSelectionGroup(null); setPostType(null); setFile(null); setTextContent(""); }}
@@ -932,7 +932,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     </p>
                     <button
                       onClick={() => setFile(null)}
-                      className="text-emerald-600 dark:text-emerald-400 font-bold text-[9px] uppercase tracking-wide hover:underline"
+                      className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] uppercase tracking-wide hover:underline"
                     >
                       Remove File
                     </button>
@@ -959,8 +959,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                           <hr className="flex-1 border-gray-100 dark:border-gray-800" /> OR <hr className="flex-1 border-gray-100 dark:border-gray-800" />
                         </div>
                         
-                        <label className="cursor-pointer bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-100 dark:border-gray-800 p-1.5 rounded-xl w-full text-center active:scale-95 transition-all">
-                          <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block px-4 py-2 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+                        <label className="cursor-pointer bg-gray-50 dark:bg-gray-950 border-2 border-dashed border-gray-100 dark:border-gray-800 p-1.5 rounded-xl w-full text-center active:scale-95 transition-all">
+                          <span className="text-sm font-bold text-gray-500 dark:text-gray-400 block px-4 py-2.5 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                             Attach Audio File
                           </span>
                           <input
@@ -978,36 +978,37 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     )}
                     {selectionGroup === "media" && (
                       <div className="flex flex-col gap-3 w-full animate-in slide-in-from-bottom-2">
-                        <button
-                          onClick={() => {
-                            const input = document.getElementById('capture-media') as HTMLInputElement;
-                            input?.click();
-                          }}
-                          className="group relative flex items-center justify-center gap-3 p-4 rounded-2xl w-full transition-all active:scale-95 shadow-md bg-rose-500 text-white"
-                        >
-                          <Video size={20} />
-                          <span className="font-bold text-sm tracking-tight">Capture Photo/Video</span>
-                          <input
-                            id="capture-media" type="file" accept="image/*,video/*" capture="environment" className="hidden"
-                            onChange={(e) => {
+                        <div className="grid grid-cols-2 gap-2 w-full">
+                          <button
+                            onClick={() => document.getElementById('capture-photo')?.click()}
+                            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl transition-all active:scale-95 shadow-md bg-rose-500 text-white"
+                          >
+                            <ImageIcon size={18} />
+                            <span className="font-bold text-sm tracking-tight text-left leading-tight">Capture Photo</span>
+                            <input id="capture-photo" type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
                               const selected = e.target.files?.[0];
-                              if (selected && selected.size > 100 * 1024 * 1024) {
-                                alert("File too large!"); e.target.value = ""; return setFile(null);
-                              }
-                              if (selected) {
-                                setFile(selected);
-                                setPostType(selected.type.startsWith("image/") ? "image" : "video");
-                              }
-                            }}
-                          />
-                        </button>
+                              if (selected) { setFile(selected); setPostType("image"); }
+                            }} />
+                          </button>
+                          <button
+                            onClick={() => document.getElementById('capture-video')?.click()}
+                            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl transition-all active:scale-95 shadow-md bg-rose-500 text-white"
+                          >
+                            <Video size={18} />
+                            <span className="font-bold text-sm tracking-tight text-left leading-tight">Capture Video</span>
+                            <input id="capture-video" type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => {
+                              const selected = e.target.files?.[0];
+                              if (selected) { setFile(selected); setPostType("video"); }
+                            }} />
+                          </button>
+                        </div>
                         
                         <div className="flex items-center gap-2 text-rose-200 dark:text-rose-900 font-bold w-full uppercase text-[9px] justify-center">
                           <hr className="flex-1 border-rose-100 dark:border-rose-900/30" /> OR <hr className="flex-1 border-rose-100 dark:border-rose-900/30" />
                         </div>
 
                         <label className="cursor-pointer bg-gray-50 dark:bg-gray-950 border-2 border-dashed border-gray-100 dark:border-gray-800 p-1.5 rounded-xl w-full text-center active:scale-95 transition-all">
-                          <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 block px-4 py-2 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+                          <span className="text-sm font-bold text-gray-500 dark:text-gray-400 block px-4 py-2.5 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                             Attach Media File
                           </span>
                           <input
@@ -1032,8 +1033,8 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                           <div className="bg-purple-500 w-8 h-8 mx-auto rounded-lg text-white shadow-md flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                             <FileText size={16} />
                           </div>
-                          <span className="text-xs font-bold text-purple-800 dark:text-purple-400 mb-1 block">Attach Document</span>
-                          <span className="text-[9px] text-purple-600/60 dark:text-purple-400/40 uppercase font-black tracking-widest">(PDF or Word)</span>
+                          <span className="text-sm font-bold text-purple-800 dark:text-purple-400 mb-1 block">Attach Document</span>
+                          <span className="text-[10px] text-purple-600/60 dark:text-purple-400/40 uppercase font-black tracking-widest leading-none">(PDF or Word)</span>
                           <input
                             type="file" accept=".pdf,.doc,.docx" className="hidden"
                             onChange={(e) => {

@@ -166,14 +166,25 @@ export default function SettingsClient() {
           icon: <Share2 size={24} className="text-indigo-500" />,
           action: (
             <button 
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-                navigator.clipboard.writeText("https://masjid-e-aftab.vercel.app/");
-                alert("App link copied to clipboard!");
+                const shareData = {
+                  title: 'Masjid-e-Aftab',
+                  text: 'Follow local prayer times and announcements at Masjid-e-Aftab.',
+                  url: 'https://masjid-e-aftab.vercel.app/'
+                };
+                if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                  try {
+                    await navigator.share(shareData);
+                  } catch (err) { }
+                } else {
+                  navigator.clipboard.writeText(shareData.url);
+                  alert("App link copied to clipboard!");
+                }
               }}
               className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-indigo-100 dark:border-indigo-900/50"
             >
-              Copy Link
+              Share
             </button>
           )
         },
@@ -295,7 +306,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.6</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.7</p>
           <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">Made with ❤️ for the Community</p>
         </div>
       </div>
