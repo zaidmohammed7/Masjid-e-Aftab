@@ -306,67 +306,67 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.9</p>
-          <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">Made with ❤️ for the Community</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.4.0</p>
+          <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-bold uppercase tracking-widest">Made for the Community</p>
         </div>
       </div>
 
       {isAboutOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-6 animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[3rem] p-8 shadow-2xl relative animate-in zoom-in-95 border border-emerald-100 dark:border-emerald-900/30 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
+          <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[2.5rem] p-5 shadow-2xl relative animate-in zoom-in-95 border border-emerald-100 dark:border-emerald-900/30 overflow-y-auto max-h-[85vh]">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-emerald-500 z-10" />
             
             <button
               onClick={() => setIsAboutOpen(false)}
-              className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-full active:scale-90"
+              className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-full active:scale-90 z-20"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
 
-            <div className="flex flex-col items-center text-center mt-4">
-              <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-3xl flex items-center justify-center text-emerald-600 mb-4 shadow-inner">
-                 <Info size={40} />
+            <div className="flex flex-col items-center text-center mt-2">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-600 mb-3 shadow-inner">
+                 <Info size={32} />
               </div>
-              <h3 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Masjid-e-Aftab</h3>
+              <h3 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tight">Masjid-e-Aftab</h3>
             </div>
 
-            <div className="mt-8 space-y-6">
-               <div className="flex gap-4">
-                  <div className="bg-emerald-50 dark:bg-emerald-500/10 p-3 rounded-2xl text-emerald-600 flex-shrink-0">
-                     <MapPin size={24} />
+            <div className="mt-6 space-y-4">
+               <div className="flex gap-3">
+                  <div className="bg-emerald-50 dark:bg-emerald-500/10 p-2.5 rounded-xl text-emerald-600 flex-shrink-0">
+                     <MapPin size={20} />
                   </div>
                   <div className="text-left">
-                     <p className="font-black text-[10px] uppercase tracking-widest text-emerald-500 mb-1">Location</p>
-                     <p className="font-bold text-gray-700 dark:text-gray-300 text-lg leading-tight">123 Mosque Street, Community City, 110001</p>
+                     <p className="font-black text-[9px] uppercase tracking-widest text-emerald-500 mb-0.5">Location</p>
+                     <p className="font-bold text-gray-700 dark:text-gray-300 text-base leading-tight">123 Mosque Street, Community City</p>
                   </div>
                </div>
 
-               <div className="flex gap-4">
-                  <div className="bg-blue-50 dark:bg-blue-500/10 p-3 rounded-2xl text-blue-600 flex-shrink-0">
-                     <Phone size={24} />
+               <div className="flex gap-3">
+                  <div className="bg-blue-50 dark:bg-blue-500/10 p-2.5 rounded-xl text-blue-600 flex-shrink-0">
+                     <Phone size={20} />
                   </div>
                   <div className="text-left">
-                     <p className="font-black text-[10px] uppercase tracking-widest text-blue-500 mb-1">Contact</p>
-                     <p className="font-bold text-gray-700 dark:text-gray-300 text-lg">+91 999 888 7777</p>
+                     <p className="font-black text-[9px] uppercase tracking-widest text-blue-500 mb-0.5">Contact</p>
+                     <p className="font-bold text-gray-700 dark:text-gray-300 text-base leading-tight">+91 999 888 7777</p>
                   </div>
                </div>
 
-               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-6 rounded-[2rem] border border-emerald-100 dark:border-emerald-800/50 shadow-inner">
-                  <div className="flex items-center gap-2 mb-3">
-                     <Star size={20} className="text-amber-500 fill-amber-500" />
-                     <p className="font-black text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Support the Masjid</p>
+               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-4 rounded-[1.5rem] border border-emerald-100 dark:border-emerald-800/50 shadow-inner">
+                  <div className="flex items-center gap-2 mb-2">
+                     <Star size={16} className="text-amber-500 fill-amber-500" />
+                     <p className="font-black text-[10px] uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Support Us</p>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium text-sm mb-4 leading-relaxed">Your contributions help us grow our local community and maintain the mosque.</p>
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-700 shadow-sm">
-                     <p className="text-[10px] font-black uppercase text-emerald-500 mb-1">GPay / Paytm Number</p>
-                     <p className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tight">+91 999 888 7777</p>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium text-[13px] mb-3 leading-tight">Your contributions help us maintain the mosque.</p>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-emerald-100 dark:border-emerald-700 shadow-sm">
+                     <p className="text-[9px] font-black uppercase text-emerald-500 mb-0.5">GPay / Paytm</p>
+                     <p className="text-lg font-black text-gray-800 dark:text-gray-100 tracking-tight leading-none">+91 999 888 7777</p>
                   </div>
                </div>
             </div>
 
             <button 
               onClick={() => setIsAboutOpen(false)}
-              className="w-full mt-8 py-5 bg-gray-900 dark:bg-emerald-600 text-white rounded-2xl font-black tracking-widest uppercase text-sm shadow-xl active:scale-95 transition-all"
+              className="w-full mt-6 py-4 bg-gray-900 dark:bg-emerald-600 text-white rounded-xl font-black tracking-widest uppercase text-xs shadow-lg active:scale-95 transition-all"
             >
               Close
             </button>

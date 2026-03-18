@@ -28,7 +28,7 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   // Parsing value of format "HH:MM AM/PM"
   const [timePart, ampmRaw] = value.split(" ");
   const [hPart, mPart] = (timePart || "").split(":");
-  
+
   const hour = hPart || "12";
   const minute = mPart || "00";
   const ampm = (ampmRaw || "PM").toUpperCase();
@@ -38,7 +38,7 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
   const handleHourChange = (newVal: string) => {
     // Only allow digits
     const digits = newVal.replace(/\D/g, "");
-    
+
     let finalHour = hour;
     let shouldFocusMinutes = false;
     let nextMinuteDigit = "";
@@ -54,7 +54,7 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
     } else if (digits.length >= 2) {
       const lastTwo = digits.slice(-2);
       const num = parseInt(lastTwo);
-      
+
       if (num >= 1 && num <= 12) {
         finalHour = lastTwo;
         shouldFocusMinutes = true;
@@ -74,7 +74,7 @@ function TimePicker({ value, onChange }: { value: string, onChange: (val: string
     }
 
     if (shouldFocusMinutes) {
-      const finalMinute = nextMinuteDigit ? `${nextMinuteDigit}0`.slice(0,2) : minute;
+      const finalMinute = nextMinuteDigit ? `${nextMinuteDigit}0`.slice(0, 2) : minute;
       onChange(`${finalHour}:${finalMinute} ${ampm}`);
       setTimeout(() => {
         minuteInputRef.current?.focus();
@@ -222,7 +222,7 @@ function CompactAudioPlayer({ fileUrl, duration: totalDuration = 0 }: { fileUrl?
         <div className="relative h-2 flex items-center">
           <div className="absolute left-0 right-0 h-1 bg-emerald-200/40 dark:bg-emerald-900/40 rounded-full" />
           <div className="absolute left-0 h-1 bg-emerald-500 rounded-full z-10" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
-          <input 
+          <input
             type="range" min="0" max={duration || 0} step="0.1" value={currentTime}
             onChange={handleSeek}
             className="seek-slider h-2 w-full absolute opacity-0 cursor-pointer z-20"
@@ -478,7 +478,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
 
   const handlePrayerTimesSubmit = async () => {
     setPtSaving(true);
-    
+
     // Clean up times (e.g. " :30 PM" -> "12:30 PM", "5: 0 PM" -> "05:00 PM")
     const clean = (time: string) => {
       let [h, mAmpm] = time.split(":");
@@ -551,7 +551,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             <LogOut size={18} className="transition-transform group-hover:-translate-x-1" />
             <span className="font-black uppercase tracking-[0.2em] text-[10px]">Logout from Session</span>
           </button>
-          
+
         </div>
       </div>
 
@@ -633,7 +633,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     <div className="flex-1 p-4 min-w-0">
                       <div className="rounded-xl overflow-hidden">
                         {item.type === "image" && item.contentImage && (
-                          <div 
+                          <div
                             className="bg-gray-50 dark:bg-gray-800 flex items-center justify-center h-44 cursor-pointer group relative"
                             onClick={() => setExpandedImage(item.contentImage!)}
                           >
@@ -717,7 +717,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {activeTab === "prayerTimes" && (
         <div className="p-6">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800 flex flex-col gap-6">
-             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4 tracking-tight capitalize">Daily jamaat times</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 text-center border-b border-gray-100 dark:border-gray-800 pb-4 tracking-tight capitalize">Daily jamaat times</h2>
 
             <div className="space-y-6">
               <div className="flex flex-col gap-2">
@@ -758,7 +758,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 onClick={handlePrayerTimesSubmit}
                 className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
               >
-                {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={24} /> Save Times</>}
+                {ptSaving ? <Loader2 size={32} className="animate-spin" /> : "Save Times"}
               </button>
             </div>
           </div>
@@ -802,7 +802,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 onClick={handlePrayerTimesSubmit}
                 className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
               >
-                {ptSaving ? <Loader2 size={32} className="animate-spin" /> : <><Send size={24} /> Update Content</>}
+                {ptSaving ? <Loader2 size={32} className="animate-spin" /> : "Update Content"}
               </button>
             </div>
           </div>
@@ -939,23 +939,23 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   />
                 ) : file ? (
                   <div className="w-full mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 flex flex-col items-center gap-2 animate-in zoom-in-95">
-                    {postType === "audio" ? (
-                      <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 tracking-tight text-center truncate w-full px-2 lowercase first-letter:uppercase leading-relaxed">
-                        {file.name}
-                      </p>
+                    {postType === "audio" && previewUrl ? (
+                      <div className="w-full px-2">
+                        <CompactAudioPlayer fileUrl={previewUrl} />
+                      </div>
                     ) : (postType === "image" || postType === "video") && previewUrl ? (
-                      <div 
+                      <div
                         onClick={() => setExpandedImage(previewUrl)}
-                        className="relative w-full aspect-video rounded-xl overflow-hidden cursor-zoom-in group border border-emerald-100 dark:border-emerald-800"
+                        className="relative w-48 aspect-video mx-auto rounded-xl overflow-hidden cursor-zoom-in group border border-emerald-100 dark:border-emerald-800 shadow-sm"
                       >
                         {postType === "image" ? (
                           <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
                           <video src={previewUrl} className="w-full h-full object-cover" />
                         )}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                          <div className="bg-white/90 p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 text-emerald-600">
-                             <Megaphone size={14} className="rotate-12" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                          <div className="bg-white/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 text-emerald-600">
+                            {postType === "image" ? <ImageIcon size={16} /> : <Video size={16} />}
                           </div>
                         </div>
                       </div>
@@ -964,10 +964,10 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                         {file.name}
                       </p>
                     )}
-                    
+
                     <button
                       onClick={() => setFile(null)}
-                      className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] uppercase tracking-wide hover:opacity-70 underline underline-offset-4 decoration-2"
+                      className="text-emerald-500 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-wider hover:opacity-80 underline underline-offset-4 decoration-2"
                     >
                       Remove File
                     </button>
@@ -993,7 +993,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                         <div className="flex items-center gap-2 text-gray-300 dark:text-gray-700 font-bold w-full uppercase text-[9px] justify-center">
                           <hr className="flex-1 border-gray-100 dark:border-gray-800" /> OR <hr className="flex-1 border-gray-100 dark:border-gray-800" />
                         </div>
-                        
+
                         <label className="cursor-pointer bg-gray-50 dark:bg-gray-950 border-2 border-dashed border-gray-100 dark:border-gray-800 p-1.5 rounded-xl w-full text-center active:scale-95 transition-all">
                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400 block px-4 py-2.5 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                             Attach Audio File
@@ -1037,9 +1037,9 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                             }} />
                           </button>
                         </div>
-                        
-                        <div className="flex items-center gap-2 text-rose-200 dark:text-rose-900 font-bold w-full uppercase text-[9px] justify-center">
-                          <hr className="flex-1 border-rose-100 dark:border-rose-900/30" /> OR <hr className="flex-1 border-rose-100 dark:border-rose-900/30" />
+
+                        <div className="flex items-center gap-2 text-gray-300 dark:text-gray-700 font-bold w-full uppercase text-[9px] justify-center">
+                          <hr className="flex-1 border-gray-100 dark:border-gray-800" /> OR <hr className="flex-1 border-gray-100 dark:border-gray-800" />
                         </div>
 
                         <label className="cursor-pointer bg-gray-50 dark:bg-gray-950 border-2 border-dashed border-gray-100 dark:border-gray-800 p-1.5 rounded-xl w-full text-center active:scale-95 transition-all">
@@ -1190,23 +1190,23 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <label className={clsx(
                   "cursor-pointer p-6 rounded-[2rem] w-full text-center border-2 border-dashed active:scale-95 transition-all text-xs",
                   editType === "audio" ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100" :
-                  (editType === "image" || editType === "video") ? "bg-rose-50 dark:bg-rose-950 border-rose-300 dark:border-rose-800 hover:bg-rose-100" :
-                  "bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-800 hover:bg-purple-100"
+                    (editType === "image" || editType === "video") ? "bg-rose-50 dark:bg-rose-950 border-rose-300 dark:border-rose-800 hover:bg-rose-100" :
+                      "bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-800 hover:bg-purple-100"
                 )}>
                   <span className={clsx(
                     "font-bold block line-clamp-2 px-4 shadow-sm py-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800",
                     editType === "audio" ? "text-emerald-700 dark:text-emerald-400" :
-                    (editType === "image" || editType === "video") ? "text-rose-700 dark:text-rose-400" :
-                    "text-purple-700 dark:text-purple-400"
+                      (editType === "image" || editType === "video") ? "text-rose-700 dark:text-rose-400" :
+                        "text-purple-700 dark:text-purple-400"
                   )}>
                     {editFile ? editFile.name : `Choose New ${editType === 'audio' ? 'Audio' : (editType === 'image' || editType === 'video') ? 'Media' : 'Document'}...`}
                   </span>
                   <input
                     type="file"
                     accept={
-                      editType === "audio" ? "audio/*" : 
-                      (editType === "image" || editType === "video") ? "image/*,video/*" : 
-                      ".pdf,.doc,.docx"
+                      editType === "audio" ? "audio/*" :
+                        (editType === "image" || editType === "video") ? "image/*,video/*" :
+                          ".pdf,.doc,.docx"
                     }
                     className="hidden"
                     onChange={(e) => {
@@ -1246,21 +1246,21 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
 
       {/* Expanded Image Overlay */}
       {expandedImage && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
           onClick={closeExpandedImage}
         >
-          <button 
+          <button
             onClick={closeExpandedImage}
             className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all active:scale-95"
           >
             <X size={32} />
           </button>
           <div className="w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
-            <img 
-              src={expandedImage} 
-              alt="Expanded Preview" 
-              className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500" 
+            <img
+              src={expandedImage}
+              alt="Expanded Preview"
+              className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500"
             />
           </div>
         </div>
