@@ -250,6 +250,17 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [selectionGroup, setSelectionGroup] = useState<"audio" | "media" | "document" | "text" | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   // Audio Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -363,6 +374,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+    setSelectionGroup(null);
     setPostType(null);
     setPostTitle("");
     setTextContent("");
@@ -926,13 +938,36 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     rows={4}
                   />
                 ) : file ? (
-                  <div className="w-full mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 flex flex-col items-center gap-1 animate-in zoom-in-95">
-                    <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 tracking-tight text-center truncate w-full px-2 lowercase first-letter:uppercase">
-                      {file.name}
-                    </p>
+                  <div className="w-full mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 flex flex-col items-center gap-2 animate-in zoom-in-95">
+                    {postType === "audio" ? (
+                      <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 tracking-tight text-center truncate w-full px-2 lowercase first-letter:uppercase leading-relaxed">
+                        {file.name}
+                      </p>
+                    ) : (postType === "image" || postType === "video") && previewUrl ? (
+                      <div 
+                        onClick={() => setExpandedImage(previewUrl)}
+                        className="relative w-full aspect-video rounded-xl overflow-hidden cursor-zoom-in group border border-emerald-100 dark:border-emerald-800"
+                      >
+                        {postType === "image" ? (
+                          <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <video src={previewUrl} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                          <div className="bg-white/90 p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 text-emerald-600">
+                             <Megaphone size={14} className="rotate-12" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 tracking-tight text-center truncate w-full px-2">
+                        {file.name}
+                      </p>
+                    )}
+                    
                     <button
                       onClick={() => setFile(null)}
-                      className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] uppercase tracking-wide hover:underline"
+                      className="text-emerald-600 dark:text-emerald-400 font-semibold text-[10px] uppercase tracking-wide hover:opacity-70 underline underline-offset-4 decoration-2"
                     >
                       Remove File
                     </button>
