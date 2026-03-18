@@ -295,7 +295,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.2</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.3</p>
           <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">Made with ❤️ for the Community</p>
         </div>
       </div>
