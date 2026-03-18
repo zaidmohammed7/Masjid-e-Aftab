@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Moon, Sun, Lock, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings, Sunrise, Sunset, CloudSun } from "lucide-react";
+import { Moon, Sun, Lock, Info, ChevronRight, Share2, Star, ShieldCheck, X, MapPin, Phone, Settings, Sunrise, Sunset, CloudSun, Bell, Download } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import Link from "next/link";
 import clsx from "clsx";
@@ -127,7 +127,7 @@ export default function SettingsClient() {
         {
           id: "prayer-alerts",
           label: "Prayer Alerts",
-          icon: <ShieldCheck size={24} className="text-purple-500" />,
+          icon: <Bell size={24} className="text-purple-500" />,
           action: (
             <div className="flex flex-col items-end gap-3">
               <button 
@@ -150,7 +150,7 @@ export default function SettingsClient() {
         {
           id: "install",
           label: "Install on Phone",
-          icon: <ShieldCheck size={24} className="text-emerald-500" />,
+          icon: <Download size={24} className="text-emerald-500" />,
           action: (
             <button 
               onClick={handleInstall}
@@ -306,7 +306,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.7</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.3.8</p>
           <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">Made with ❤️ for the Community</p>
         </div>
       </div>
