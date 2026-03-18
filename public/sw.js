@@ -1,4 +1,4 @@
-// Service Worker Version: 1.3.1
+// Service Worker Version: 1.3.2
 self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
@@ -18,9 +18,10 @@ self.addEventListener('push', function(event) {
         if (shouldShow) {
           const options = {
             body: data.body || `It's time for ${prayerType} prayer.`,
-            icon: '/icon-192x192.png',   // App Logo in notification body
-            badge: '/notification-icon.png', // Silhouette icon for Android status bar
-            vibrate: [200, 100, 200, 100, 200], // Stronger physical alert
+            icon: '/icon-192x192.png',
+            badge: '/notification-icon.png',
+            image: undefined,
+            vibrate: [200, 100, 200, 100, 200],
             tag: `prayer-alert-${prayerType}`,
             renotify: true,
             data: {

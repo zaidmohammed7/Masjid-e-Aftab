@@ -299,9 +299,25 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptJummah1, setPtJummah1] = useState(formatForPicker(initialPrayerTimes?.jummah1));
   const [ptJummah2, setPtJummah2] = useState(formatForPicker(initialPrayerTimes?.jummah2));
   const [ptJummah3, setPtJummah3] = useState(formatForPicker(initialPrayerTimes?.jummah3));
-  const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "Hadeeth of the Day");
+  const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "");
   const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
+
+  // Sync state when initialPrayerTimes changes (after router.refresh)
+  useEffect(() => {
+    if (initialPrayerTimes) {
+      setPtFajr(formatForPicker(initialPrayerTimes.fajr));
+      setPtDhuhr(formatForPicker(initialPrayerTimes.dhuhr));
+      setPtAsr(formatForPicker(initialPrayerTimes.asr));
+      setPtMaghrib(formatForPicker(initialPrayerTimes.maghrib));
+      setPtIsha(formatForPicker(initialPrayerTimes.isha));
+      setPtJummah1(formatForPicker(initialPrayerTimes.jummah1));
+      setPtJummah2(formatForPicker(initialPrayerTimes.jummah2));
+      setPtJummah3(formatForPicker(initialPrayerTimes.jummah3));
+      setPtHadeethTitle(initialPrayerTimes.hadeethTitle || "");
+      setPtHadeethText(initialPrayerTimes.hadeethText || "");
+    }
+  }, [initialPrayerTimes]);
   const [isTestSending, setIsTestSending] = useState(false);
 
 
@@ -477,6 +493,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
     const res = await savePrayerTimes(initialPrayerTimes?._id || null, data);
     setPtSaving(false);
     if (res.success) {
+      router.refresh(); // Request Next.js to reconstruct the server UI
       alert("Prayer times updated successfully!");
       router.refresh();
     } else {

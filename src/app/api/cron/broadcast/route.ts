@@ -119,14 +119,7 @@ export async function GET(req: Request) {
     const keys = await kv.keys("user:subscription:*");
     console.log(`[Cron] Target Prayer: ${activePrayer}. Fetched ${keys.length} tokens from Redis.`);
 
-    if (keys.length === 0) {
-      const allKeys = await kv.keys("*");
-      return NextResponse.json({ 
-        message: "Zero subscriptions found.", 
-        allKeysFound: allKeys,
-        debugHint: "Try toggling Prayer Alerts OFF and ON in Settings to register your device."
-      });
-    }
+    if (keys.length === 0) return NextResponse.json({ message: "Zero subscriptions found." });
 
     // 3. Broadcast in Optimized Chunks
     const CHUNK_SIZE = 250; // Increased for scale
