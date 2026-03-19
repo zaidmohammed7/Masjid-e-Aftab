@@ -87,18 +87,18 @@ export default async function HomePage() {
         )}
 
         {/* News & Announcements Professional Card */}
-        <Link href="/announcements" className="block relative bg-white dark:bg-gray-900 rounded-[2.5rem] p-1 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.1)] border border-gray-100 dark:border-gray-800 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 ease-out fill-mode-both">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-bl-[6rem] transition-transform group-hover:scale-125 duration-700" />
+        <Link href="/announcements" className="block relative bg-white dark:bg-gray-900 rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-gray-800/50 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 ease-out fill-mode-both">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-[5rem] transition-transform group-hover:scale-110 duration-700" />
           
-          <div className="flex items-center gap-8 p-1 relative z-10">
-            <div className="p-7 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] text-white shadow-xl shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-500">
-               <Megaphone size={40} />
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="p-4 bg-emerald-500 rounded-[1.2rem] text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-500">
+               <Megaphone size={24} />
             </div>
             <div className="flex-1">
-              <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tighter mb-1">News Feed</h2>
-              <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] leading-none mb-5">Digital Notice Board</p>
+              <h3 className="text-[10px] font-black text-emerald-500 tracking-[0.3em] uppercase mb-1">Latest Updates</h3>
+              <h2 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tighter leading-none">Feed</h2>
               
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-widest group-hover:translate-x-1 transition-all">
+              <div className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-all">
                 Open Announcements
                 <div className="h-0.5 w-6 bg-emerald-500/30 rounded-full" />
               </div>
