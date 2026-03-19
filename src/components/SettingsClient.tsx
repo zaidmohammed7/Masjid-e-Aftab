@@ -94,6 +94,13 @@ export default function SettingsClient() {
   };
 
   const handleInstall = async () => {
+    // Check if already in standalone mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+    if (isStandalone) {
+      alert("Masjid App is already installed on your device.");
+      return;
+    }
+
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
@@ -101,7 +108,12 @@ export default function SettingsClient() {
         setDeferredPrompt(null);
       }
     } else {
-      alert("To install: Tap the browser menu (3 dots or share icon) and select 'Add to Home Screen'.");
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      if (isIOS) {
+        alert("To Install: Tap the 3 dots (...) beside the URL, then select the 'Share' icon, and finally 'Add to Home Screen'.");
+      } else {
+        alert("To Install: Tap the browser menu (usually 3 dots in the top-right) and select 'Install app' or 'Add to home screen'.");
+      }
     }
   };
 
@@ -319,7 +331,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.4.2</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.4.3</p>
           <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-bold uppercase tracking-widest">Made for the Community</p>
         </div>
       </div>

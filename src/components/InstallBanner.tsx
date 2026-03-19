@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, Download, Share } from "lucide-react";
+import { X, Download, Share, MoreHorizontal } from "lucide-react";
 
 export default function InstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -80,8 +80,11 @@ export default function InstallBanner() {
 
         <div className="flex items-center gap-2">
           {isIOS ? (
-            <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-tighter shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-              Tap <Share size={14} className="mx-0.5 inline" /> then 'Add to Home'
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                Tap <MoreHorizontal size={14} className="inline" /> then <Share size={14} className="inline" /> then 'Add to Home'
+              </div>
+              <p className="text-[8px] font-bold text-gray-400 mr-2">Scroll down in share menu</p>
             </div>
           ) : (
             <button
