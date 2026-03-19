@@ -1,4 +1,4 @@
-// Service Worker Version: 1.3.3
+// Service Worker Version: 1.3.4
 self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
@@ -20,7 +20,6 @@ self.addEventListener('push', function(event) {
             body: data.body || `It's time for ${prayerType} prayer.`,
             icon: '/icon-192x192.png',
             badge: '/notification-icon.png',
-            image: '',
             vibrate: [200, 100, 200, 100, 200],
             tag: `prayer-alert-${prayerType}`,
             renotify: true,
