@@ -6,10 +6,10 @@ const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Disable CDN to get fresh data immediately
+  useCdn: true, // Use global edge cache
 });
 
-export const revalidate = 0; // Disable caching for immediate updates
+export const revalidate = 60; // Cache for 60 seconds (ISR)
 
 export default async function AnnouncementsPage() {
   const announcements = await client.fetch(`

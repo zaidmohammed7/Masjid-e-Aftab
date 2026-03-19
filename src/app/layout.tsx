@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Masjid-e-Aftab App",
-  description: "Extreme UX Masjid-e-Aftab PWA",
+  description: "Daily prayer times and announcements",
   manifest: "/manifest.ts",
   icons: {
     icon: "/icon.png",

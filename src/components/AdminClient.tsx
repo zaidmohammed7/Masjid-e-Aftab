@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, Mic, Image as ImageIcon, FileText, X, Send, SendHorizontal, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight, Pause, Play } from "lucide-react";
+import { Plus, Mic, Image as ImageIcon, FileText, X, Send, SendHorizontal, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
 import { createClient } from "@sanity/client";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import { utcToIst } from "@/lib/time";
+import TimePicker from "./TimePicker";
+import CompactAudioPlayer from "./CompactAudioPlayer";
 
 type Announcement = {
   _id: string;
@@ -22,216 +24,6 @@ type Announcement = {
   contentPdf?: string;
 };
 
-// Reusable TimePicker ensuring uniform cross-platform UI
-// Custom Select Component for a more "Pro" feel
-function TimePicker({ value, onChange }: { value: string, onChange: (val: string) => void }) {
-  // Parsing value of format "HH:MM AM/PM"
-  const [timePart, ampmRaw] = value.split(" ");
-  const [hPart, mPart] = (timePart || "").split(":");
-
-  const hour = hPart || "12";
-  const minute = mPart || "00";
-  const ampm = (ampmRaw || "PM").toUpperCase();
-
-  const minuteInputRef = useRef<HTMLInputElement>(null);
-
-  const handleHourChange = (newVal: string) => {
-    // Only allow digits
-    const digits = newVal.replace(/\D/g, "");
-
-    let finalHour = hour;
-    let shouldFocusMinutes = false;
-    let nextMinuteDigit = "";
-
-    if (digits.length === 1) {
-      const num = parseInt(digits);
-      if (num >= 2 && num <= 9) {
-        finalHour = `0${digits}`;
-        shouldFocusMinutes = true;
-      } else {
-        finalHour = digits; // wait for next digit if it's 1 or 0
-      }
-    } else if (digits.length >= 2) {
-      const lastTwo = digits.slice(-2);
-      const num = parseInt(lastTwo);
-
-      if (num >= 1 && num <= 12) {
-        finalHour = lastTwo;
-        shouldFocusMinutes = true;
-      } else if (num > 12) {
-        // Smart handle: if user types "1" then "3", it can't be "13".
-        // Assume "1" was "01" and "3" belongs to minutes.
-        if (lastTwo[0] === "1" && parseInt(lastTwo[1]) > 2) {
-          finalHour = "01";
-          nextMinuteDigit = lastTwo[1];
-          shouldFocusMinutes = true;
-        } else {
-          // just take the last digit as a new start
-          finalHour = `0${lastTwo[1]}`;
-          if (parseInt(lastTwo[1]) >= 2) shouldFocusMinutes = true;
-        }
-      }
-    }
-
-    if (shouldFocusMinutes) {
-      const finalMinute = nextMinuteDigit ? `${nextMinuteDigit}0`.slice(0, 2) : minute;
-      onChange(`${finalHour}:${finalMinute} ${ampm}`);
-      setTimeout(() => {
-        minuteInputRef.current?.focus();
-        if (nextMinuteDigit) {
-          // If we pushed a digit to minutes, place cursor after it
-          minuteInputRef.current?.setSelectionRange(1, 1);
-        } else {
-          minuteInputRef.current?.select();
-        }
-      }, 0);
-    } else {
-      onChange(`${finalHour}:${minute} ${ampm}`);
-    }
-  };
-
-  const handleMinuteChange = (newVal: string) => {
-    const digits = newVal.replace(/\D/g, "");
-    let finalMinute = digits;
-
-    if (digits.length >= 2) {
-      const lastTwo = digits.slice(-2);
-      const num = parseInt(lastTwo);
-      if (num <= 59) {
-        finalMinute = lastTwo;
-      } else {
-        finalMinute = "59";
-      }
-    }
-
-    onChange(`${hour}:${finalMinute} ${ampm}`);
-  };
-
-  return (
-    <div className="flex gap-4 items-center w-full">
-      <div className="flex flex-1 items-center gap-2 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-sm focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
-        <div className="flex-1 flex flex-col items-center">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">HH</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={hour}
-            onFocus={(e) => e.target.select()}
-            onChange={(e) => handleHourChange(e.target.value)}
-            className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
-            placeholder="12"
-          />
-        </div>
-        <span className="text-2xl font-black text-gray-200">:</span>
-        <div className="flex-1 flex flex-col items-center">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">MM</span>
-          <input
-            ref={minuteInputRef}
-            type="text"
-            inputMode="numeric"
-            value={minute}
-            onFocus={(e) => e.target.select()}
-            onChange={(e) => handleMinuteChange(e.target.value)}
-            className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
-            placeholder="00"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl shadow-inner gap-1">
-        <button
-          onClick={() => onChange(`${hour}:${minute} AM`)}
-          className={clsx(
-            "px-4 py-2 rounded-xl text-[10px] font-black transition-all",
-            ampm === "AM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
-          )}
-        >AM</button>
-        <button
-          onClick={() => onChange(`${hour}:${minute} PM`)}
-          className={clsx(
-            "px-4 py-2 rounded-xl text-[10px] font-black transition-all",
-            ampm === "PM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
-          )}
-        >PM</button>
-      </div>
-    </div>
-  );
-}
-
-function CompactAudioPlayer({ fileUrl, duration: totalDuration = 0 }: { fileUrl?: string; duration?: number }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(totalDuration);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (!audioRef.current && fileUrl) {
-      const audio = new Audio(fileUrl);
-      audioRef.current = audio;
-      audio.onended = () => setIsPlaying(false);
-      audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
-      audio.onloadedmetadata = () => setDuration(audio.duration);
-    }
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, [fileUrl]);
-
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(console.error);
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioRef.current) return;
-    const time = parseFloat(e.target.value);
-    audioRef.current.currentTime = time;
-    setCurrentTime(time);
-  };
-
-  const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  return (
-    <div className="flex items-center gap-3 p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl w-full min-w-0" onClick={e => e.stopPropagation()}>
-      <button onClick={togglePlay} className={clsx(
-        "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-95",
-        isPlaying ? "bg-red-500" : "bg-emerald-500"
-      )}>
-        {isPlaying ? <Pause size={18} className="text-white fill-current" /> : <Play size={18} className="text-white fill-current ml-0.5" />}
-      </button>
-
-      <div className="flex-1 flex flex-col justify-center min-w-0 pr-1">
-        <div className="flex justify-between items-center mb-1 px-0.5">
-          <span className="text-[9px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tighter tabular-nums">
-            {formatTime(currentTime)} / {formatTime(duration)}
-          </span>
-        </div>
-        <div className="relative h-2 flex items-center">
-          <div className="absolute left-0 right-0 h-1 bg-emerald-200/40 dark:bg-emerald-900/40 rounded-full" />
-          <div className="absolute left-0 h-1 bg-emerald-500 rounded-full z-10" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
-          <input
-            type="range" min="0" max={duration || 0} step="0.1" value={currentTime}
-            onChange={handleSeek}
-            className="seek-slider h-2 w-full absolute opacity-0 cursor-pointer z-20"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function AdminClient({ announcements, initialPrayerTimes }: { announcements: Announcement[], initialPrayerTimes: any }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "prayerTimes" | "imaamsCorner">("announcements");
@@ -629,19 +421,18 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   </div>
 
                   {/* Main Content Area */}
-                  <div className="flex items-stretch">
-                    <div className="flex-1 p-4 min-w-0">
-                      <div className="rounded-xl overflow-hidden">
+                  <div className="flex items-center min-h-0">
+                    <div className="flex-1 p-3 min-w-0">
                         {item.type === "image" && item.contentImage && (
                           <div
-                            className="bg-gray-50 dark:bg-gray-800 flex items-center justify-center h-44 cursor-pointer group relative"
+                            className="bg-gray-50 dark:bg-gray-800 flex items-center justify-center h-44 cursor-pointer group relative rounded-xl overflow-hidden"
                             onClick={() => setExpandedImage(item.contentImage!)}
                           >
                             <img src={item.contentImage} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                           </div>
                         )}
                         {item.type === "video" && item.contentVideo && (
-                          <div className="bg-black flex items-center justify-center h-44">
+                          <div className="bg-black flex items-center justify-center h-44 rounded-xl overflow-hidden">
                             <video src={item.contentVideo} controls className="w-full h-full object-contain" />
                           </div>
                         )}
@@ -665,28 +456,27 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                           </div>
                         )}
                         {item.type === "text" && item.contentText && (
-                          <p className="text-[12px] font-medium text-gray-600 dark:text-gray-400 leading-relaxed italic line-clamp-3">
+                          <p className="text-[12px] font-medium text-gray-700 dark:text-gray-300 leading-snug whitespace-pre-wrap break-words line-clamp-3 px-1">
                             {item.contentText}
                           </p>
                         )}
-                      </div>
                     </div>
 
                     {/* Actions Panel */}
-                    <div className="flex flex-col gap-1 border-l border-gray-100 dark:border-gray-800 p-2 justify-center bg-gray-50/30 dark:bg-gray-800/10">
+                    <div className="flex flex-col gap-0 border-l border-gray-100 dark:border-gray-800 p-0.5 justify-center bg-gray-50/30 dark:bg-gray-800/10 self-stretch">
                       <button
                         onClick={() => openEditModal(item._id, item.title || "", item.contentText || "", item.type)}
-                        className="p-3 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-xl transition-colors active:scale-95"
+                        className="p-1.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-xl transition-colors active:scale-95"
                         title="Edit"
                       >
-                        <Edit size={20} />
+                        <Edit size={16} />
                       </button>
                       <button
                         onClick={() => handleDelete(item._id)}
-                        className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors active:scale-95"
+                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors active:scale-95"
                         title="Delete"
                       >
-                        <Trash2 size={20} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>

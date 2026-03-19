@@ -9,7 +9,7 @@ export default function Loading() {
           <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin scale-110"></div>
           
           <div className="relative w-20 h-20 bg-white dark:bg-gray-900 rounded-[1.5rem] p-0.5 shadow-2xl animate-pulse overflow-hidden">
-             <Image src="/icon.png" alt="Loading" width={80} height={80} className="rounded-2xl" />
+             <Image src="/icon-512x512.png" alt="Loading" width={80} height={80} className="rounded-2xl" />
           </div>
         </div>
         <p className="mt-8 text-[10px] font-black text-emerald-600/40 dark:text-emerald-400/40 uppercase tracking-[0.4em] animate-pulse">

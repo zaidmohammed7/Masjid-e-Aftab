@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { deviceId, subscription } = await req.json();
+    const { subscription } = await req.json();
 
-    if (!deviceId || !subscription) {
-      return NextResponse.json({ error: "Missing deviceId or subscription" }, { status: 400 });
+    if (!subscription) {
+      return NextResponse.json({ error: "Missing subscription" }, { status: 400 });
     }
 
-    // Save to Redis: Key is user:subscription:<deviceId>, Value is the JSON string
-    await kv.set(`user:subscription:${deviceId}`, JSON.stringify(subscription));
+    // Save to Redis Set: Use SADD for optimized broadcasting (replaces O(n) KEYS extraction)
+    await kv.sadd("user:subscriptions", JSON.stringify(subscription));
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

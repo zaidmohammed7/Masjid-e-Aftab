@@ -34,18 +34,11 @@ export async function subscribeToPush() {
     applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
   });
 
-  // Get or Generate a unique device ID
-  let deviceId = localStorage.getItem('deviceId');
-  if (!deviceId) {
-    deviceId = Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('deviceId', deviceId);
-  }
-
-  // Send to server
+  // Send to server (deviceId no longer used for Set-based storage)
   const response = await fetch('/api/notifications/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ deviceId, subscription })
+    body: JSON.stringify({ subscription })
   });
 
   if (!response.ok) {
@@ -63,6 +56,18 @@ export async function unsubscribeFromPush() {
   if (registration) {
     const subscription = await registration.pushManager.getSubscription();
     if (subscription) {
+      // 1. Notify server first to remove from Redis
+      try {
+        await fetch('/api/notifications/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription })
+        });
+      } catch (e) {
+        console.error("Failed to unsubscribe on server", e);
+      }
+
+      // 2. Unsubscribe locally
       await subscription.unsubscribe();
     }
   }

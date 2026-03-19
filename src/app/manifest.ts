@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Masjid-e-Aftab Community',
     short_name: 'Masjid-e-Aftab',
-    description: 'Community PWA for local masjid announcements',
+    description: 'Daily prayer times and announcements',
     start_url: '/',
     display: 'standalone',
     background_color: '#bbf7d0',

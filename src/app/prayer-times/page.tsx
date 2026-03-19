@@ -2,9 +2,9 @@ import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import { Clock } from "lucide-react";
 
-const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
+const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
 
-export const revalidate = 0; // Disable caching for immediate updates
+export const revalidate = 60; // Cache for 1 minute (ISR)
 
 import { utcToIst } from "@/lib/time";
 

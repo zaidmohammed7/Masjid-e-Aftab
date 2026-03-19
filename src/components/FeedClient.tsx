@@ -175,8 +175,8 @@ function AnnouncementCard({ item, onImageClick }: { item: Announcement, onImageC
           </div>
         )}
         {item.type === "text" && (
-          <div className="p-3 text-center bg-gray-50 dark:bg-gray-800/50">
-            <p className="text-base font-bold text-[var(--card-text)] leading-relaxed whitespace-pre-wrap">
+          <div className="p-3 bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-base font-bold text-[var(--card-text)] leading-relaxed whitespace-pre-wrap text-left">
               {item.contentText}
             </p>
           </div>

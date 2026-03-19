@@ -10,18 +10,18 @@ webpush.setVapidDetails(
 
 export async function POST(req: Request) {
   try {
-    const { deviceId } = await req.json();
+    const { subscription } = await req.json();
 
-    if (!deviceId) {
-      return NextResponse.json({ error: "Missing deviceId" }, { status: 400 });
+    if (!subscription) {
+      return NextResponse.json({ error: "Missing subscription object" }, { status: 400 });
     }
 
-    const subStr = await kv.get(`user:subscription:${deviceId}`);
-    if (!subStr) {
-      return NextResponse.json({ error: "No subscription found for this device" }, { status: 404 });
+    // Optional: Verify the subscription exists in our Redis Set
+    const isMember = await kv.sismember("user:subscriptions", JSON.stringify(subscription));
+    if (!isMember) {
+      // We'll still allow testing for newly created subscriptions not yet propagated
+      console.warn("[Test] Subscription not found in Redis Set, but proceeding with push.");
     }
-
-    const subscription = typeof subStr === "string" ? JSON.parse(subStr) : subStr;
 
     const payload = JSON.stringify({
       title: "Test Notification",

@@ -71,7 +71,7 @@ export default function InstallBanner() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 flex-shrink-0 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-1 border border-emerald-100 dark:border-emerald-800/50">
-              <Image src="/icon.png" alt="Logo" width={48} height={48} className="rounded-xl shadow-sm" />
+              <Image src="/icon-192x192.png" alt="Logo" width={48} height={48} className="rounded-xl shadow-sm" />
             </div>
             <div className="flex flex-col">
               <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 leading-tight">Install Masjid App</h3>

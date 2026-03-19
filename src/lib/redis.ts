@@ -1,9 +1,10 @@
-import Redis from "ioredis";
+import { Redis } from "@upstash/redis";
 
-const redisUrl = process.env.KV_REDIS_URL;
-
-if (!redisUrl) {
-  throw new Error("KV_REDIS_URL is not defined in environment variables");
-}
-
-export const kv = new Redis(redisUrl);
+/**
+ * Switch from ioredis to @upstash/redis REST SDK to prevent connection 
+ * pooling issues on serverless platforms like Vercel.
+ */
+export const kv = new Redis({
+  url: process.env.UPSTASH_REDIS_KV_REST_API_URL!,
+  token: process.env.UPSTASH_REDIS_KV_REST_API_TOKEN!,
+});

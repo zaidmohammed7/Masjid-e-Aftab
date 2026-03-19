@@ -1,17 +1,12 @@
 import { kv } from "@/lib/redis";
 import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
-import webpush from "web-push";
 import { differenceInMinutes, parseISO, addDays, format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { NextResponse } from "next/server";
+import { Client } from "@upstash/qstash";
 
-// Web-push Configuration
-webpush.setVapidDetails(
-  "mailto:contact@masjid-e-aftab.org",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+const qstash = new Client({ token: process.env.QSTASH_TOKEN! });
 
 const client = createClient({
   projectId,
@@ -22,12 +17,9 @@ const client = createClient({
 });
 
 export async function GET(req: Request) {
-  // 0. Security: Check Authorization header OR ?pw query parameter
+  // 0. Security: Only allow Vercel Cron or manual calls with CRON_SECRET
   const authHeader = req.headers.get("Authorization");
-  const { searchParams } = new URL(req.url);
-  const password = searchParams.get("pw");
-  
-  const isAuthorized = authHeader === `Bearer ${process.env.CRON_SECRET}` || password === "RaanBiryani@27";
+  const isAuthorized = authHeader === `Bearer ${process.env.CRON_SECRET}`;
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -115,62 +107,45 @@ export async function GET(req: Request) {
       });
     }
 
-    // 2. Fetch all subscriptions from Redis
-    const keys = await kv.keys("user:subscription:*");
-    console.log(`[Cron] Target Prayer: ${activePrayer}. Fetched ${keys.length} tokens from Redis.`);
+    // 2. Fetch all subscriptions from Redis using SMEMBERS
+    const allSubs = await kv.smembers("user:subscriptions") as string[];
+    console.log(`[Dispatcher] Target: ${activePrayer}. Found ${allSubs.length} sessions.`);
 
-    if (keys.length === 0) return NextResponse.json({ message: "Zero subscriptions found." });
+    if (allSubs.length === 0) return NextResponse.json({ message: "Zero subscriptions found." });
 
-    // 3. Broadcast in Optimized Chunks
-    const CHUNK_SIZE = 250; // Increased for scale
-    let prunedCount = 0;
-    let successCount = 0;
-    
-    const payload = JSON.stringify({
+    // 3. Dispatch to Workers via QStash Fan-out
+    const CHUNK_SIZE = 500;
+    const protocol = req.url.startsWith('https') ? 'https' : 'http';
+    const host = req.headers.get('host');
+    const workerUrl = `${protocol}://${host}/api/notifications/process-chunk`;
+
+    const payload = {
       title: "Prayer Alert",
       prayerType: activePrayer,
       body: `It's almost time for ${activePrayer.charAt(0).toUpperCase() + activePrayer.slice(1)} prayer.`,
-    });
+    };
 
-    for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
-      const chunk = keys.slice(i, i + CHUNK_SIZE);
-      const subs = await kv.mget(...chunk);
+    const dispatchPromises = [];
+
+    for (let i = 0; i < allSubs.length; i += CHUNK_SIZE) {
+      const chunk = allSubs.slice(i, i + CHUNK_SIZE);
       
-      const chunkPromises = subs.map((subStr, idx) => {
-        if (!subStr) return Promise.resolve(null);
-        let sub: any;
-        try {
-          sub = typeof subStr === "string" ? JSON.parse(subStr) : subStr;
-        } catch (e) {
-          return Promise.resolve(null);
-        }
-
-        return webpush.sendNotification(sub, payload)
-          .then(() => { successCount++; return null; })
-          .catch(async (err) => {
-            // Prune expired tokens (410 Gone or 404 Not Found)
-            if (err.statusCode === 410 || err.statusCode === 404) {
-                await kv.del(chunk[idx]);
-                prunedCount++;
-            }
-            return null;
-          });
-      });
-
-      await Promise.allSettled(chunkPromises);
-
-      // Scale Guard: Tiny delay between batches to respect Vercel's Hobby limits
-      if (i + CHUNK_SIZE < keys.length) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
+      dispatchPromises.push(
+        qstash.publishJSON({
+          url: workerUrl,
+          body: { chunk, payload },
+        })
+      );
     }
 
-    console.log(`[Cron] Broadcast finished. Success: ${successCount}, Pruned: ${prunedCount}`);
+    await Promise.all(dispatchPromises);
+
+    console.log(`[Dispatcher] Dispatched ${dispatchPromises.length} chunks to QStash.`);
 
     return NextResponse.json({
-      message: `Broadcast finished for ${activePrayer}`,
-      sent: successCount,
-      pruned: prunedCount
+      message: `Dispatched ${allSubs.length} notifications to ${dispatchPromises.length} workers via QStash.`,
+      prayer: activePrayer,
+      chunks: dispatchPromises.length
     });
 
   } catch (error: any) {

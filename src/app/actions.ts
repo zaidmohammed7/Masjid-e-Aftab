@@ -85,6 +85,7 @@ export async function publishAnnouncement(data: FormData) {
 
     await client.create(document);
     revalidatePath("/");
+    revalidatePath("/announcements");
     revalidatePath("/admin");
     return { success: true };
   } catch (error: any) {
@@ -206,9 +207,8 @@ export async function savePrayerTimes(id: string | null, data: any) {
        await client.create({ _type: "prayerTimes", title: "Current Prayer Times", ...utcData });
     }
     revalidatePath("/prayer-times");
-    revalidatePath("/admin");
     revalidatePath("/");
-    revalidatePath("/(main)", "layout"); // Revalidate main group if applicable
+    revalidatePath("/admin");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error?.message || "Failed to save prayer times" };

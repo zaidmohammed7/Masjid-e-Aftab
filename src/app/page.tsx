@@ -6,9 +6,9 @@ import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
 import InstallBanner from "@/components/InstallBanner";
 
-const client = createClient({ projectId, dataset, apiVersion, useCdn: false });
+const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
 
-export const revalidate = 0; // Disable caching for immediate updates
+export const revalidate = 60; // Cache for 60 seconds (ISR)
 
 export default async function HomePage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
@@ -38,7 +38,7 @@ export default async function HomePage() {
         <div className="relative z-20 mb-4 flex justify-center animate-in zoom-in duration-1000">
           <div className="p-0.5 bg-white/10 backdrop-blur-md rounded-[1.8rem] border border-white/20 shadow-2xl">
             <div className="bg-white rounded-[1.6rem] p-0.5 overflow-hidden shadow-inner">
-              <Image src="/icon.png" alt="Masjid-e-Aftab Logo" width={60} height={60} className="rounded-[1.4rem]" priority />
+              <Image src="/icon-192x192.png" alt="Masjid-e-Aftab Logo" width={60} height={60} className="rounded-[1.4rem]" priority />
             </div>
           </div>
         </div>
