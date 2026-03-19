@@ -67,43 +67,59 @@ export default function InstallBanner() {
 
   return (
     <div className="fixed bottom-28 left-4 right-4 z-50 animate-in slide-in-from-bottom-10 duration-500">
-      <div className="bg-white dark:bg-gray-900 rounded-3xl p-4 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.3)] border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative w-12 h-12 flex-shrink-0 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-1 border border-emerald-100 dark:border-emerald-800/50">
-            <Image src="/icon.png" alt="Logo" width={48} height={48} className="rounded-xl shadow-sm" />
-          </div>
-          <div className="flex flex-col">
-            <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 leading-tight">Install App</h3>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Better experience</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isIOS ? (
-            <div className="flex flex-col items-end gap-1.5">
-              <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-                Tap <MoreHorizontal size={14} className="inline" /> then <Share size={14} className="inline" /> Share
-              </div>
-              <div className="flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter shadow-lg shadow-emerald-600/20 active:scale-95 transition-all">
-                Then <PlusSquare size={14} className="inline" /> Add to Home Screen
-              </div>
+      <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] p-4 shadow-[0_25px_50px_-15px_rgba(0,0,0,0.3)] border border-emerald-100 dark:border-emerald-900/50 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative w-12 h-12 flex-shrink-0 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-1 border border-emerald-100 dark:border-emerald-800/50">
+              <Image src="/icon.png" alt="Logo" width={48} height={48} className="rounded-xl shadow-sm" />
             </div>
-          ) : (
-            <button
-              onClick={handleInstall}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
-            >
-              <Download size={14} />
-              Install
-            </button>
-          )}
-          
+            <div className="flex flex-col">
+              <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 leading-tight">Install Masjid App</h3>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Better experience on phone</p>
+            </div>
+          </div>
           <button 
             onClick={handleDismiss}
             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
           >
             <X size={20} />
           </button>
+        </div>
+
+        <div className="w-full">
+          {isIOS ? (
+            <div className="bg-emerald-50/50 dark:bg-emerald-500/5 p-4 rounded-3xl border border-emerald-100 dark:border-emerald-900/30">
+              <p className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-3">One-time Manual Setup:</p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">1</span>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                    Tap <MoreHorizontal size={16} className="inline text-emerald-600 mx-1" /> beside browser URL
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">2</span>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                    Tap <Share size={16} className="inline text-emerald-600 mx-1" /> Share
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">3</span>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                    Scroll and tap <PlusSquare size={16} className="inline text-emerald-600 mx-1" /> Add to Home Screen
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={handleInstall}
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
+            >
+              <Download size={16} />
+              Install Application
+            </button>
+          )}
         </div>
       </div>
     </div>
