@@ -6,7 +6,10 @@ import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { NextResponse } from "next/server";
 import { Client } from "@upstash/qstash";
 
-const qstash = new Client({ token: process.env.QSTASH_TOKEN! });
+const qstash = new Client({ 
+  token: process.env.QSTASH_TOKEN!,
+  baseUrl: process.env.QSTASH_URL // Correct regional endpoint
+});
 
 const client = createClient({
   projectId,
@@ -17,9 +20,15 @@ const client = createClient({
 });
 
 export async function GET(req: Request) {
-  // 0. Security: Only allow Vercel Cron or manual calls with CRON_SECRET
+  // 0. Security: Only allow Vercel Cron or manual calls with CRON_SECRET/pw
+  const { searchParams } = new URL(req.url);
+  const cronPass = searchParams.get("pw");
+  const force = searchParams.get("force") === "true";
   const authHeader = req.headers.get("Authorization");
-  const isAuthorized = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+  
+  const isAuthorized = 
+    authHeader === `Bearer ${process.env.CRON_SECRET}` || 
+    cronPass === process.env.CRON_SECRET;
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -92,9 +101,10 @@ export async function GET(req: Request) {
 
         console.log(`[Broadcast] ${p}: Next at ${targetZoned.toLocaleString()} IST (${diff} mins)`);
 
-        // Precision Window: 15-20 minutes away
-        if (diff >= 15 && diff < 20) {
+        // Precision Window: 15-20 minutes away OR manual force
+        if ((diff >= 15 && diff < 20) || force) {
           activePrayer = p;
+          if (force) break; // Use the first available prayer if forcing
         }
       }
     }
