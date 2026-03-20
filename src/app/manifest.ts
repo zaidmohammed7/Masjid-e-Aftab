@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Daily prayer times and announcements',
     start_url: '/',
     display: 'standalone',
-    background_color: '#bbf7d0',
-    theme_color: '#10b981',
+    background_color: '#fbf9f1',
+    theme_color: '#C5A059',
     icons: [
       {
         src: '/icon-192x192.png',

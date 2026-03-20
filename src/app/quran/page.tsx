@@ -20,7 +20,7 @@ export default async function QuranPage() {
   const surahs = await getSurahs();
 
   return (
-    <main className={`${amiri.variable} min-h-screen bg-zinc-50 dark:bg-gray-950 font-sans`}>
+    <main className={`${amiri.variable} min-h-screen bg-transparent font-sans`}>
       <QuranClient initialSurahs={surahs} />
     </main>
   );

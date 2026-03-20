@@ -3,6 +3,9 @@
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-gold: #C5A059;
+  --color-champagne: #EAD9B5;
+  --font-serif: "Playfair Display", serif;
 }
 
 /* 
@@ -14,67 +17,58 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    /* slate-50 */
-    --foreground: #0f172a;
-    /* slate-900 */
+    --background: #fbf9f1; /* Master Warm Cream - Home Page Primary */
+    --foreground: #2d2d2d; /* High-end Charcoal */
 
-    /* Card specific variables to bypass variant issues if they persist */
-    --card-bg: #ffffff;
-    --card-border: #f1f5f9;
-    /* slate-100 */
-    --card-text: #064e3b;
-    /* emerald-900 */
-    --card-hover: #f8fafc;
-    /* slate-50 */
+    --card-bg: #ffffff; /* Crisp White Popup */
+    --card-border: #EAD9B5; /* Soft Champagne Border */
+    --card-text: #2d2d2d; 
+    --card-hover: #fbf9f1;
 
     --app-font-size: 16px;
     color-scheme: light;
   }
 
-  html.dark {
-    --background: #020617;
-    /* slate-950 */
-    --foreground: #f8fafc;
-
-    --card-bg: #111827;
-    /* gray-900 */
-    --card-border: #1f2937;
-    /* gray-800 */
-    --card-text: #ecfdf5;
-    /* emerald-50 */
-    --card-hover: #1f2937;
-    /* gray-800 */
-
-    color-scheme: dark;
-  }
-
-  /* Explicitly reset for light mode just in case browser forces colors */
+  /* Force light mode regardless of system if .dark class is NOT present */
   @media (prefers-color-scheme: dark) {
     :root:not(.dark) {
-      --background: #f8fafc;
-      --foreground: #0f172a;
+      --background: #fbf9f1;
+      --foreground: #2d2d2d;
       color-scheme: light;
     }
   }
 
-  .font-size-small {
-    --app-font-size: 14px;
+  html.dark {
+    --background: #121212; /* Deeper charcoal for base background */
+    --foreground: #FCFAF2; /* High-contrast Ivory for readability */
+    --card-bg: #1a1c1e; /* Standardized Dark Charcoal from Times page */
+    --card-border: rgba(197, 160, 89, 0.15); /* Subtler Gold Border */
+    --card-text: #FCFAF2;
+    --card-hover: #242628;
+    color-scheme: dark;
   }
 
-  .font-size-medium {
-    --app-font-size: 16px;
-  }
-
-  .font-size-large {
-    --app-font-size: 18px;
-  }
+  .font-size-small { --app-font-size: 14px; }
+  .font-size-medium { --app-font-size: 16px; }
+  .font-size-large { --app-font-size: 18px; }
 
   html {
     font-size: var(--app-font-size);
     background-color: var(--background) !important;
+    background-image: 
+      linear-gradient(rgba(251, 249, 241, 0.96), rgba(251, 249, 241, 0.96)),
+      url('/pattern.svg') !important;
+    background-repeat: repeat;
+    background-size: 100px;
+    background-attachment: fixed;
     color: var(--foreground) !important;
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark {
+    background-image: 
+      linear-gradient(rgba(26, 26, 26, 0.98), rgba(26, 26, 26, 0.98)),
+      url('/pattern.svg') !important;
   }
 }
 
@@ -115,7 +109,7 @@ input[type=range].seek-slider::-webkit-slider-thumb {
   height: 12px;
   width: 12px;
   border-radius: 50%;
-  background: #10b981;
+  background: #C5A059;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: -4px;
@@ -135,7 +129,7 @@ input[type=range].seek-slider::-moz-range-thumb {
   height: 12px;
   width: 12px;
   border-radius: 50%;
-  background: #10b981;
+  background: #C5A059;
   cursor: pointer;
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);

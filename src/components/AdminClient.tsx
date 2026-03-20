@@ -306,30 +306,30 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   };
 
   return (
-    <div className="min-h-screen bg-transparent pb-40 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent pb-40 transition-colors duration-300 font-sans selection:bg-gold/30">
       <style dangerouslySetInnerHTML={{
         __html: `
         .custom-select-arrow {
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8l5 5 5-5'/%3e%3c/svg%3e");
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23C5A059' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8l5 5 5-5'/%3e%3c/svg%3e");
           background-position: right 0.5rem center;
           background-repeat: no-repeat;
           background-size: 1.5em 1.5em;
         }
       `}} />
       {/* Premium Gradient Header block - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
+      <div className="bg-gradient-to-br from-[#C5A059] via-[#D5B06A] to-[#8E6D2F] text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(197,160,89,0.4)] relative overflow-hidden text-center mb-6">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
           <Lock size={160} />
         </div>
         <div className="absolute -top-16 -right-16 opacity-20 rotate-12 mix-blend-overlay">
           <div className="w-80 h-80 rounded-[4rem] border-[30px] border-white blur-sm"></div>
         </div>
-        <div className="absolute bottom-[-10%] -left-10 w-40 h-40 bg-emerald-400 rounded-full mix-blend-screen opacity-20 blur-2xl"></div>
+        <div className="absolute bottom-[-10%] -left-10 w-40 h-40 bg-gold/20 rounded-full mix-blend-screen opacity-20 blur-2xl"></div>
 
-        <h1 className="text-4xl font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white">
+        <h1 className="text-4xl font-serif font-black relative z-10 tracking-tight leading-tight drop-shadow-lg text-white uppercase">
           Admin Control
         </h1>
-        <p className="text-emerald-50/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">
+        <p className="text-white/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">
           Management dashboard
         </p>
       </div>
@@ -353,7 +353,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           onClick={() => setActiveTab("announcements")}
           className={clsx(
             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
           )}
         >
           <Megaphone size={20} /> Posts
@@ -362,7 +362,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           onClick={() => setActiveTab("prayerTimes")}
           className={clsx(
             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
           )}
         >
           <Clock size={20} /> Times
@@ -371,7 +371,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           onClick={() => setActiveTab("imaamsCorner")}
           className={clsx(
             "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "imaamsCorner" ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            activeTab === "imaamsCorner" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
           )}
         >
           <Star size={20} /> Imaam
@@ -381,7 +381,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {activeTab === "announcements" && (
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">Recent Posts</h2>
+            <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight">Recent Posts</h2>
             <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl shadow-inner">
               <button
                 onClick={() => setAdminLang("all")}
@@ -399,14 +399,14 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           </div>
 
           {announcements.filter(a => adminLang === "all" || a.language === "both" || a.language === adminLang).length === 0 ? (
-            <div className="bg-[var(--card-bg)] p-10 rounded-3xl shadow-sm border border-[var(--card-border)] flex flex-col items-center justify-center min-h-[200px] text-center">
+            <div className="bg-[var(--card-bg)] p-10 rounded-3xl shadow-sm dark:shadow-none border border-[var(--card-border)] flex flex-col items-center justify-center min-h-[200px] text-center">
               <Megaphone size={48} className="text-gray-200 mb-4" />
               <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No {adminLang !== "all" ? adminLang : ""} posts found.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {announcements.filter(a => adminLang === "all" || a.language === "both" || a.language === adminLang).map((item) => (
-                <div key={item._id} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[2rem] overflow-hidden shadow-sm flex flex-col transition-all active:scale-[0.99] duration-300">
+                <div key={item._id} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[2rem] overflow-hidden shadow-sm dark:shadow-none flex flex-col transition-all active:scale-[0.99] duration-300">
                   {/* Header: Title and Language Badge */}
                   <div className="flex justify-between items-center px-5 py-3 border-b border-[var(--card-border)] bg-gray-50/50 dark:bg-gray-800/30">
                     <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 tracking-tight leading-tight flex-1 line-clamp-1">
@@ -495,7 +495,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
           {/* Floating Action / Quick Post Button */}
           <button
             onClick={toggleModal}
-            className="fixed bottom-32 right-6 w-14 h-14 bg-emerald-500 text-white rounded-full shadow-2xl hover:bg-emerald-600 active:scale-90 transition-all z-40 animate-bounce flex items-center justify-center"
+            className="fixed bottom-32 right-6 w-14 h-14 bg-gold text-white rounded-full shadow-2xl hover:bg-[#8E6D2F] active:scale-90 transition-all z-40 animate-bounce flex items-center justify-center"
             aria-label="Quick Post"
             style={{ animationDuration: '1s' }}
           >
@@ -546,7 +546,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <button
                 disabled={ptSaving}
                 onClick={handlePrayerTimesSubmit}
-                className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
+                className="w-full bg-gold text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-[#8E6D2F] shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
               >
                 {ptSaving ? <Loader2 size={32} className="animate-spin" /> : "Save Times"}
               </button>
@@ -559,11 +559,11 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         <div className="p-6 pt-2">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800">
             <div className="flex flex-col items-center mb-8">
-              <div className="bg-emerald-100 dark:bg-emerald-900/30 p-4 rounded-3xl text-emerald-600 dark:text-emerald-400 mb-4">
+              <div className="bg-gold/10 dark:bg-gold/900/30 p-4 rounded-3xl text-gold mb-4 shadow-sm ring-1 ring-gold/20">
                 <Star size={48} />
               </div>
-              <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight capitalize">Imaam's corner</h2>
-              <p className="text-gray-400 font-medium">Update the Hadeeth of the Day</p>
+              <h2 className="text-3xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight capitalize">Imaam's corner</h2>
+              <p className="text-gold/60 font-medium">Update the Hadeeth of the Day</p>
             </div>
 
             <div className="space-y-6">
@@ -573,7 +573,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   value={ptHadeethTitle}
                   onChange={e => setPtHadeethTitle(e.target.value)}
                   placeholder="e.g. Hadeeth of the Day"
-                  className="w-full p-4 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 shadow-sm transition-all"
+                  className="w-full p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100 shadow-sm transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -582,7 +582,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   value={ptHadeethText}
                   onChange={e => setPtHadeethText(e.target.value)}
                   placeholder="Type the Imaam's message or Hadeeth..."
-                  className="w-full p-4 border-2 border-gray-100 dark:border-gray-800 rounded-2xl focus:border-emerald-500 outline-none font-bold bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 shadow-sm transition-all min-h-[150px]"
+                  className="w-full p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100 shadow-sm transition-all min-h-[150px]"
                   rows={6}
                 />
               </div>
@@ -590,7 +590,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <button
                 disabled={ptSaving}
                 onClick={handlePrayerTimesSubmit}
-                className="w-full bg-emerald-500 text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-emerald-600 shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
+                className="w-full bg-gold text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-[#8E6D2F] shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
               >
                 {ptSaving ? <Loader2 size={32} className="animate-spin" /> : "Update Content"}
               </button>
@@ -648,7 +648,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 value={postTitle}
                 onChange={e => setPostTitle(e.target.value)}
                 placeholder="e.g. Eid Update"
-                className="w-full p-3 border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-2xl focus:border-emerald-500 outline-none text-lg font-bold shadow-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-700"
+                className="w-full p-3 border-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-2xl focus:border-gold outline-none text-lg font-bold shadow-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-700"
               />
             </div>
 
@@ -656,9 +656,9 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => { setSelectionGroup("audio"); setPostType("audio"); }}
-                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900 active:scale-95 transition-all shadow-sm border border-emerald-100 dark:border-emerald-800/50"
+                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-gold/10 text-[#8E6D2F] dark:bg-gold/10 dark:text-gold/60 hover:bg-gold-100 dark:hover:bg-gold/20 active:scale-95 transition-all shadow-sm border border-gold-100 dark:border-gold/10/50"
                 >
-                  <div className="bg-emerald-500 text-white p-2 rounded-xl shadow-md flex-shrink-0">
+                  <div className="bg-gold text-white p-2 rounded-xl shadow-md flex-shrink-0">
                     <Mic size={18} />
                   </div>
                   <span className="text-sm font-black tracking-tighter text-left leading-tight">Audio</span>
@@ -699,7 +699,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <div className="flex items-center gap-3">
                   <div className={clsx(
                     "p-2 rounded-xl text-white",
-                    selectionGroup === "audio" ? "bg-emerald-500" : selectionGroup === "media" ? "bg-rose-500" : selectionGroup === "document" ? "bg-purple-500" : "bg-amber-500"
+                    selectionGroup === "audio" ? "bg-gold" : selectionGroup === "media" ? "bg-rose-500" : selectionGroup === "document" ? "bg-purple-500" : "bg-amber-500"
                   )}>
                     {selectionGroup === "audio" && <Mic size={20} />}
                     {selectionGroup === "media" && <ImageIcon size={20} />}
@@ -710,7 +710,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 </div>
                 <button
                   onClick={() => { setSelectionGroup(null); setPostType(null); setFile(null); setTextContent(""); }}
-                  className="text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] uppercase tracking-wider underline underline-offset-4"
+                  className="text-[#8E6D2F] dark:text-gold/60 font-extrabold text-[10px] uppercase tracking-wider underline underline-offset-4"
                 >
                   Change
                 </button>
@@ -728,7 +728,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     rows={4}
                   />
                 ) : file ? (
-                  <div className="w-full mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 flex flex-col items-center gap-2 animate-in zoom-in-95">
+                  <div className="w-full mb-4 p-3 bg-gold/10 dark:bg-gold/10/30 rounded-2xl border border-gold-100 dark:border-gold/20/20 flex flex-col items-center gap-2 animate-in zoom-in-95">
                     {postType === "audio" && previewUrl ? (
                       <div className="w-full px-2">
                         <CompactAudioPlayer fileUrl={previewUrl} />
@@ -736,7 +736,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     ) : (postType === "image" || postType === "video") && previewUrl ? (
                       <div
                         onClick={() => setExpandedImage(previewUrl)}
-                        className="relative w-48 aspect-video mx-auto rounded-xl overflow-hidden cursor-zoom-in group border border-emerald-100 dark:border-emerald-800 shadow-sm"
+                        className="relative w-48 aspect-video mx-auto rounded-xl overflow-hidden cursor-zoom-in group border border-gold-100 dark:border-gold/10 shadow-sm"
                       >
                         {postType === "image" ? (
                           <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
@@ -744,20 +744,20 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                           <video src={previewUrl} className="w-full h-full object-cover" />
                         )}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
-                          <div className="bg-white/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 text-emerald-600">
+                          <div className="bg-white/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 text-[#8E6D2F]">
                             {postType === "image" ? <ImageIcon size={16} /> : <Video size={16} />}
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 tracking-tight text-center truncate w-full px-2">
+                      <p className="text-xs font-bold text-gold/10 dark:text-gold/60 tracking-tight text-center truncate w-full px-2">
                         {file.name}
                       </p>
                     )}
 
                     <button
                       onClick={() => setFile(null)}
-                      className="text-emerald-500 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-wider hover:opacity-80 underline underline-offset-4 decoration-2"
+                      className="text-gold dark:text-gold/60 font-bold text-[10px] uppercase tracking-wider hover:opacity-80 underline underline-offset-4 decoration-2"
                     >
                       Remove File
                     </button>
@@ -770,13 +770,13 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                           onClick={isRecording ? stopRecording : startRecording}
                           className={clsx(
                             "group relative flex items-center justify-center gap-3 p-4 rounded-2xl w-full transition-all active:scale-95 shadow-md overflow-hidden",
-                            isRecording ? "bg-red-500 scale-105" : "bg-emerald-50 dark:bg-emerald-950/50 border-2 border-dashed border-emerald-200 dark:border-emerald-800"
+                            isRecording ? "bg-red-500 scale-105" : "bg-gold/10 dark:bg-gold/10/50 border-2 border-dashed border-gold-200 dark:border-gold/10"
                           )}
                         >
-                          <div className={clsx("p-2 rounded-lg shadow-sm transition-transform", isRecording ? "bg-white text-red-500" : "bg-emerald-500 text-white")}>
+                          <div className={clsx("p-2 rounded-lg shadow-sm transition-transform", isRecording ? "bg-white text-red-500" : "bg-gold text-white")}>
                             <Mic size={18} />
                           </div>
-                          <span className={clsx("font-bold text-sm tracking-tight", isRecording ? "text-white" : "text-emerald-900 dark:text-emerald-400")}>
+                          <span className={clsx("font-bold text-sm tracking-tight", isRecording ? "text-white" : "text-gold/20 dark:text-gold/60")}>
                             {isRecording ? "Recording... (Stop)" : "Record Live Audio"}
                           </span>
                         </button>
@@ -923,12 +923,12 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                   }}
                   className={clsx(
                     "w-full text-white p-3 rounded-xl text-base font-black flex flex-col items-center justify-center gap-1 shadow-md active:scale-95 transition-all duration-300 overflow-hidden relative",
-                    (isSubmitting || isUploading) ? "bg-gray-400" : "bg-emerald-500 hover:bg-emerald-600"
+                    (isSubmitting || isUploading) ? "bg-gray-400" : "bg-gold hover:bg-[#8E6D2F]"
                   )}
                 >
                   {isUploading && (
                     <div
-                      className="absolute bottom-0 left-0 h-2 bg-emerald-300 transition-all duration-300"
+                      className="absolute bottom-0 left-0 h-2 bg-gold/40 transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   )}
@@ -960,7 +960,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               <input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-emerald-500 shadow-sm font-bold"
+                className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-gold shadow-sm font-bold"
               />
             </div>
 
@@ -970,7 +970,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <textarea
                   value={editTextContent}
                   onChange={(e) => setEditTextContent(e.target.value)}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-emerald-500 shadow-inner"
+                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-800 rounded-2xl text-xl text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-950 focus:outline-none focus:border-gold shadow-inner"
                   rows={4}
                 />
               </div>
@@ -979,13 +979,13 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 <label className="font-bold text-gray-500 uppercase tracking-widest text-sm w-full pl-2 mb-2">Replace Attached File (Optional)</label>
                 <label className={clsx(
                   "cursor-pointer p-6 rounded-[2rem] w-full text-center border-2 border-dashed active:scale-95 transition-all text-xs",
-                  editType === "audio" ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100" :
+                  editType === "audio" ? "bg-gold/10 dark:bg-gold/10 border-gold/40 dark:border-gold/10 hover:bg-gold-100" :
                     (editType === "image" || editType === "video") ? "bg-rose-50 dark:bg-rose-950 border-rose-300 dark:border-rose-800 hover:bg-rose-100" :
                       "bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-800 hover:bg-purple-100"
                 )}>
                   <span className={clsx(
                     "font-bold block line-clamp-2 px-4 shadow-sm py-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800",
-                    editType === "audio" ? "text-emerald-700 dark:text-emerald-400" :
+                    editType === "audio" ? "text-gold dark:text-gold/60" :
                       (editType === "image" || editType === "video") ? "text-rose-700 dark:text-rose-400" :
                         "text-purple-700 dark:text-purple-400"
                   )}>
@@ -1016,12 +1016,12 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
               onClick={handleEditSubmit}
               className={clsx(
                 "w-full text-white p-6 rounded-full text-2xl font-bold flex flex-col items-center justify-center gap-2 shadow-xl active:scale-95 transition-all relative overflow-hidden",
-                (isEditing || isUploading) ? "bg-gray-400" : "bg-emerald-500 hover:bg-emerald-600"
+                (isEditing || isUploading) ? "bg-gray-400" : "bg-gold hover:bg-[#8E6D2F]"
               )}
             >
               {isUploading && (
                 <div
-                  className="absolute bottom-0 left-0 h-2 bg-emerald-300 transition-all duration-300"
+                  className="absolute bottom-0 left-0 h-2 bg-gold/40 transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               )}

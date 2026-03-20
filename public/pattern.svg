@@ -1,0 +1,6 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" fill-rule="evenodd">
+    <path d="M0 40h40V0H0v40zm20-20l20 20M20 20L0 40M20 20L40 0M20 20L0 0" stroke="#C5A059" stroke-opacity="0.05" stroke-width="0.5"/>
+    <rect x="18" y="18" width="4" height="4" transform="rotate(45 20 20)" stroke="#C5A059" stroke-opacity="0.08" stroke-width="0.5"/>
+  </g>
+</svg>

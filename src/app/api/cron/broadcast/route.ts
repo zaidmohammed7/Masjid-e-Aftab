@@ -117,8 +117,18 @@ export async function GET(req: Request) {
       });
     }
 
-    // 2. Fetch all subscriptions from Redis using SMEMBERS
-    const allSubs = await kv.smembers("user:subscriptions") as string[];
+    // 2. Fetch all subscriptions from Redis using SSCAN (Memory-Efficient for 5,000+ users)
+    let allSubs: string[] = [];
+    let cursor = "0";
+
+    do {
+      const [nextCursor, members] = await kv.sscan("user:subscriptions", cursor, {
+        count: 1000, // Process in large but safe batches
+      });
+      allSubs = allSubs.concat(members as string[]);
+      cursor = nextCursor;
+    } while (cursor !== "0");
+
     console.log(`[Dispatcher] Target: ${activePrayer}. Found ${allSubs.length} sessions.`);
 
     if (allSubs.length === 0) return NextResponse.json({ message: "Zero subscriptions found." });

@@ -56,23 +56,26 @@ export default function CompactAudioPlayer({ fileUrl, duration: totalDuration = 
   };
 
   return (
-    <div className="flex items-center gap-3 p-1.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl w-full min-w-0" onClick={e => e.stopPropagation()}>
+    <div className="flex items-center gap-3 p-1.5 bg-gold/5 dark:bg-gold/900/10 rounded-xl w-full min-w-0" onClick={e => e.stopPropagation()}>
       <button onClick={togglePlay} className={clsx(
         "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-95",
-        isPlaying ? "bg-red-500" : "bg-emerald-500"
+        isPlaying ? "bg-red-600" : "bg-gold"
       )}>
         {isPlaying ? <Pause size={18} className="text-white fill-current" /> : <Play size={18} className="text-white fill-current ml-0.5" />}
       </button>
 
       <div className="flex-1 flex flex-col justify-center min-w-0 pr-1">
-        <div className="flex justify-between items-center mb-1 px-0.5">
-          <span className="text-[9px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tighter tabular-nums">
+        <div className="flex justify-between items-center mb-1 px-1">
+          <span className="text-[9px] font-black text-gold uppercase tracking-[0.2em] tabular-nums">
+            {isPlaying ? "Playing..." : "Paused"}
+          </span>
+          <span className="text-[9px] font-black text-gold/60 uppercase tracking-tighter tabular-nums">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
         </div>
-        <div className="relative h-2 flex items-center">
-          <div className="absolute left-0 right-0 h-1 bg-emerald-200/40 dark:bg-emerald-900/40 rounded-full" />
-          <div className="absolute left-0 h-1 bg-emerald-500 rounded-full z-10" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
+        <div className="relative h-2 flex items-center px-0.5">
+          <div className="absolute left-0 right-0 h-1 bg-champagne/40 dark:bg-gray-800 rounded-full" />
+          <div className="absolute left-0 h-1 bg-gold rounded-full z-10" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
           <input
             type="range" min="0" max={duration || 0} step="0.1" value={currentTime}
             onChange={handleSeek}

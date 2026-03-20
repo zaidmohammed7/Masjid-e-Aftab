@@ -93,22 +93,22 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
 
   return (
     <div className="flex gap-4 items-center w-full">
-      <div className="flex flex-1 items-center gap-2 bg-white dark:bg-gray-950 border-2 border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-sm focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+      <div className="flex flex-1 items-center gap-2 bg-white dark:bg-gray-950 border-2 border-champagne/30 dark:border-gray-800 rounded-2xl px-4 py-3 shadow-sm focus-within:border-gold focus-within:ring-4 focus-within:ring-gold/10 transition-all">
         <div className="flex-1 flex flex-col items-center">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">HH</span>
+          <span className="text-[10px] font-black text-gold/60 uppercase tracking-tighter mb-1">HH</span>
           <input
             type="text"
             inputMode="numeric"
             value={hour}
             onFocus={(e) => e.target.select()}
             onChange={(e) => handleHourChange(e.target.value)}
-            className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
+            className="w-full bg-transparent outline-none font-serif font-black text-center text-2xl text-[#2d2d2d] dark:text-gray-100 appearance-none"
             placeholder="12"
           />
         </div>
-        <span className="text-2xl font-black text-gray-200">:</span>
+        <span className="text-2xl font-black text-champagne">:</span>
         <div className="flex-1 flex flex-col items-center">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">MM</span>
+          <span className="text-[10px] font-black text-gold/60 uppercase tracking-tighter mb-1">MM</span>
           <input
             ref={minuteInputRef}
             type="text"
@@ -116,25 +116,25 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
             value={minute}
             onFocus={(e) => e.target.select()}
             onChange={(e) => handleMinuteChange(e.target.value)}
-            className="w-full bg-transparent outline-none font-black text-center text-2xl text-gray-800 dark:text-gray-100 appearance-none"
+            className="w-full bg-transparent outline-none font-serif font-black text-center text-2xl text-[#2d2d2d] dark:text-gray-100 appearance-none"
             placeholder="00"
           />
         </div>
       </div>
 
-      <div className="flex flex-col bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl shadow-inner gap-1">
+      <div className="flex flex-col bg-gray-100/50 dark:bg-gray-800 p-1.5 rounded-[1.5rem] shadow-inner gap-1.5 border border-champagne/20">
         <button
           onClick={() => onChange(`${hour}:${minute} AM`)}
           className={clsx(
-            "px-4 py-2 rounded-xl text-[10px] font-black transition-all",
-            ampm === "AM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
+            "px-4 py-2.5 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+            ampm === "AM" ? "bg-white dark:bg-gray-700 text-gold shadow-md" : "text-gray-400"
           )}
         >AM</button>
         <button
           onClick={() => onChange(`${hour}:${minute} PM`)}
           className={clsx(
-            "px-4 py-2 rounded-xl text-[10px] font-black transition-all",
-            ampm === "PM" ? "bg-white dark:bg-gray-700 text-emerald-600 shadow-md" : "text-gray-400"
+            "px-4 py-2.5 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+            ampm === "PM" ? "bg-white dark:bg-gray-700 text-gold shadow-md" : "text-gray-400"
           )}
         >PM</button>
       </div>
