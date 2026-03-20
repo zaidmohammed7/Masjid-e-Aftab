@@ -75,7 +75,7 @@ export default function InstallBanner() {
             </div>
             <div className="flex flex-col">
               <h3 className="text-base font-serif font-black text-[#2d2d2d] dark:text-gray-100 leading-tight">Install Masjid App</h3>
-              <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mt-0.5">Gold Edition • Official PWA</p>
+              <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mt-0.5">For a better experience</p>
             </div>
           </div>
           <button 
