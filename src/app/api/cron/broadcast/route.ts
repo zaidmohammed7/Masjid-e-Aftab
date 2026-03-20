@@ -8,7 +8,7 @@ import { Client } from "@upstash/qstash";
 
 const qstash = new Client({ 
   token: process.env.QSTASH_TOKEN!,
-  baseUrl: process.env.QSTASH_URL // Correct regional endpoint
+  baseUrl: process.env.QSTASH_US_URL // Regional endpoint
 });
 
 const client = createClient({
