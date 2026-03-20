@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Clock, Phone, Settings, Megaphone } from "lucide-react";
+import { Home, Clock, Phone, Settings, Megaphone, BookOpen } from "lucide-react";
 import clsx from "clsx";
 
 export default function BottomNav() {
@@ -11,6 +11,7 @@ export default function BottomNav() {
   const navItems = [
     { name: "Home", href: "/", icon: <Home size={32} /> },
     { name: "Feed", href: "/announcements", icon: <Megaphone size={32} /> },
+    { name: "Quran", href: "/quran", icon: <BookOpen size={32} /> },
     { name: "Times", href: "/prayer-times", icon: <Clock size={32} /> },
     { name: "Settings", href: "/settings", icon: <Settings size={32} /> },
   ];
@@ -23,7 +24,7 @@ export default function BottomNav() {
                       rounded-t-[2.5rem] px-6 py-4 flex justify-between items-center max-w-md mx-auto h-[100px] transition-colors duration-300">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-          
+
           return (
             <Link
               key={item.href}

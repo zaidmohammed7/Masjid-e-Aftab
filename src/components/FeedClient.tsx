@@ -51,8 +51,8 @@ export default function FeedClient({ announcements }: { announcements: Announcem
   return (
     <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-emerald-200 transition-colors duration-300">
 
-      {/* Premium Gradient Header block - Centered & Sync Height */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center mb-6">
+      {/* Premium Gradient Header block - Centered & Sticky */}
+      <div className="sticky top-0 z-40 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-[0_20px_40px_-15px_rgba(4,120,87,0.5)] relative overflow-hidden text-center">
         <div className="absolute top-10 left-10 opacity-10 mix-blend-overlay rotate-12">
           <Megaphone size={160} />
         </div>
@@ -60,8 +60,8 @@ export default function FeedClient({ announcements }: { announcements: Announcem
         <p className="text-emerald-100/90 text-lg font-medium mt-2 relative z-10 tracking-wide drop-shadow-md">Latest news and updates</p>
       </div>
 
-      {/* Floating Header Container */}
-      <div className="sticky top-4 z-50 px-4">
+      {/* Floating Header Container - Sticky below the main header */}
+      <div className="sticky top-36 z-50 px-4 mt-3">
         {/* Language Toggle */}
         <div className="flex z-10 p-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl rounded-[2.5rem] max-w-[360px] mx-auto shadow-2xl border border-white/40 dark:border-gray-800 relative ring-1 ring-black/5">
           <button

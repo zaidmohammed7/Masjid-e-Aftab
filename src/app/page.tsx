@@ -1,6 +1,6 @@
 import { createClient } from "next-sanity";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
-import { Clock, Megaphone, MapPin, Phone, Star } from "lucide-react";
+import { Clock, Megaphone, MapPin, Phone, Star, BookOpen } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
@@ -14,15 +14,15 @@ export default async function HomePage() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
 
   return (
-    <main className="min-h-screen pb-40 bg-zinc-50 dark:bg-gray-950 font-sans selection:bg-emerald-200 transition-colors duration-500 overflow-x-hidden">
+    <main className="min-h-screen pb-40 bg-zinc-50 dark:bg-gray-950 font-sans selection:bg-emerald-200 transition-colors duration-500">
       {/* Dynamic Animated Background Blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-100/40 dark:bg-emerald-900/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[10%] left-[-10%] w-[400px] h-[400px] bg-teal-100/40 dark:bg-teal-900/10 rounded-full blur-[100px]" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* Premium Hero Header */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-8 pb-10 px-8 rounded-b-[3rem] shadow-[0_25px_50px_-12px_rgba(4,120,87,0.3)] relative overflow-hidden text-center z-10">
+      {/* Premium Hero Header - Sticky */}
+      <div className="sticky top-0 z-40 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 text-white pt-8 pb-10 px-8 rounded-b-[3rem] shadow-[0_25px_50px_-12px_rgba(4,120,87,0.3)] relative overflow-hidden text-center">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
           <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full blur-xl animate-pulse" />
           <div className="absolute bottom-10 right-10 w-32 h-32 border border-white rounded-full blur-2xl opacity-50" />
@@ -30,7 +30,7 @@ export default async function HomePage() {
 
         {/* Background Watermark Icon - Simplistic & Seamless */}
         <div className="absolute -right-12 -bottom-16 opacity-[0.12] mix-blend-screen pointer-events-none"
-             style={{ maskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)' }}>
+          style={{ maskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle at center, black 30%, transparent 70%)' }}>
           <Image src="/watermark.png" alt="" width={350} height={350} priority />
         </div>
 
@@ -89,15 +89,15 @@ export default async function HomePage() {
         {/* News & Announcements Professional Card */}
         <Link href="/announcements" className="block relative bg-white dark:bg-gray-900 rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-gray-800/50 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300 ease-out fill-mode-both">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-[5rem] transition-transform group-hover:scale-110 duration-700" />
-          
+
           <div className="flex items-center gap-4 relative z-10">
             <div className="p-4 bg-emerald-500 rounded-[1.2rem] text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-500">
-               <Megaphone size={24} />
+              <Megaphone size={24} />
             </div>
             <div className="flex-1">
               <h3 className="text-[10px] font-black text-emerald-500 tracking-[0.3em] uppercase mb-1">Latest Updates</h3>
               <h2 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tighter leading-none">Feed</h2>
-              
+
               <div className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-all">
                 Open Announcements
                 <div className="h-0.5 w-6 bg-emerald-500/30 rounded-full" />
@@ -106,8 +106,28 @@ export default async function HomePage() {
           </div>
         </Link>
 
-      </div>
-      
+        {/* Quran Professional Card */}
+        <Link href="/quran" className="block relative bg-white dark:bg-gray-900 rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-gray-800/50 transform active:scale-[0.98] transition-all duration-300 overflow-hidden group animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 ease-out fill-mode-both">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-bl-[5rem] transition-transform group-hover:scale-110 duration-700" />
+          
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="p-4 bg-emerald-500 rounded-[1.2rem] text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-500">
+               <BookOpen size={24} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-[10px] font-black text-emerald-500 tracking-[0.3em] uppercase mb-1">Holy Book</h3>
+              <h2 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tighter leading-none">Quran Reader</h2>
+              
+              <div className="mt-3 flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-all">
+                Read & Listen to the Holy Quran
+                <div className="h-0.5 w-6 bg-emerald-500/30 rounded-full" />
+              </div>
+            </div>
+          </div>
+        </Link>
+
+       </div>
+
       <InstallBanner />
     </main>
   );

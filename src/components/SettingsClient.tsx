@@ -246,7 +246,7 @@ export default function SettingsClient() {
 
   return (
     <div className="min-h-screen bg-transparent pb-32">
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
+      <div className="sticky top-0 z-40 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white pt-6 pb-8 px-8 rounded-b-[3.5rem] shadow-2xl relative overflow-hidden text-center">
         <div className="absolute top-10 right-10 opacity-10 mix-blend-overlay rotate-12">
           <Settings size={160} />
         </div>
@@ -348,7 +348,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold">Masjid App v1.5.2</p>
+          <p className="text-gray-400 text-sm font-bold">Masjid App v1.6.0</p>
           <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-bold uppercase tracking-widest">Made for the Community</p>
         </div>
       </div>
