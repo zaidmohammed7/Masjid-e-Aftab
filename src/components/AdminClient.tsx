@@ -347,34 +347,34 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex bg-gray-100 dark:bg-gray-800/50 p-1 mx-6 mt-6 rounded-[2rem] shadow-inner">
+      {/* Standardized Tabs - Matching Feed Selector Dimensions Exactly */}
+      <div className="flex bg-[#FCFAF2] dark:bg-[#1a1c1e] backdrop-blur-2xl p-1.5 mx-auto max-w-[360px] mt-6 rounded-[2.5rem] shadow-2xl border border-champagne dark:border-[var(--card-border)] relative ring-1 ring-black/5">
         <button
           onClick={() => setActiveTab("announcements")}
           className={clsx(
-            "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "announcements" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            "flex-1 py-4 text-sm flex items-center justify-center font-black rounded-[2rem] transition-all uppercase tracking-tight outline-none relative z-10",
+            activeTab === "announcements" ? "bg-gradient-to-br from-gold to-[#8E6D2F] text-white shadow-lg scale-105" : "text-gray-500 dark:text-gray-400 hover:text-gold"
           )}
         >
-          <Megaphone size={20} /> Posts
+          Posts
         </button>
         <button
           onClick={() => setActiveTab("prayerTimes")}
           className={clsx(
-            "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "prayerTimes" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            "flex-1 py-4 text-sm flex items-center justify-center font-black rounded-[2rem] transition-all uppercase tracking-tight outline-none relative z-10 mx-1",
+            activeTab === "prayerTimes" ? "bg-gradient-to-br from-gold to-[#8E6D2F] text-white shadow-lg scale-105" : "text-gray-500 dark:text-gray-400 hover:text-gold"
           )}
         >
-          <Clock size={20} /> Times
+          Times
         </button>
         <button
           onClick={() => setActiveTab("imaamsCorner")}
           className={clsx(
-            "flex-1 py-4 text-sm flex flex-col items-center justify-center gap-1 font-black rounded-[1.75rem] transition-all uppercase tracking-widest",
-            activeTab === "imaamsCorner" ? "bg-white dark:bg-gray-700 text-gold shadow-xl scale-105" : "text-gray-400 dark:text-gray-500 hover:bg-white/50"
+            "flex-1 py-4 text-sm flex items-center justify-center font-black rounded-[2rem] transition-all uppercase tracking-tight outline-none relative z-10",
+            activeTab === "imaamsCorner" ? "bg-gradient-to-br from-gold to-[#8E6D2F] text-white shadow-lg scale-105" : "text-gray-500 dark:text-gray-400 hover:text-gold"
           )}
         >
-          <Star size={20} /> Imaam
+          Imaam
         </button>
       </div>
 
@@ -385,15 +385,15 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
             <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl shadow-inner">
               <button
                 onClick={() => setAdminLang("all")}
-                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "all" ? "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm" : "text-gray-400")}
+                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "all" ? "bg-gold text-white shadow-sm" : "text-gray-400 hover:text-gold")}
               >All</button>
               <button
                 onClick={() => setAdminLang("english")}
-                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all mx-1", adminLang === "english" ? "bg-blue-500 text-white shadow-sm" : "text-gray-400")}
+                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all mx-1", adminLang === "english" ? "bg-gold text-white shadow-sm" : "text-gray-400 hover:text-gold")}
               >English</button>
               <button
                 onClick={() => setAdminLang("urdu")}
-                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "urdu" ? "bg-green-500 text-white shadow-sm" : "text-gray-400")}
+                className={clsx("px-3 py-1.5 text-xs font-bold rounded-lg transition-all", adminLang === "urdu" ? "bg-gold text-white shadow-sm" : "text-gray-400 hover:text-gold")}
               >اردو</button>
             </div>
           </div>
@@ -414,7 +414,7 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                     </h3>
                     <div className={clsx(
                       "ml-2 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm",
-                      item.language === "urdu" ? "bg-green-500 text-white" : item.language === "english" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      item.language === "urdu" ? "bg-gold text-white" : item.language === "english" ? "bg-[#8E6D2F] text-white" : "bg-champagne dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                     )}>
                       {item.language === "both" ? "Urdu/Eng" : item.language}
                     </div>
@@ -620,21 +620,21 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
                 onClick={() => setPostLang("both")}
                 className={clsx(
                   "flex-1 py-3 text-sm font-black rounded-xl transition-all uppercase tracking-tighter",
-                  postLang === "both" ? "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
+                  postLang === "both" ? "bg-gold text-white shadow-md scale-105" : "text-gray-500 hover:text-gold"
                 )}
               >Both</button>
               <button
                 onClick={() => setPostLang("english")}
                 className={clsx(
                   "flex-1 py-3 text-sm font-black rounded-xl transition-all uppercase tracking-tighter mx-1",
-                  postLang === "english" ? "bg-blue-500 text-white shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
+                  postLang === "english" ? "bg-gold text-white shadow-md scale-105" : "text-gray-500 hover:text-gold"
                 )}
               >English</button>
               <button
                 onClick={() => setPostLang("urdu")}
                 className={clsx(
                   "flex-1 py-3 text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5",
-                  postLang === "urdu" ? "bg-green-500 text-white shadow-md scale-105" : "text-gray-500 hover:bg-gray-200"
+                  postLang === "urdu" ? "bg-gold text-white shadow-md scale-105" : "text-gray-500 hover:text-gold"
                 )}
               >
                 <span className="text-lg">اردو</span>

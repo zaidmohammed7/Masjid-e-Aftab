@@ -63,13 +63,13 @@ export default function FeedClient({ announcements }: { announcements: Announcem
       {/* Floating Header Container - Sticky below the main header */}
       <div className="sticky top-36 z-50 px-4 mt-3">
         {/* Language Toggle */}
-        <div className="flex z-10 p-1.5 bg-white/95 dark:bg-gray-950/90 backdrop-blur-2xl rounded-[2.5rem] max-w-[360px] mx-auto shadow-2xl border border-champagne dark:border-gray-800 relative ring-1 ring-black/5">
+        <div className="flex z-10 p-1.5 bg-[#FCFAF2] dark:bg-[#1a1c1e] backdrop-blur-2xl rounded-[2.5rem] max-w-[360px] mx-auto shadow-2xl border border-champagne dark:border-[var(--card-border)] relative ring-1 ring-black/5">
           <button
             onClick={() => setActiveLang("all")}
             className={clsx(
-              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tighter",
+              "flex-1 flex items-center justify-center py-4 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tight",
               activeLang === "all"
-                ? "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-800 shadow-lg scale-105"
+                ? "bg-gradient-to-br from-gold to-[#8E6D2F] text-white shadow-lg scale-105"
                 : "text-gray-500 hover:text-gold"
             )}
           >
@@ -78,7 +78,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
           <button
             onClick={() => setActiveLang("english")}
             className={clsx(
-              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tighter mx-1",
+              "flex-1 flex items-center justify-center py-4 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tight mx-1",
               activeLang === "english"
                 ? "bg-gradient-to-br from-[#8E6D2F] to-[#C5A059] text-white shadow-lg scale-105"
                 : "text-gray-500 dark:text-gray-400 hover:text-gold"
@@ -89,7 +89,7 @@ export default function FeedClient({ announcements }: { announcements: Announcem
           <button
             onClick={() => setActiveLang("urdu")}
             className={clsx(
-              "flex-1 flex items-center justify-center py-3.5 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none",
+              "flex-1 flex items-center justify-center py-4 rounded-[2rem] transition-all duration-300 relative z-10 text-sm font-black outline-none uppercase tracking-tight",
               activeLang === "urdu"
                 ? "bg-gradient-to-br from-gold to-[#8E6D2F] text-white shadow-lg scale-105"
                 : "text-gray-500 hover:text-gold"
