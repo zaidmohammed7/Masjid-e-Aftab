@@ -23,7 +23,8 @@ export default function BottomNav() {
       <div className="bg-[#fbf9f1]/95 dark:bg-gray-950/90 backdrop-blur-2xl border-t border-champagne dark:border-gray-800 shadow-[0_-10px_40px_-15px_rgba(197,160,89,0.15)] 
                       rounded-t-[2.5rem] px-6 py-4 flex justify-between items-center max-w-md mx-auto h-[100px] transition-colors duration-300">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+          const currentPath = pathname || "/";
+          const isActive = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href));
 
           return (
             <Link

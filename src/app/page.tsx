@@ -104,10 +104,10 @@ export default async function Home() {
             </div>
             <div className="flex-1">
               <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase mb-1">Latest Updates</h3>
-              <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none">Feed</h2>
+              <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none">Posts</h2>
 
               <div className="mt-3 flex items-center gap-2 text-gold/80 dark:text-gold/60 font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-all">
-                Open Announcements
+                Open Posts
                 <div className="h-0.5 w-6 bg-gold/30 rounded-full" />
               </div>
             </div>
@@ -127,7 +127,7 @@ export default async function Home() {
               <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none">Quran Reader</h2>
               
               <div className="mt-3 flex items-center gap-2 text-gold/80 dark:text-gold/60 font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-all">
-                Read & Listen to the Holy Quran
+                Read the Holy Quran
                 <div className="h-0.5 w-6 bg-gold/30 rounded-full" />
               </div>
             </div>
