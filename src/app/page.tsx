@@ -5,13 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
 import InstallBanner from "@/components/InstallBanner";
+import MakkahLive from "@/components/MakkahLive";
+import { getMakkahLiveId } from "@/lib/makkah";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
 
 export const revalidate = 60; // Cache for 60 seconds (ISR)
 
-export default async function HomePage() {
+export default async function Home() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
+  const makkahLiveId = await getMakkahLiveId();
 
   return (
     <main className="min-h-screen pb-40 bg-zinc-50 dark:bg-gray-950 font-sans selection:bg-emerald-200 transition-colors duration-500">
@@ -54,8 +57,13 @@ export default async function HomePage() {
 
       <div className="px-6 pt-12 space-y-12 max-w-md mx-auto relative z-20">
 
-        {/* Dynamic Prayer Times clock */}
+        {/* Makkah Live Stream Section */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
+          <MakkahLive initialVideoId={makkahLiveId} />
+        </div>
+
+        {/* Dynamic Prayer Times clock */}
+        <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 delay-100 ease-out fill-mode-both">
           <NextPrayer prayerTimes={prayerTimes} />
         </div>
 
