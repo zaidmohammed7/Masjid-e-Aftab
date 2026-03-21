@@ -6,25 +6,6 @@ import { calculateQibla } from "@/lib/qibla";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 
-const getCardinal = (angle: number) => {
-  angle = (angle + 360) % 360;
-  const directions = [
-    "North", "North-Northeast", "Northeast", "East-Northeast",
-    "East", "East-Southeast", "Southeast", "South-Southeast",
-    "South", "South-Southwest", "Southwest", "West-Southwest",
-    "West", "West-Northwest", "Northwest", "North-Northwest"
-  ];
-  const index = Math.round(angle / 22.5) % 16;
-  const primary = directions[index];
-  
-  if (angle > 0 && angle < 15) return "North, slightly East";
-  if (angle > 345 && angle < 360) return "North, slightly West";
-  if (angle > 75 && angle < 90) return "East, slightly North";
-  if (angle > 90 && angle < 105) return "East, slightly South";
-  
-  return primary;
-};
-
 export default function QiblaCard() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [qibla, setQibla] = useState<number | null>(null);
@@ -36,7 +17,6 @@ export default function QiblaCard() {
 
   // Continuous Rotation states
   const [contHeading, setContHeading] = useState<number>(0);
-  const [prevHeading, setPrevHeading] = useState<number>(0);
 
   // Load last known position from localStorage
   useEffect(() => {
@@ -48,7 +28,7 @@ export default function QiblaCard() {
         setQibla(data.qibla);
         setCity(data.city);
         setHasPermission(true);
-      } catch (e) {}
+      } catch (e) { }
     }
   }, []);
 
@@ -72,7 +52,7 @@ export default function QiblaCard() {
           const data = await res.json();
           const cityName = data.city || data.locality || "Current Location";
           setCity(cityName);
-          
+
           localStorage.setItem("last_qibla_data", JSON.stringify({
             coords: { lat: latitude, lon: longitude },
             qibla: qWay,
@@ -93,10 +73,12 @@ export default function QiblaCard() {
 
     // Handle Orientation
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      const raw = (e as any).webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : 0);
+      // webkitCompassHeading is available on iOS (absolute North)
+      // alpha is available on Android (0 is North if absolute: true)
+      const raw = (e as any).webkitCompassHeading || (e.alpha !== null ? e.alpha : 0);
       setHeading(raw);
 
-      // Continuous rotation logic for ring
+      // Continuous shortest-path rotation logic
       setContHeading(prev => {
         let delta = raw - (prev % 360);
         if (delta > 180) delta -= 360;
@@ -112,7 +94,7 @@ export default function QiblaCard() {
           if (res === 'granted') {
             window.addEventListener('deviceorientation', handleOrientation);
           }
-        } catch (e) {}
+        } catch (e) { }
       } else {
         window.addEventListener('deviceorientation', handleOrientation);
       }
@@ -124,7 +106,7 @@ export default function QiblaCard() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 delay-150 fill-mode-both">
-      <div 
+      <div
         className={clsx(
           "relative bg-white dark:bg-[var(--card-bg)] rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(197,160,89,0.15)] dark:shadow-none border border-champagne dark:border-[var(--card-border)] overflow-hidden transition-all duration-500",
           isExpanded ? "min-h-[450px]" : "min-h-[120px]"
@@ -133,7 +115,7 @@ export default function QiblaCard() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 dark:bg-gold/10 rounded-bl-[5rem]" />
 
         {!isExpanded ? (
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer group"
             onClick={() => setIsExpanded(true)}
           >
@@ -147,7 +129,7 @@ export default function QiblaCard() {
                   Qibla Finder
                 </h2>
                 {hasPermission && (
-                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest flex items-center gap-1">
+                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">
                     {city}
                   </p>
                 )}
@@ -157,22 +139,22 @@ export default function QiblaCard() {
         ) : (
           <div className="flex flex-col items-center">
             <div className="w-full flex justify-between items-center mb-8">
-               <button onClick={() => setIsExpanded(false)} className="text-xs font-black text-gold uppercase tracking-widest hover:opacity-70 transition-opacity">
-                  Close
-               </button>
-               <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase">Compass View</h3>
-               <div className="w-10" />
+              <button onClick={() => setIsExpanded(false)} className="text-xs font-black text-gold uppercase tracking-widest hover:opacity-70 transition-opacity">
+                Close
+              </button>
+              <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase">Compass View</h3>
+              <div className="w-10" />
             </div>
 
             {!hasPermission ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center text-gold mb-6 animate-pulse">
-                   <Lock size={32} />
+                  <Lock size={32} />
                 </div>
                 <p className="text-[#2d2d2d] dark:text-gray-200 font-bold mb-6 px-4">
-                   We need your location to calculate the exact direction of the Kaaba.
+                  We need your location to calculate the exact direction of the Kaaba.
                 </p>
-                <button 
+                <button
                   onClick={requestLocation}
                   className="bg-gold text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-gold/20 active:scale-95 transition-all"
                 >
@@ -190,12 +172,12 @@ export default function QiblaCard() {
 
                 {/* Compass Face */}
                 <div className="relative w-64 h-64 rounded-full border border-champagne/30 dark:border-white/5 flex items-center justify-center">
-                  
+
                   {/* Subtle Background Dial Ring */}
                   <div className="absolute inset-4 rounded-full border border-dashed border-gray-100 dark:border-gray-800/30 opacity-50" />
 
                   {/* Rotating Elements Block (Physical Orientation Context) */}
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 pointer-events-none"
                     animate={{ rotate: -contHeading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
@@ -205,7 +187,7 @@ export default function QiblaCard() {
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">S</div>
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">W</div>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">E</div>
-                    
+
                     {/* Ring ticks for context */}
                     {[0, 90, 180, 270].map(deg => (
                       <div key={deg} className="absolute h-full w-[1px] bg-gray-100 dark:bg-gray-800/20 left-1/2 -translate-x-1/2" style={{ transform: `rotate(${deg}deg)` }} />
@@ -213,44 +195,34 @@ export default function QiblaCard() {
                   </motion.div>
 
                   {/* Rotating Needle (Points to Kaaba relative to phone top) */}
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 flex items-center justify-center pointer-events-none"
                     animate={{ rotate: (qibla || 0) - contHeading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
                   >
                     {/* The Sleek Tapered Gold Needle */}
                     <div className="absolute h-44 w-1 flex flex-col items-center">
-                       {/* The Pointer Tip */}
-                       <div className="absolute -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gold" />
-                       <div className="w-[1.5px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_5px_20px_rgba(197,160,89,0.3)]" />
+                      {/* The Pointer Tip */}
+                      <div className="absolute -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gold" />
+                      <div className="w-[1.5px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_5px_20px_rgba(197,160,89,0.3)]" />
                     </div>
 
                     {/* Kaaba Marker at the tip */}
                     <div className="absolute translate-y-[-115px]">
                       <div className="w-6 h-6 bg-[#2d2d2d] rounded-sm border-2 border-gold flex items-center justify-center shadow-2xl scale-90">
-                         <div className="w-4 h-1 bg-gold/50 rounded-full mb-1" />
+                        <div className="w-4 h-1 bg-gold/50 rounded-full mb-1" />
                       </div>
                     </div>
                   </motion.div>
-                  
+
                   {/* Center Dot */}
                   <div className="w-4 h-4 bg-[#2d2d2d] border-2 border-gold rounded-full z-10 shadow-xl" />
                 </div>
 
                 <div className="mt-10 text-center bg-[#fbf9f1] dark:bg-white/5 py-4 px-6 rounded-3xl border border-champagne/20">
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Instructions</p>
-                   <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
-                      Hold phone <span className="text-gold">flat in your palm</span>.<br/>Turn until needle aligns with top pointer.
-                   </p>
-                </div>
-
-                {/* Developer Mode Debugging */}
-                <div className="mt-6 flex flex-col items-center">
-                  <div className="px-3 py-1 bg-[#2d2d2d] rounded-full text-[8px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">
-                    Developer Mode
-                  </div>
-                  <p className="text-[10px] font-bold text-gray-400 italic">
-                    Qibla: {Math.round(qibla || 0)}° ({getCardinal(qibla || 0)})
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Instructions</p>
+                  <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
+                    Hold phone <span className="text-gold">flat in your palm</span>.<br />Turn until needle aligns with top pointer.
                   </p>
                 </div>
               </div>

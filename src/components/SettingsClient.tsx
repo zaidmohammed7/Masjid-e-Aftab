@@ -42,7 +42,7 @@ export default function SettingsClient() {
     async function loadPrefs() {
       const enabled = await get("prayer_alerts_enabled");
       setPrayerAlerts(!!enabled);
-      
+
       const pKeys: PrayerKey[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
       const newIdxAlerts = { ...individualAlerts };
       for (const k of pKeys) {
@@ -143,7 +143,7 @@ export default function SettingsClient() {
           label: "Dark Mode",
           icon: theme === "dark" ? <Moon size={24} className="text-blue-400" /> : <Sun size={24} className="text-amber-500" />,
           action: (
-            <button 
+            <button
               onClick={toggleTheme}
               className={clsx(
                 "w-14 h-8 rounded-full p-1 transition-colors duration-300 flex items-center",
@@ -160,7 +160,7 @@ export default function SettingsClient() {
           icon: <Bell size={24} className="text-gold" />,
           action: (
             <div className="flex flex-col items-end gap-3">
-              <button 
+              <button
                 onClick={handleTogglePrayerAlerts}
                 className={clsx(
                   "w-14 h-8 rounded-full p-1 transition-colors duration-300 flex items-center",
@@ -182,7 +182,7 @@ export default function SettingsClient() {
           label: "Install on Phone",
           icon: <Download size={24} className="text-gold" />,
           action: (
-            <button 
+            <button
               onClick={handleInstall}
               className="bg-gold/10 text-gold dark:text-gold px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-champagne dark:border-gray-800"
             >
@@ -195,7 +195,7 @@ export default function SettingsClient() {
           label: "Share App",
           icon: <Share2 size={24} className="text-gold" />,
           action: (
-            <button 
+            <button
               onClick={async (e) => {
                 e.preventDefault();
                 const shareData = {
@@ -279,19 +279,19 @@ export default function SettingsClient() {
                       </div>
                       {item.action}
                     </div>
-                    
+
                     {/* Inline Prayer Sub-Toggles */}
                     {item.id === "prayer-alerts" && prayerAlerts && (
                       <div className="px-6 pb-6 animate-in slide-in-from-top-2 duration-300">
                         <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-3xl border border-gray-100 dark:border-gray-800 flex flex-col gap-1">
-                          <button 
+                          <button
                             onClick={() => setIsAlertsExpanded(!isAlertsExpanded)}
                             className="flex items-center justify-between w-full p-2 mb-1 text-gold dark:text-gold font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-80 transition-all border-b border-champagne dark:border-gray-800 pb-2"
                           >
                             {isAlertsExpanded ? "Hide Settings" : "Adjust Individual Alerts"}
                             <ChevronRight className={clsx("transition-transform duration-300", isAlertsExpanded ? "rotate-90" : "rotate-0")} size={14} />
                           </button>
-                          
+
                           {isAlertsExpanded && (
                             <div className="flex flex-col gap-1 animate-in fade-in slide-in-from-top-1 duration-300">
                               {[
@@ -311,7 +311,7 @@ export default function SettingsClient() {
                                       <span className="text-[10px] font-medium text-gray-400 text-left">{p.script}</span>
                                     </div>
                                   </div>
-                                  <button 
+                                  <button
                                     onClick={() => handleToggleIndividual(p.key as PrayerKey)}
                                     className={clsx(
                                       "w-10 h-5 rounded-full p-0.5 transition-colors flex items-center",
@@ -342,13 +342,13 @@ export default function SettingsClient() {
             </div>
           </div>
         ))}
-        
+
         <div className="text-center pt-8 pb-4">
           <div className="flex items-center justify-center gap-2 text-gold mb-2">
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase font-serif">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold font-serif">Masjid-e-Aftab v1.10.0</p>
+          <p className="text-gray-400 text-sm font-bold font-serif">Masjid-e-Aftab v1.10.5</p>
           <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-black uppercase tracking-widest">For a better experience</p>
         </div>
       </div>
@@ -357,7 +357,7 @@ export default function SettingsClient() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300">
           <div className="bg-white dark:bg-gray-900 w-full max-w-sm rounded-[2.5rem] p-6 sm:p-8 shadow-2xl dark:shadow-none relative animate-in zoom-in-95 border border-champagne dark:border-gold/20 overflow-y-auto max-h-[90vh] custom-scrollbar">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gold z-10" />
-            
+
             <button
               onClick={() => setIsAboutOpen(false)}
               className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-full active:scale-90 z-20"
@@ -367,46 +367,46 @@ export default function SettingsClient() {
 
             <div className="flex flex-col items-center text-center mt-2 shrink-0">
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 dark:bg-gold/20 rounded-2xl flex items-center justify-center text-gold mb-3 shadow-inner">
-                 <Info size={28} className="sm:size-32" />
+                <Info size={28} className="sm:size-32" />
               </div>
               <h3 className="text-xl sm:text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight">Masjid-e-Aftab</h3>
             </div>
 
             <div className="mt-6 space-y-4">
-               <div className="flex gap-3">
-                  <div className="bg-gold/10 dark:bg-gold/20 p-2.5 rounded-xl text-gold flex-shrink-0">
-                     <MapPin size={20} />
-                  </div>
-                  <div className="text-left">
-                     <p className="font-black text-[10px] uppercase tracking-widest text-gold mb-0.5">Location</p>
-                     <p className="font-bold text-gray-700 dark:text-gray-300 text-[13px] leading-tight">123 Mosque Street, Community City</p>
-                  </div>
-               </div>
+              <div className="flex gap-3">
+                <div className="bg-gold/10 dark:bg-gold/20 p-2.5 rounded-xl text-gold flex-shrink-0">
+                  <MapPin size={20} />
+                </div>
+                <div className="text-left">
+                  <p className="font-black text-[10px] uppercase tracking-widest text-gold mb-0.5">Location</p>
+                  <p className="font-bold text-gray-700 dark:text-gray-300 text-[13px] leading-tight">123 Mosque Street, Community City</p>
+                </div>
+              </div>
 
-               <div className="flex gap-3">
-                  <div className="bg-gold/10 dark:bg-gold/20 p-2.5 rounded-xl text-gold flex-shrink-0">
-                     <Phone size={20} />
-                  </div>
-                  <div className="text-left">
-                     <p className="font-black text-[10px] uppercase tracking-widest text-gold mb-0.5">Contact</p>
-                     <p className="font-bold text-gray-700 dark:text-gray-300 text-[13px] leading-tight">+91 999 888 7777</p>
-                  </div>
-               </div>
+              <div className="flex gap-3">
+                <div className="bg-gold/10 dark:bg-gold/20 p-2.5 rounded-xl text-gold flex-shrink-0">
+                  <Phone size={20} />
+                </div>
+                <div className="text-left">
+                  <p className="font-black text-[10px] uppercase tracking-widest text-gold mb-0.5">Contact</p>
+                  <p className="font-bold text-gray-700 dark:text-gray-300 text-[13px] leading-tight">+91 999 888 7777</p>
+                </div>
+              </div>
 
-               <div className="bg-gradient-to-br from-gold/5 to-champagne/10 dark:from-gold/20 dark:to-gold/10 p-4 rounded-[1.5rem] border border-champagne dark:border-gold/20 shadow-inner overflow-hidden">
-                  <div className="flex items-center gap-2 mb-2">
-                     <Star size={16} className="text-gold fill-gold" />
-                     <p className="font-black text-[10px] uppercase tracking-widest text-[#8E6D2F] dark:text-gold">Support Us</p>
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium text-[12px] sm:text-[13px] mb-3 leading-tight">Your contributions help us maintain the mosque.</p>
-                  <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-champagne dark:border-gold/30 shadow-sm dark:shadow-none">
-                     <p className="text-[10px] font-black uppercase text-gold mb-0.5">GPay / Paytm</p>
-                     <p className="text-base sm:text-lg font-black text-[#2d2d2d] dark:text-white tracking-tight leading-none">+91 999 888 7777</p>
-                  </div>
-               </div>
+              <div className="bg-gradient-to-br from-gold/5 to-champagne/10 dark:from-gold/20 dark:to-gold/10 p-4 rounded-[1.5rem] border border-champagne dark:border-gold/20 shadow-inner overflow-hidden">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star size={16} className="text-gold fill-gold" />
+                  <p className="font-black text-[10px] uppercase tracking-widest text-[#8E6D2F] dark:text-gold">Support Us</p>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 font-medium text-[12px] sm:text-[13px] mb-3 leading-tight">Your contributions help us maintain the mosque.</p>
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-champagne dark:border-gold/30 shadow-sm dark:shadow-none">
+                  <p className="text-[10px] font-black uppercase text-gold mb-0.5">GPay / Paytm</p>
+                  <p className="text-base sm:text-lg font-black text-[#2d2d2d] dark:text-white tracking-tight leading-none">+91 999 888 7777</p>
+                </div>
+              </div>
             </div>
 
-            <button 
+            <button
               onClick={() => setIsAboutOpen(false)}
               className="w-full mt-6 py-4 bg-[#2d2d2d] dark:bg-gold text-white rounded-xl font-black tracking-widest uppercase text-xs shadow-lg active:scale-95 transition-all"
             >
