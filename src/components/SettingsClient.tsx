@@ -348,7 +348,7 @@ export default function SettingsClient() {
             <ShieldCheck size={20} />
             <span className="font-black tracking-widest text-xs uppercase font-serif">Secure & Private</span>
           </div>
-          <p className="text-gray-400 text-sm font-bold font-serif">Masjid-e-Aftab v1.11.0</p>
+          <p className="text-gray-400 text-sm font-bold font-serif">Masjid-e-Aftab v1.11.5</p>
           <p className="text-gray-300 dark:text-gray-600 text-[10px] sm:text-xs mt-1 font-black uppercase tracking-widest">For a better experience</p>
         </div>
       </div>

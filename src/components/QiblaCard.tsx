@@ -75,11 +75,14 @@ export default function QiblaCard() {
     const handleOrientation = (e: DeviceOrientationEvent) => {
       // webkitCompassHeading is absolute North (iOS)
       // alpha is often relative or inverted on Android browsers
-      // We normalize to a standard Clockwise 0-360 heading
-      const raw = (e as any).webkitCompassHeading !== undefined 
+      // We normalize to a standard Clockwise 0-360 heading and fix 180-degree flip
+      let raw = (e as any).webkitCompassHeading !== undefined 
         ? (e as any).webkitCompassHeading 
         : (e.alpha !== null ? (360 - e.alpha) % 360 : 0);
       
+      // Fix 180-degree absolute offset
+      raw = (raw + 180) % 360;
+
       setHeading(raw);
 
       // Continuous shortest-path rotation logic
