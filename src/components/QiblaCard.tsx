@@ -109,7 +109,7 @@ export default function QiblaCard() {
           >
             <div className="flex items-center gap-4">
               <div className="p-4 bg-gold rounded-[1.2rem] text-white shadow-lg shadow-gold/20 group-hover:scale-105 transition-transform duration-500">
-                <MapPin size={24} />
+                <Compass size={24} />
               </div>
               <div className="flex-1">
                 <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase mb-1">Direction</h3>
@@ -164,40 +164,53 @@ export default function QiblaCard() {
                 {error && <p className="text-red-500 text-[10px] mt-4 font-bold">{error}</p>}
               </div>
             ) : (
-              <div className="relative flex items-center justify-center w-full py-6">
-                {/* Compass Face */}
-                <div className="relative w-64 h-64 rounded-full border-4 border-champagne/30 dark:border-white/5 flex items-center justify-center shadow-inner">
-                  {/* Compass Markers */}
-                  <div className="absolute top-2 font-black text-[10px] text-gray-300">N</div>
-                  <div className="absolute bottom-2 font-black text-[10px] text-gray-300">S</div>
-                  <div className="absolute left-2 font-black text-[10px] text-gray-300">W</div>
-                  <div className="absolute right-2 font-black text-[10px] text-gray-300">E</div>
+              <div className="relative flex flex-col items-center justify-center w-full py-6">
+                {/* Fixed Top Pointer (The 'Ahead' direction of the phone) */}
+                <div className="absolute top-0 z-20 flex flex-col items-center">
+                  <div className="w-1 h-3 bg-gold rounded-full shadow-glow shadow-gold/50 mb-1" />
+                  <p className="text-[8px] font-black text-gold uppercase tracking-[0.2em]">Top of Phone</p>
+                </div>
 
-                  {/* Fixed North Marker */}
+                {/* Compass Face */}
+                <div className="relative w-64 h-64 rounded-full border border-champagne/30 dark:border-white/5 flex items-center justify-center">
+                  
+                  {/* Subtle Background Dial Ring */}
+                  <div className="absolute inset-4 rounded-full border border-dashed border-gray-100 dark:border-gray-800/30 opacity-50" />
+
+                  {/* Rotating Elements Block (Physical Orientation Context) */}
                   <motion.div 
                     className="absolute inset-0 pointer-events-none"
                     animate={{ rotate: -heading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
                   >
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 font-black text-[12px] text-gray-300 dark:text-gray-600">N</div>
+                    {/* Directional markers for physical context */}
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">N</div>
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">S</div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">W</div>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">E</div>
+                    
+                    {/* Ring ticks for context */}
+                    {[0, 90, 180, 270].map(deg => (
+                      <div key={deg} className="absolute h-full w-[1px] bg-gray-100 dark:bg-gray-800/20 left-1/2 -translate-x-1/2" style={{ transform: `rotate(${deg}deg)` }} />
+                    ))}
                   </motion.div>
 
-                  {/* Rotating Needle Element */}
+                  {/* Rotating Needle (Points to Kaaba relative to phone top) */}
                   <motion.div 
-                    className="absolute inset-0 flex items-center justify-center"
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
                     animate={{ rotate: (qibla || 0) - heading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
                   >
-                    {/* Compass Needle - Sleek Gold Tapered Line pointing to Kaaba */}
+                    {/* The Sleek Tapered Gold Needle */}
                     <div className="absolute h-44 w-1 flex flex-col items-center">
-                       {/* Tip pointing to Kaaba */}
-                       <div className="absolute -top-1 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[8px] border-b-gold" />
-                       <div className="w-[1px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_0_15px_rgba(197,160,89,0.5)]" />
+                       {/* The Pointer Tip */}
+                       <div className="absolute -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gold" />
+                       <div className="w-[1.5px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_5px_20px_rgba(197,160,89,0.3)]" />
                     </div>
 
-                    {/* Kaaba Icon at the edge of the needle's rotation */}
+                    {/* Kaaba Marker at the tip */}
                     <div className="absolute translate-y-[-115px]">
-                      <div className="w-6 h-6 bg-[#2d2d2d] rounded-sm border-2 border-gold flex items-center justify-center shadow-lg scale-90">
+                      <div className="w-6 h-6 bg-[#2d2d2d] rounded-sm border-2 border-gold flex items-center justify-center shadow-2xl scale-90">
                          <div className="w-4 h-1 bg-gold/50 rounded-full mb-1" />
                       </div>
                     </div>
@@ -207,10 +220,10 @@ export default function QiblaCard() {
                   <div className="w-4 h-4 bg-[#2d2d2d] border-2 border-gold rounded-full z-10 shadow-xl" />
                 </div>
 
-                <div className="absolute bottom-[-40px] text-center">
-                   <p className="text-[10px] font-black text-gold uppercase tracking-[0.2em] mb-1">Heading</p>
-                   <p className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100">
-                      {Math.round(heading)}° <span className="text-gray-300 text-sm font-sans mx-1">/</span> {Math.round(qibla || 0)}°
+                <div className="mt-10 text-center bg-[#fbf9f1] dark:bg-white/5 py-4 px-6 rounded-3xl border border-champagne/20">
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Instructions</p>
+                   <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
+                      Hold phone <span className="text-gold">flat in your palm</span>.<br/>Turn until needle aligns with top pointer.
                    </p>
                 </div>
               </div>
