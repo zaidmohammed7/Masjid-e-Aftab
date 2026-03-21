@@ -4,6 +4,7 @@ import { Clock, Megaphone, MapPin, Phone, Star, BookOpen } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import NextPrayer from "@/components/NextPrayer";
+import QiblaCard from "@/components/QiblaCard";
 import InstallBanner from "@/components/InstallBanner";
 import MakkahLive from "@/components/MakkahLive";
 import { getMakkahLiveId } from "@/lib/makkah";
@@ -66,6 +67,9 @@ export default async function Home() {
         <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 delay-100 ease-out fill-mode-both">
           <NextPrayer prayerTimes={prayerTimes} />
         </div>
+
+        {/* Qibla Direction Finder Section */}
+        <QiblaCard />
 
         {/* Imaams Corner Section */}
         {prayerTimes?.hadeethText && (
