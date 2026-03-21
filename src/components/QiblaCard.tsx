@@ -6,6 +6,25 @@ import { calculateQibla } from "@/lib/qibla";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 
+const getCardinal = (angle: number) => {
+  angle = (angle + 360) % 360;
+  const directions = [
+    "North", "North-Northeast", "Northeast", "East-Northeast",
+    "East", "East-Southeast", "Southeast", "South-Southeast",
+    "South", "South-Southwest", "Southwest", "West-Southwest",
+    "West", "West-Northwest", "Northwest", "North-Northwest"
+  ];
+  const index = Math.round(angle / 22.5) % 16;
+  const primary = directions[index];
+  
+  if (angle > 0 && angle < 15) return "North, slightly East";
+  if (angle > 345 && angle < 360) return "North, slightly West";
+  if (angle > 75 && angle < 90) return "East, slightly North";
+  if (angle > 90 && angle < 105) return "East, slightly South";
+  
+  return primary;
+};
+
 export default function QiblaCard() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [qibla, setQibla] = useState<number | null>(null);
@@ -14,6 +33,10 @@ export default function QiblaCard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Continuous Rotation states
+  const [contHeading, setContHeading] = useState<number>(0);
+  const [prevHeading, setPrevHeading] = useState<number>(0);
 
   // Load last known position from localStorage
   useEffect(() => {
@@ -70,9 +93,16 @@ export default function QiblaCard() {
 
     // Handle Orientation
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      // webkitCompassHeading is available on iOS
-      const h = (e as any).webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : 0);
-      setHeading(h);
+      const raw = (e as any).webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : 0);
+      setHeading(raw);
+
+      // Continuous rotation logic for ring
+      setContHeading(prev => {
+        let delta = raw - (prev % 360);
+        if (delta > 180) delta -= 360;
+        else if (delta < -180) delta += 360;
+        return prev + delta;
+      });
     };
 
     const startOrientation = async () => {
@@ -113,17 +143,8 @@ export default function QiblaCard() {
               </div>
               <div className="flex-1">
                 <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase mb-1">Direction</h3>
-                <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none flex items-center gap-2">
+                <h2 className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none">
                   Qibla Finder
-                  {qibla && (
-                    <motion.div 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1, rotate: qibla }}
-                      className="ml-1"
-                    >
-                       <Navigation size={14} className="text-gold fill-gold" />
-                    </motion.div>
-                  )}
                 </h2>
                 {hasPermission && (
                   <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest flex items-center gap-1">
@@ -131,10 +152,6 @@ export default function QiblaCard() {
                   </p>
                 )}
               </div>
-            </div>
-            
-            <div className="bg-gold/5 dark:bg-gold/10 p-3 rounded-full text-gold">
-               <Compass size={20} />
             </div>
           </div>
         ) : (
@@ -180,7 +197,7 @@ export default function QiblaCard() {
                   {/* Rotating Elements Block (Physical Orientation Context) */}
                   <motion.div 
                     className="absolute inset-0 pointer-events-none"
-                    animate={{ rotate: -heading }}
+                    animate={{ rotate: -contHeading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
                   >
                     {/* Directional markers for physical context */}
@@ -198,7 +215,7 @@ export default function QiblaCard() {
                   {/* Rotating Needle (Points to Kaaba relative to phone top) */}
                   <motion.div 
                     className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    animate={{ rotate: (qibla || 0) - heading }}
+                    animate={{ rotate: (qibla || 0) - contHeading }}
                     transition={{ type: "spring", stiffness: 40, damping: 15 }}
                   >
                     {/* The Sleek Tapered Gold Needle */}
@@ -225,6 +242,16 @@ export default function QiblaCard() {
                    <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
                       Hold phone <span className="text-gold">flat in your palm</span>.<br/>Turn until needle aligns with top pointer.
                    </p>
+                </div>
+
+                {/* Developer Mode Debugging */}
+                <div className="mt-6 flex flex-col items-center">
+                  <div className="px-3 py-1 bg-[#2d2d2d] rounded-full text-[8px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">
+                    Developer Mode
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-400 italic">
+                    Qibla: {Math.round(qibla || 0)}° ({getCardinal(qibla || 0)})
+                  </p>
                 </div>
               </div>
             )}
