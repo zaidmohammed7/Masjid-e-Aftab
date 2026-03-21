@@ -73,9 +73,13 @@ export default function QiblaCard() {
 
     // Handle Orientation
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      // webkitCompassHeading is available on iOS (absolute North)
-      // alpha is available on Android (0 is North if absolute: true)
-      const raw = (e as any).webkitCompassHeading || (e.alpha !== null ? e.alpha : 0);
+      // webkitCompassHeading is absolute North (iOS)
+      // alpha is often relative or inverted on Android browsers
+      // We normalize to a standard Clockwise 0-360 heading
+      const raw = (e as any).webkitCompassHeading !== undefined 
+        ? (e as any).webkitCompassHeading 
+        : (e.alpha !== null ? (360 - e.alpha) % 360 : 0);
+      
       setHeading(raw);
 
       // Continuous shortest-path rotation logic
@@ -83,6 +87,15 @@ export default function QiblaCard() {
         let delta = raw - (prev % 360);
         if (delta > 180) delta -= 360;
         else if (delta < -180) delta += 360;
+        if (raw === 0 && prev % 360 > 180) delta = (360 - (prev % 360)) + raw;
+        if (raw === 360 && prev % 360 < 180) delta = raw - (prev % 360 + 360);
+        
+        // Final fallback for delta sanity
+        if (Math.abs(delta) > 180) {
+           if (delta > 0) delta -= 360;
+           else delta += 360;
+        }
+
         return prev + delta;
       });
     };
