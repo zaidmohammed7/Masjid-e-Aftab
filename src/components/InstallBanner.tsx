@@ -86,23 +86,23 @@ export default function InstallBanner() {
           {isIOS ? (
             <div className="bg-gold/5 dark:bg-gold/5 p-5 rounded-[2rem] border border-champagne/50 dark:border-gray-800">
               <p className="text-gold/60 text-[8px] font-black uppercase tracking-[0.3em] mb-4 text-center">One-time Manual Setup:</p>
-              <div className="flex flex-col gap-4 px-2">
-                <div className="flex items-center gap-4">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[11px] font-black shadow-sm">1</span>
-                  <p className="text-xs font-bold text-[#2d2d2d] dark:text-gray-300">
-                    Tap <MoreHorizontal size={16} className="inline text-gold mx-1" /> beside browser URL
+              <div className="flex flex-col gap-3 px-0">
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">1</span>
+                  <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
+                    Tap <MoreHorizontal size={14} className="inline text-gold mx-1" /> beside URL
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[11px] font-black shadow-sm">2</span>
-                  <p className="text-xs font-bold text-[#2d2d2d] dark:text-gray-300">
-                    Tap <Share size={16} className="inline text-gold mx-1" /> Share icon
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">2</span>
+                  <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
+                    Tap <Share size={14} className="inline text-gold mx-1" /> Share icon
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[11px] font-black shadow-sm">3</span>
-                  <p className="text-xs font-bold text-[#2d2d2d] dark:text-gray-300">
-                    Scroll and tap <PlusSquare size={16} className="inline text-gold mx-1" /> Add to Home Screen
+                <div className="flex items-center gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">3</span>
+                  <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300 tracking-tight">
+                    Scroll and tap <PlusSquare size={14} className="inline text-gold mx-1" /> Add to Home Screen
                   </p>
                 </div>
               </div>

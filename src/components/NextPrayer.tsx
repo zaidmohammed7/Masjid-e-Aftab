@@ -141,10 +141,10 @@ export default function NextPrayer({ prayerTimes }: { prayerTimes: any }) {
              </p>
              <p className="text-4xl font-serif font-black text-[#8E6D2F] dark:text-gold tracking-tight tabular-nums">{bestNext.time}</p>
            </div>
-           <div className="text-right bg-gold/5 dark:bg-[#1a1c1e] text-gold dark:text-gold px-5 py-3 rounded-[1.5rem] border border-champagne/50 dark:border-[var(--card-border)] shadow-sm dark:shadow-none">
-             <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">Time Left</p>
-             <p className="font-black text-2xl line-clamp-1 tabular-nums">{bestNext.timeString}</p>
-           </div>
+            <div className="text-right bg-gold/5 dark:bg-[#1a1c1e] text-gold dark:text-gold px-3 py-2 rounded-[1.2rem] border border-champagne/50 dark:border-[var(--card-border)] shadow-sm dark:shadow-none min-w-[80px]">
+              <p className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-0.5">Time Left</p>
+              <p className="font-black text-xl tabular-nums leading-none">{bestNext.timeString}</p>
+            </div>
          </div>
        ) : (
          <div className="text-center py-4 z-10">
