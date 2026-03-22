@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Mic, Image as ImageIcon, FileText, X, Send, SendHorizontal, Loader2, Trash2, Megaphone, Edit, Clock, LogOut, Lock, Video, Languages, Star, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes } from "../app/actions";
+import { publishAnnouncement, deleteAnnouncement, updateAnnouncement, savePrayerTimes, saveHadithSettings } from "../app/actions";
 import { createClient } from "@sanity/client";
 import { projectId, dataset, apiVersion } from "@/sanity/env";
 import { utcToIst } from "@/lib/time";
@@ -25,7 +25,15 @@ type Announcement = {
 };
 
 
-export default function AdminClient({ announcements, initialPrayerTimes }: { announcements: Announcement[], initialPrayerTimes: any }) {
+export default function AdminClient({ 
+  announcements, 
+  initialPrayerTimes, 
+  initialHadithSettings 
+}: { 
+  announcements: Announcement[], 
+  initialPrayerTimes: any,
+  initialHadithSettings: any
+}) {
   const [activeTab, setActiveTab] = useState<"announcements" | "prayerTimes" | "imaamsCorner">("announcements");
   const [adminLang, setAdminLang] = useState<"all" | "urdu" | "english">("all");
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
@@ -102,8 +110,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
   const [ptJummah1, setPtJummah1] = useState(formatForPicker(initialPrayerTimes?.jummah1));
   const [ptJummah2, setPtJummah2] = useState(formatForPicker(initialPrayerTimes?.jummah2));
   const [ptJummah3, setPtJummah3] = useState(formatForPicker(initialPrayerTimes?.jummah3));
-  const [ptHadeethTitle, setPtHadeethTitle] = useState(initialPrayerTimes?.hadeethTitle || "");
-  const [ptHadeethText, setPtHadeethText] = useState(initialPrayerTimes?.hadeethText || "");
   const [ptSaving, setPtSaving] = useState(false);
 
   // Sync state when initialPrayerTimes changes (after router.refresh)
@@ -117,8 +123,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       setPtJummah1(formatForPicker(initialPrayerTimes.jummah1));
       setPtJummah2(formatForPicker(initialPrayerTimes.jummah2));
       setPtJummah3(formatForPicker(initialPrayerTimes.jummah3));
-      setPtHadeethTitle(initialPrayerTimes.hadeethTitle || "");
-      setPtHadeethText(initialPrayerTimes.hadeethText || "");
     }
   }, [initialPrayerTimes]);
   const [isTestSending, setIsTestSending] = useState(false);
@@ -130,6 +134,82 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
     if (!res.ok) throw new Error("Could not fetch secure upload token");
     const data = await res.json();
     return data.token;
+  };
+
+  // Hadith Settings States
+  const [hArabic, setHArabic] = useState(initialHadithSettings?.arabicText || "");
+  const [hEnglish, setHEnglish] = useState(initialHadithSettings?.englishText || "");
+  const [hUrdu, setHUrdu] = useState(initialHadithSettings?.urduText || "");
+  const [hSource, setHSource] = useState(initialHadithSettings?.source || "");
+  const [hIndex, setHIndex] = useState(initialHadithSettings?.currentIndex || 1);
+  const [isOverride, setIsOverride] = useState(initialHadithSettings?.isManualOverride || false);
+  const [hSaving, setHSaving] = useState(false);
+  const [hLoading, setHLoading] = useState(false);
+
+  // External API selection states
+  const [books, setBooks] = useState<any[]>([
+    { bookSlug: "sahih-bukhari", bookName: "Sahih Bukhari" },
+    { bookSlug: "sahih-muslim", bookName: "Sahih Muslim" },
+    { bookSlug: "al-tirmidhi", bookName: "Al-Tirmidhi" },
+    { bookSlug: "sunan-abu-dawood", bookName: "Sunan Abu Dawood" },
+    { bookSlug: "sunan-ibn-majah", bookName: "Sunan Ibn Majah" },
+    { bookSlug: "sunan-nasai", bookName: "Sunan An-Nasa'i" }
+  ]);
+  const [selectedBook, setSelectedBook] = useState("sahih-bukhari");
+  const [isBookSelectorOpen, setIsBookSelectorOpen] = useState(false);
+
+  useEffect(() => {
+    // Fetch books from hadithapi.com
+    const fetchBooks = async () => {
+      try {
+        const res = await fetch("https://hadithapi.com/api/books?apiKey=$2y$10$YourApiKeyGoesHere"); // Placeholder
+        const data = await res.json();
+        if (data && data.books) setBooks(data.books);
+      } catch (e) {}
+    };
+    fetchBooks();
+  }, []);
+
+  const handleFetchFromAPI = async () => {
+    setHLoading(true);
+    try {
+      const res = await fetch(`/api/hadith/fetch?index=${hIndex}&book=${selectedBook}`);
+      const data = await res.json();
+      if (data && !data.error) {
+        setHArabic(data.arabic);
+        setHEnglish(data.english);
+        setHUrdu(data.urdu);
+        setHSource(data.source);
+      } else {
+        alert("No Hadith found with that number.");
+      }
+    } catch (e) {
+      alert("Error fetching from Hadith API.");
+    } finally {
+      setHLoading(false);
+    }
+  };
+
+  const handleHadithSubmit = async () => {
+    setHSaving(true);
+    const data = {
+      arabicText: hArabic,
+      englishText: hEnglish,
+      urduText: hUrdu,
+      source: hSource,
+      currentIndex: hIndex,
+      isManualOverride: true,
+      lastUpdated: new Date().toISOString(),
+    };
+    const res = await saveHadithSettings(initialHadithSettings?._id || null, data);
+    setHSaving(false);
+    if (res.success) {
+      setIsOverride(true);
+      router.refresh();
+      alert("Hadith updated!");
+    } else {
+      alert("Error: " + res.error);
+    }
   };
 
   // Direct Sanity Upload Helper
@@ -291,8 +371,6 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       jummah1: clean(ptJummah1),
       jummah2: clean(ptJummah2),
       jummah3: clean(ptJummah3),
-      hadeethTitle: ptHadeethTitle,
-      hadeethText: ptHadeethText,
     };
     const res = await savePrayerTimes(initialPrayerTimes?._id || null, data);
     setPtSaving(false);
@@ -558,42 +636,128 @@ export default function AdminClient({ announcements, initialPrayerTimes }: { ann
       {activeTab === "imaamsCorner" && (
         <div className="p-6 pt-2">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-xl border border-white dark:border-gray-800">
-            <div className="flex flex-col items-center mb-8">
+            <div className="flex flex-col items-center mb-10">
               <div className="bg-gold/10 dark:bg-gold/900/30 p-4 rounded-3xl text-gold mb-4 shadow-sm ring-1 ring-gold/20">
-                <Star size={48} />
+                <Star size={48} className="fill-gold/20" />
               </div>
               <h2 className="text-3xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight capitalize">Imaam's corner</h2>
-              <p className="text-gold/60 font-medium">Update the Hadeeth of the Day</p>
+              <p className="text-gold/60 font-medium tracking-wide">Automated Hadith System</p>
+              
+              {isOverride && (
+                <div className="mt-4 inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-1.5 rounded-full">
+                  <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                    Manual Override Active - Reset at 12 AM IST
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-6">
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Hadeeth Title</label>
-                <input
-                  value={ptHadeethTitle}
-                  onChange={e => setPtHadeethTitle(e.target.value)}
-                  placeholder="e.g. Hadeeth of the Day"
-                  className="w-full p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100 shadow-sm transition-all"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Hadeeth Text / Message</label>
-                <textarea
-                  value={ptHadeethText}
-                  onChange={e => setPtHadeethText(e.target.value)}
-                  placeholder="Type the Imaam's message or Hadeeth..."
-                  className="w-full p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100 shadow-sm transition-all min-h-[150px]"
-                  rows={6}
-                />
+            <div className="space-y-8">
+              {/* API Selection Row - Optimized for Mobile & Widescreen */}
+              <div className="flex flex-col md:flex-row gap-6 bg-gray-50/50 dark:bg-gray-950/30 p-8 rounded-[2rem] border border-gray-100 dark:border-gray-800/50">
+                <div className="flex-[2] flex flex-col gap-2 relative">
+                  <label className="font-bold text-gray-400 uppercase tracking-widest text-[9px] pl-1">Source Collection</label>
+                  <button
+                    onClick={() => setIsBookSelectorOpen(true)}
+                    className="w-full flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-2 border-champagne dark:border-gray-800 rounded-2xl font-bold transition-all text-sm shrink-0 shadow-sm"
+                  >
+                    <span className="truncate pr-4">
+                      {books.find(b => b.bookSlug === selectedBook)?.bookName || "Select Book..."}
+                    </span>
+                    <ChevronRight size={18} className="rotate-90 text-gold flex-shrink-0" />
+                  </button>
+                  
+                  {isBookSelectorOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-2 z-[70] bg-white dark:bg-gray-900 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-champagne dark:border-gray-800 max-h-40 overflow-y-auto p-2 animate-in zoom-in-95 duration-200">
+                       {books.map(b => (
+                         <button
+                           key={b.bookSlug}
+                           onClick={() => { setSelectedBook(b.bookSlug); setIsBookSelectorOpen(false); }}
+                           className={clsx(
+                             "w-full p-3 text-left rounded-xl transition-all font-bold text-sm mb-1",
+                             selectedBook === b.bookSlug ? "bg-gold text-white" : "hover:bg-gold/5 text-gray-600 dark:text-gray-300"
+                           )}
+                         >
+                           {b.bookName}
+                         </button>
+                       ))}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex-1 flex flex-col gap-2">
+                  <label className="font-bold text-gray-400 uppercase tracking-widest text-[9px] pl-1">Hadith Number</label>
+                  <div className="flex gap-4">
+                    <input
+                      type="number"
+                      value={hIndex}
+                      onChange={e => setHIndex(parseInt(e.target.value) || 1)}
+                      className="flex-1 min-w-[80px] p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl outline-none font-bold bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-center shadow-sm"
+                    />
+                    <button
+                      onClick={handleFetchFromAPI}
+                      disabled={hLoading}
+                      className="flex-[1.5] bg-[#222] dark:bg-gold text-white p-4 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                      {hLoading ? <Loader2 size={16} className="animate-spin" /> : "Auto-Fill"}
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <button
-                disabled={ptSaving}
-                onClick={handlePrayerTimesSubmit}
-                className="w-full bg-gold text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-[#8E6D2F] shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
-              >
-                {ptSaving ? <Loader2 size={32} className="animate-spin" /> : "Update Content"}
-              </button>
+              {/* Editing Area */}
+              <div className="space-y-6 pt-4">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Arabic Hadith</label>
+                  <textarea
+                    value={hArabic}
+                    onChange={e => setHArabic(e.target.value)}
+                    dir="rtl"
+                    className="w-full p-6 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold text-xl bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100 placeholder:text-gray-200"
+                    rows={4}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">English Translation</label>
+                    <textarea
+                      value={hEnglish}
+                      onChange={e => setHEnglish(e.target.value)}
+                      className="w-full p-5 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-medium text-sm italic bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100"
+                      rows={6}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">اردو ترجمہ (Urdu)</label>
+                    <textarea
+                      value={hUrdu}
+                      onChange={e => setHUrdu(e.target.value)}
+                      dir="rtl"
+                      className="w-full p-5 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold text-lg bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-100"
+                      rows={6}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">Source / Reference</label>
+                  <input
+                    value={hSource}
+                    onChange={e => setHSource(e.target.value)}
+                    className="w-full p-4 border-2 border-champagne dark:border-gray-800 rounded-2xl focus:border-gold outline-none font-bold bg-white dark:bg-gray-950 text-[#2d2d2d] dark:text-gray-400"
+                  />
+                </div>
+
+                <button
+                  disabled={hSaving}
+                  onClick={handleHadithSubmit}
+                  className="w-full bg-gold text-white p-6 rounded-[2rem] text-xl font-black flex items-center justify-center gap-4 hover:bg-[#8E6D2F] shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest"
+                >
+                  {hSaving ? <Loader2 size={32} className="animate-spin" /> : "Update"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

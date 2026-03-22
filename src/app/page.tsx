@@ -8,6 +8,7 @@ import QiblaCard from "@/components/QiblaCard";
 import InstallBanner from "@/components/InstallBanner";
 import MakkahLive from "@/components/MakkahLive";
 import { getMakkahLiveId } from "@/lib/makkah";
+import ImamCorner from "@/components/ImamCorner";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
 
@@ -15,6 +16,7 @@ export const revalidate = 60; // Cache for 60 seconds (ISR)
 
 export default async function Home() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
+  const hadithSettings = await client.fetch(`*[_id == "hadith-of-the-day"][0]`);
   const makkahLiveId = await getMakkahLiveId();
 
   return (
@@ -72,30 +74,13 @@ export default async function Home() {
         <QiblaCard />
 
         {/* Imaams Corner Section */}
-        {prayerTimes?.hadeethText && (
-          <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 delay-200 fill-mode-both">
-            <div className="relative bg-white dark:bg-[var(--card-bg)] rounded-[3rem] p-8 shadow-[0_15px_40px_-12px_rgba(197,160,89,0.15)] dark:shadow-none border border-champagne dark:border-[var(--card-border)] overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 dark:bg-gold/10 rounded-bl-[5rem] transition-transform group-hover:scale-110 duration-700" />
-
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-4 bg-gold rounded-[1.2rem] text-white shadow-lg shadow-gold/20">
-                  <Star size={24} className="fill-white" />
-                </div>
-                <div>
-                  <h3 className="text-[10px] font-black text-gold tracking-[0.3em] uppercase mb-1">Imaam's Corner</h3>
-                  <p className="text-2xl font-serif font-black text-[#2d2d2d] dark:text-gray-100 tracking-tight leading-none">
-                    {prayerTimes?.hadeethTitle || "Daily Message"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative border-l-4 border-gold/20 pl-6 ml-2">
-                <p className="text-xl font-bold text-[#2d2d2d] dark:text-gray-300 italic leading-relaxed">
-                  "{prayerTimes.hadeethText}"
-                </p>
-              </div>
-            </div>
-          </div>
+        {hadithSettings?.arabicText && (
+          <ImamCorner 
+            arabic={hadithSettings.arabicText}
+            english={hadithSettings.englishText}
+            urdu={hadithSettings.urduText}
+            source={hadithSettings.source}
+          />
         )}
 
         {/* News & Announcements Professional Card */}

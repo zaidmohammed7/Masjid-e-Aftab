@@ -28,6 +28,13 @@ export default async function AdminPage() {
   `);
 
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
+  const hadithSettings = await client.fetch(`*[_id == "hadith-of-the-day"][0]`);
 
-  return <AdminClient announcements={announcements} initialPrayerTimes={prayerTimes} />;
+  return (
+    <AdminClient 
+      announcements={announcements} 
+      initialPrayerTimes={prayerTimes} 
+      initialHadithSettings={hadithSettings} 
+    />
+  );
 }

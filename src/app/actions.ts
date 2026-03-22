@@ -214,3 +214,26 @@ export async function savePrayerTimes(id: string | null, data: any) {
     return { success: false, error: error?.message || "Failed to save prayer times" };
   }
 }
+export async function saveHadithSettings(id: string | null, data: any) {
+  const token = process.env.SANITY_API_TOKEN;
+  if (!token) throw new Error("Missing Sanity API Token.");
+
+  const client = createClient({ projectId, dataset, apiVersion, useCdn: false, token });
+
+  try {
+    // Force singleton ID for Hadith settings
+    const singletonId = "hadith-of-the-day";
+    const existing = await client.fetch(`*[_id == "${singletonId}"][0]`);
+
+    if (existing) {
+       await client.patch(singletonId).set(data).commit();
+    } else {
+       await client.create({ _id: singletonId, _type: "hadithSettings", ...data });
+    }
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error?.message || "Failed to save Hadith settings" };
+  }
+}

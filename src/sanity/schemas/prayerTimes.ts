@@ -20,16 +20,5 @@ export const prayerTimesType = defineType({
     defineField({ name: 'jummah1', title: 'Jummah 1st Jamaat', type: 'string' }),
     defineField({ name: 'jummah2', title: 'Jummah 2nd Jamaat', type: 'string' }),
     defineField({ name: 'jummah3', title: 'Jummah 3rd Jamaat', type: 'string' }),
-    defineField({
-      name: 'hadeethTitle',
-      title: 'Hadeeth of the Day Title',
-      type: 'string',
-      initialValue: 'Hadeeth of the Day',
-    }),
-    defineField({
-      name: 'hadeethText',
-      title: 'Hadeeth of the Day Text',
-      type: 'text',
-    }),
   ],
 });
