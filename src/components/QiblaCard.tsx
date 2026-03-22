@@ -13,6 +13,8 @@ export default function QiblaCard() {
   const [city, setCity] = useState<string>("Detecting Location...");
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isCompassStarted, setIsCompassStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Continuous Rotation states
@@ -68,56 +70,68 @@ export default function QiblaCard() {
     );
   };
 
+  const handleOrientation = (e: any) => {
+    let rawHeading = 0;
+
+    // 1. Check for webkitCompassHeading (iOS)
+    if (e.webkitCompassHeading !== undefined) {
+      rawHeading = e.webkitCompassHeading;
+    } 
+    // 2. Android: counter-clockwise alpha to clockwise heading
+    else if (e.alpha !== null) {
+      rawHeading = (360 - e.alpha) % 360;
+    }
+
+    setHeading(rawHeading);
+
+    // Continuous Rotation logic for smooth animation
+    setContHeading(prev => {
+      let delta = rawHeading - (prev % 360);
+      if (delta > 180) delta -= 360;
+      else if (delta < -180) delta += 360;
+      return prev + delta;
+    });
+  };
+
+  const startCompass = async () => {
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const response = await (DeviceOrientationEvent as any).requestPermission();
+        if (response === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation, true);
+          setIsCompassStarted(true);
+        } else {
+          setError("Compass permission denied. Please allow motion sensors in settings.");
+        }
+      } catch (err) {
+        setError("Error requesting compass permission.");
+      }
+    } else {
+      // Android / Standards
+      const hasAbsolute = 'ondeviceorientationabsolute' in window;
+      if (hasAbsolute) {
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      } else {
+        window.addEventListener('deviceorientation', handleOrientation, true);
+      }
+      setIsCompassStarted(true);
+    }
+  };
+
   useEffect(() => {
     if (!isExpanded) return;
 
-    // Handle Orientation
-    const handleOrientation = (e: DeviceOrientationEvent) => {
-      // webkitCompassHeading is absolute North (iOS)
-      // alpha is often relative or inverted on Android browsers
-      // We normalize to a standard Clockwise 0-360 heading and fix 180-degree flip
-      let raw = (e as any).webkitCompassHeading !== undefined 
-        ? (e as any).webkitCompassHeading 
-        : (e.alpha !== null ? (360 - e.alpha) % 360 : 0);
-      
-      // Fix 180-degree absolute offset
-      raw = (raw + 180) % 360;
+    const isIOSDevice = typeof (DeviceOrientationEvent as any).requestPermission === 'function';
+    setIsIOS(isIOSDevice);
 
-      setHeading(raw);
+    if (!isIOSDevice) {
+      startCompass();
+    }
 
-      // Continuous shortest-path rotation logic
-      setContHeading(prev => {
-        let delta = raw - (prev % 360);
-        if (delta > 180) delta -= 360;
-        else if (delta < -180) delta += 360;
-        if (raw === 0 && prev % 360 > 180) delta = (360 - (prev % 360)) + raw;
-        if (raw === 360 && prev % 360 < 180) delta = raw - (prev % 360 + 360);
-        
-        // Final fallback for delta sanity
-        if (Math.abs(delta) > 180) {
-           if (delta > 0) delta -= 360;
-           else delta += 360;
-        }
-
-        return prev + delta;
-      });
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation, true);
+      window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
     };
-
-    const startOrientation = async () => {
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        try {
-          const res = await (DeviceOrientationEvent as any).requestPermission();
-          if (res === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation);
-          }
-        } catch (e) { }
-      } else {
-        window.addEventListener('deviceorientation', handleOrientation);
-      }
-    };
-
-    startOrientation();
-    return () => window.removeEventListener('deviceorientation', handleOrientation);
   }, [isExpanded]);
 
   return (
@@ -179,68 +193,89 @@ export default function QiblaCard() {
                 {error && <p className="text-red-500 text-[10px] mt-4 font-bold">{error}</p>}
               </div>
             ) : (
-              <div className="relative flex flex-col items-center justify-center w-full py-6">
-                {/* Fixed Top Pointer (The 'Ahead' direction of the phone) */}
-                <div className="absolute top-0 z-20 flex flex-col items-center">
-                  <div className="w-1 h-3 bg-gold rounded-full shadow-glow shadow-gold/50 mb-1" />
-                  <p className="text-[8px] font-black text-gold uppercase tracking-[0.2em]">Top of Phone</p>
-                </div>
-
-                {/* Compass Face */}
-                <div className="relative w-64 h-64 rounded-full border border-champagne/30 dark:border-white/5 flex items-center justify-center">
-
-                  {/* Subtle Background Dial Ring */}
-                  <div className="absolute inset-4 rounded-full border border-dashed border-gray-100 dark:border-gray-800/30 opacity-50" />
-
-                  {/* Rotating Elements Block (Physical Orientation Context) */}
-                  <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    animate={{ rotate: -contHeading }}
-                    transition={{ type: "spring", stiffness: 40, damping: 15 }}
-                  >
-                    {/* Directional markers for physical context */}
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">N</div>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">S</div>
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">W</div>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">E</div>
-
-                    {/* Ring ticks for context */}
-                    {[0, 90, 180, 270].map(deg => (
-                      <div key={deg} className="absolute h-full w-[1px] bg-gray-100 dark:bg-gray-800/20 left-1/2 -translate-x-1/2" style={{ transform: `rotate(${deg}deg)` }} />
-                    ))}
-                  </motion.div>
-
-                  {/* Rotating Needle (Points to Kaaba relative to phone top) */}
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    animate={{ rotate: (qibla || 0) - contHeading }}
-                    transition={{ type: "spring", stiffness: 40, damping: 15 }}
-                  >
-                    {/* The Sleek Tapered Gold Needle */}
-                    <div className="absolute h-44 w-1 flex flex-col items-center">
-                      {/* The Pointer Tip */}
-                      <div className="absolute -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gold" />
-                      <div className="w-[1.5px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_5px_20px_rgba(197,160,89,0.3)]" />
+              <div className="w-full">
+                {isIOS && !isCompassStarted ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center text-gold mb-6 animate-pulse">
+                      <Navigation size={32} />
+                    </div>
+                    <p className="text-[#2d2d2d] dark:text-gray-200 font-bold mb-6 px-4 leading-relaxed">
+                      Tap below to start the compass.<br />
+                      <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Required by iOS Safari</span>
+                    </p>
+                    <button
+                      onClick={startCompass}
+                      className="bg-gold text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-gold/20 active:scale-95 transition-all"
+                    >
+                      Start Compass
+                    </button>
+                    {error && <p className="text-red-500 text-[10px] mt-4 font-bold">{error}</p>}
+                  </div>
+                ) : (
+                  <div className="relative flex flex-col items-center justify-center w-full py-6">
+                    {/* Fixed Top Pointer (The 'Ahead' direction of the phone) */}
+                    <div className="absolute top-0 z-20 flex flex-col items-center">
+                      <div className="w-1 h-3 bg-gold rounded-full shadow-glow shadow-gold/50 mb-1" />
+                      <p className="text-[8px] font-black text-gold uppercase tracking-[0.2em]">Top of Phone</p>
                     </div>
 
-                    {/* Kaaba Marker at the tip */}
-                    <div className="absolute translate-y-[-115px]">
-                      <div className="w-6 h-6 bg-[#2d2d2d] rounded-sm border-2 border-gold flex items-center justify-center shadow-2xl scale-90">
-                        <div className="w-4 h-1 bg-gold/50 rounded-full mb-1" />
-                      </div>
+                    {/* Compass Face */}
+                    <div className="relative w-64 h-64 rounded-full border border-champagne/30 dark:border-white/5 flex items-center justify-center">
+
+                      {/* Subtle Background Dial Ring */}
+                      <div className="absolute inset-4 rounded-full border border-dashed border-gray-100 dark:border-gray-800/30 opacity-50" />
+
+                      {/* Rotating Elements Block (Physical Orientation Context) */}
+                      <motion.div
+                        className="absolute inset-0 pointer-events-none"
+                        animate={{ rotate: -contHeading }}
+                        transition={{ type: "spring", stiffness: 40, damping: 15 }}
+                      >
+                        {/* Directional markers for physical context */}
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">N</div>
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">S</div>
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">W</div>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-[10px] text-gray-300 dark:text-gray-600 opacity-60">E</div>
+
+                        {/* Ring ticks for context */}
+                        {[0, 90, 180, 270].map(deg => (
+                          <div key={deg} className="absolute h-full w-[1px] bg-gray-100 dark:bg-gray-800/20 left-1/2 -translate-x-1/2" style={{ transform: `rotate(${deg}deg)` }} />
+                        ))}
+                      </motion.div>
+
+                      {/* Rotating Needle (Points to Kaaba relative to phone top) */}
+                      <motion.div
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        animate={{ rotate: (qibla || 0) - contHeading }}
+                        transition={{ type: "spring", stiffness: 40, damping: 15 }}
+                      >
+                        {/* The Sleek Tapered Gold Needle */}
+                        <div className="absolute h-44 w-1 flex flex-col items-center">
+                          {/* The Pointer Tip */}
+                          <div className="absolute -top-1 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gold" />
+                          <div className="w-[1.5px] h-full bg-gradient-to-b from-gold via-gold/50 to-transparent rounded-full shadow-[0_5px_20px_rgba(197,160,89,0.3)]" />
+                        </div>
+
+                        {/* Kaaba Marker at the tip */}
+                        <div className="absolute translate-y-[-115px]">
+                          <div className="w-6 h-6 bg-[#2d2d2d] rounded-sm border-2 border-gold flex items-center justify-center shadow-2xl scale-90">
+                            <div className="w-4 h-1 bg-gold/50 rounded-full mb-1" />
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Center Dot */}
+                      <div className="w-4 h-4 bg-[#2d2d2d] border-2 border-gold rounded-full z-10 shadow-xl" />
                     </div>
-                  </motion.div>
 
-                  {/* Center Dot */}
-                  <div className="w-4 h-4 bg-[#2d2d2d] border-2 border-gold rounded-full z-10 shadow-xl" />
-                </div>
-
-                <div className="mt-10 text-center bg-[#fbf9f1] dark:bg-white/5 py-4 px-6 rounded-3xl border border-champagne/20">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Instructions</p>
-                  <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
-                    Hold phone <span className="text-gold">flat in your palm</span>.<br />Turn until needle aligns with top pointer.
-                  </p>
-                </div>
+                    <div className="mt-10 text-center bg-[#fbf9f1] dark:bg-white/5 py-4 px-6 rounded-3xl border border-champagne/20">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Instructions</p>
+                      <p className="text-[11px] font-bold text-[#2d2d2d] dark:text-gray-300">
+                        Hold phone <span className="text-gold">flat in your palm</span>.<br />Turn until needle aligns with top pointer.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
