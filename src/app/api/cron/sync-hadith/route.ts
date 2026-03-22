@@ -5,9 +5,19 @@ import { fetchHadithByIndex } from "@/lib/hadith";
 
 function isThresholdMet(lastUpdatedIso: string): boolean {
   if (!lastUpdatedIso) return true;
-  const lastTime = new Date(lastUpdatedIso).getTime();
-  const currentTime = new Date().getTime();
-  return (currentTime - lastTime) > (5 * 60 * 1000); // 5 minutes
+  
+  // Convert IST (UTC+5:30) for day comparison
+  const now = new Date();
+  const last = new Date(lastUpdatedIso);
+  
+  const getIstDay = (date: Date) => {
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istTime = new Date(date.getTime() + istOffset);
+    return istTime.getUTCDate();
+  };
+
+  // True if the current IST day is different from the last updated IST day
+  return getIstDay(now) !== getIstDay(last);
 }
 
 export async function GET(req: NextRequest) {
