@@ -44,12 +44,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Manual override/Threshold active. Skipping." });
   }
 
-  const newIndex = (settings?.currentIndex || 0) + 1;
-  // Forced to Sahih Bukhari for automation
-  const h = await fetchHadithByIndex(newIndex, "sahih-bukhari");
+  const nextIndex = (settings?.currentIndex || 0) + 1;
+  const newIndex = nextIndex > 42 ? 1 : nextIndex; 
+  
+  // Forced to Imam Nawawi for automation
+  const h = await fetchHadithByIndex(newIndex, "nawawi");
 
   if (!h) {
-    return NextResponse.json({ error: "Failed to fetch Hadith" }, { status: 500 });
+    return NextResponse.json({ error: `Failed to fetch Hadith #${newIndex}` }, { status: 500 });
   }
 
   // Prepare document data

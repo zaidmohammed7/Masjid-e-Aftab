@@ -8,7 +8,38 @@ export interface Hadith {
 import { promises as fs } from 'fs';
 import path from 'path';
 
+async function fetchNawawiHadith(index: number): Promise<Hadith | null> {
+  try {
+    const [araRes, engRes] = await Promise.all([
+      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-nawawi.json`),
+      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nawawi.json`)
+    ]);
+
+    const araData = await araRes.json();
+    const engData = await engRes.json();
+
+    const arabic = araData.hadiths.find((h: any) => h.hadithnumber === index);
+    const english = engData.hadiths.find((h: any) => h.hadithnumber === index);
+
+    if (arabic && english) {
+      return {
+        arabic: arabic.text,
+        english: english.text,
+        urdu: "", // No Urdu translation in this repo for Nawawi
+        source: `Imam Nawawi - ${index}`,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching Nawawi Hadith:", error);
+  }
+  return null;
+}
+
 export async function fetchHadithByIndex(index: number, book: string = "sahih-bukhari"): Promise<Hadith | null> {
+  if (book === "nawawi") {
+    return fetchNawawiHadith(index);
+  }
+
   try {
     let apiKey = process.env.HADITH_API_KEY;
     

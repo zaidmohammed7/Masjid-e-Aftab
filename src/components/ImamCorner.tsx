@@ -51,12 +51,14 @@ export default function ImamCorner({ arabic, english, urdu, source }: HadithProp
                 {english}
               </p>
             </div>
-            <div className="bg-[#fbf9f1] dark:bg-gray-800/40 p-6 rounded-3xl border border-champagne/10">
-              <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-3 opacity-60">Urdu</p>
-              <p className="text-xl font-amiri text-[#2d2d2d] dark:text-[#FCFAF2] leading-relaxed text-right dir-rtl">
-                {urdu}
-              </p>
-            </div>
+            {urdu && (
+              <div className="bg-[#fbf9f1] dark:bg-gray-800/40 p-6 rounded-3xl border border-champagne/10">
+                <p className="text-[9px] font-black text-gold uppercase tracking-widest mb-3 opacity-60">Urdu</p>
+                <p className="text-xl font-amiri text-[#2d2d2d] dark:text-[#FCFAF2] leading-relaxed text-right dir-rtl">
+                  {urdu}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Source Flag */}

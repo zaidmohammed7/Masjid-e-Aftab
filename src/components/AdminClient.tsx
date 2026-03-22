@@ -148,6 +148,7 @@ export default function AdminClient({
 
   // External API selection states
   const [books, setBooks] = useState<any[]>([
+    { bookSlug: "nawawi", bookName: "Al-Arba'in al-Nawawiyyah" },
     { bookSlug: "sahih-bukhari", bookName: "Sahih Bukhari" },
     { bookSlug: "sahih-muslim", bookName: "Sahih Muslim" },
     { bookSlug: "al-tirmidhi", bookName: "Al-Tirmidhi" },
@@ -155,7 +156,7 @@ export default function AdminClient({
     { bookSlug: "sunan-ibn-majah", bookName: "Sunan Ibn Majah" },
     { bookSlug: "sunan-nasai", bookName: "Sunan An-Nasa'i" }
   ]);
-  const [selectedBook, setSelectedBook] = useState("sahih-bukhari");
+  const [selectedBook, setSelectedBook] = useState("nawawi");
   const [isBookSelectorOpen, setIsBookSelectorOpen] = useState(false);
 
   useEffect(() => {
@@ -164,7 +165,12 @@ export default function AdminClient({
       try {
         const res = await fetch("https://hadithapi.com/api/books?apiKey=$2y$10$YourApiKeyGoesHere"); // Placeholder
         const data = await res.json();
-        if (data && data.books) setBooks(data.books);
+        if (data && data.books) {
+          // Prepend our custom Nawawi collection to the API list
+          const nawawi = { bookSlug: "nawawi", bookName: "Al-Arba'in al-Nawawiyyah" };
+          const others = data.books.filter((b: any) => b.bookSlug !== "nawawi");
+          setBooks([nawawi, ...others]);
+        }
       } catch (e) {}
     };
     fetchBooks();
@@ -730,7 +736,7 @@ export default function AdminClient({
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">اردو ترجمہ (Urdu)</label>
+                    <label className="font-bold text-gray-400 uppercase tracking-widest text-[10px] pl-2">اردو ترجمہ (Urdu - Optional)</label>
                     <textarea
                       value={hUrdu}
                       onChange={e => setHUrdu(e.target.value)}
