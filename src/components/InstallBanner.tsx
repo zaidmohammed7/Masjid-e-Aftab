@@ -17,17 +17,13 @@ export default function InstallBanner() {
 
     if (isStandalone) return;
 
-    // 2. Check persistence (dismissed for 7 days)
-    const lastDismissed = localStorage.getItem("install_banner_dismissed");
-    if (lastDismissed) {
-      const dismissedDate = new Date(lastDismissed);
-      const now = new Date();
-      const diffDays = Math.ceil((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (diffDays < 7) return;
-    }
+    // 2. Check session persistence (dismissed during current session)
+    const sessionDismissed = sessionStorage.getItem("install_banner_session_dismissed");
+    if (sessionDismissed) return;
 
-    // 3. Detect iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    // 3. Detect iOS (including modern iPads)
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
     setIsIOS(isIOSDevice);
 
     // 4. Handle Android/Chrome Install Prompt
@@ -59,7 +55,7 @@ export default function InstallBanner() {
   };
 
   const handleDismiss = () => {
-    localStorage.setItem("install_banner_dismissed", new Date().toISOString());
+    sessionStorage.setItem("install_banner_session_dismissed", "true");
     setShowBanner(false);
   };
 
