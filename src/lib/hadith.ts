@@ -26,7 +26,7 @@ async function fetchNawawiHadith(index: number): Promise<Hadith | null> {
         arabic: arabic.text,
         english: english.text,
         urdu: "", // No Urdu translation in this repo for Nawawi
-        source: `Imam Nawawi - ${index}`,
+        source: `Al-Arba'in al-Nawawiyyah - ${index}`,
       };
     }
   } catch (error) {
