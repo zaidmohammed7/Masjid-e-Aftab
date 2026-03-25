@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import { Analytics } from "@vercel/analytics/react";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ClearBadge from "@/components/ClearBadge";
@@ -40,6 +41,7 @@ export default function RootLayout({
             <BottomNav />
           </div>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

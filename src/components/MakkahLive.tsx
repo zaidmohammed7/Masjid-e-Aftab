@@ -4,12 +4,19 @@ import React, { useState } from "react";
 import { Play, Tv } from "lucide-react";
 import Image from "next/image";
 
-export default function MakkahLive({ initialVideoId }: { initialVideoId?: string }) {
+/**
+ * Self-healing Makkah Live Stream.
+ * Uses YouTube's permanent channel live-embed URL so the stream
+ * automatically resolves to whatever video the channel is currently
+ * broadcasting — no scraper, no stale video IDs, no redeployments.
+ */
+const CHANNEL_EMBED_URL =
+  "https://www.youtube.com/embed/live_stream?channel=UCos52azQNBgW63_9uDJoPDA";
+
+export default function MakkahLive() {
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Official Saudi Quran TV active live ID: kYqGbBqmp8g (if prop is missing)
-  const videoId = initialVideoId || "kYqGbBqmp8g";
-  const videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0`;
+  const videoSrc = `${CHANNEL_EMBED_URL}&autoplay=1&mute=0&rel=0`;
 
   return (
     <section className="w-full max-w-md mx-auto mb-10 overflow-hidden px-1">

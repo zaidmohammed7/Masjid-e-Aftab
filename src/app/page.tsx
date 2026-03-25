@@ -7,8 +7,9 @@ import NextPrayer from "@/components/NextPrayer";
 import QiblaCard from "@/components/QiblaCard";
 import InstallBanner from "@/components/InstallBanner";
 import MakkahLive from "@/components/MakkahLive";
-import { getMakkahLiveId } from "@/lib/makkah";
 import ImamCorner from "@/components/ImamCorner";
+import { headers } from "next/headers";
+import { kv } from "@/lib/redis";
 
 const client = createClient({ projectId, dataset, apiVersion, useCdn: true });
 
@@ -17,7 +18,25 @@ export const revalidate = 60; // Cache for 60 seconds (ISR)
 export default async function Home() {
   const prayerTimes = await client.fetch(`*[_type == "prayerTimes"][0]`);
   const hadithSettings = await client.fetch(`*[_id == "hadith-of-the-day"][0]`);
-  const makkahLiveId = await getMakkahLiveId();
+
+  // ── Visitor Tracking (Upstash HyperLogLog) ──────────────────────
+  // Privacy-preserving: we hash the IP so no PII is stored.
+  try {
+    const hdrs = await headers();
+    const forwarded = hdrs.get("x-forwarded-for");
+    const ip = forwarded?.split(",")[0]?.trim() ?? "unknown";
+    // Simple hash to anonymise the IP
+    const encoder = new TextEncoder();
+    const data = encoder.encode(ip + "_masjid_salt_2026");
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const visitorId = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    await kv.pfadd("unique_visitors", visitorId);
+  } catch (e) {
+    // Non-critical — never block page render for analytics
+    console.error("Visitor tracking error:", e);
+  }
+
 
   return (
     <main className="min-h-screen pb-40 bg-transparent font-sans selection:bg-gold/30 transition-colors duration-500">
@@ -62,7 +81,7 @@ export default async function Home() {
 
         {/* Makkah Live Stream Section */}
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
-          <MakkahLive initialVideoId={makkahLiveId} />
+          <MakkahLive />
         </div>
 
         {/* Dynamic Prayer Times clock */}
